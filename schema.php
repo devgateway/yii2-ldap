@@ -11,17 +11,20 @@ trait ReadOnlyGetter
     }
 }
 
-class LdapObject
+class ObjectDefinition
 {
     protected $oid;
     protected $names;
+    protected $sup;
 
     public function __construct(
         string $oid,
-        array $names = array()
+        array $names = array(),
+        $sup = NULL
     ) {
         $this->$oid = $oid;
         $this->$names = $names;
+        $this->$sup = $sup;
     }
 
     use ReadOnlyGetter;
@@ -44,6 +47,7 @@ abstract class Syntax
 {
 }
 
+/*
 abstract class MatchingRule
 {
 }
@@ -59,6 +63,7 @@ class Ordering extends MatchingRule
 class Substring extends MatchingRule
 {
 }
+ */
 
 class AttributeDefinition
 {
@@ -76,14 +81,14 @@ class AttributeDefinition
         string $oid,
         array $names,
         string $desc,
-        bool $obsolete,
-        MatchingRule $equality,
-        MatchingRule $ordering,
-        MatchingRule $substr,
+        // MatchingRule $equality,
+        // MatchingRule $ordering,
+        // MatchingRule $substr,
         Syntax $syntax,
-        bool $singlevalue,
-        bool $collective,
-        bool $nousermod
+        bool $singlevalue = false,
+        bool $obsolete = false,
+        bool $collective = false,
+        bool $nousermod = false
     ) {
     }
 }
