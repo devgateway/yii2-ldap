@@ -1,6 +1,50 @@
 <?php
 namespace ldap;
 
+class OidArray implements \ArrayAccess
+{
+    protected $oids;
+    protected $names;
+
+    private static function validateOid($oid)
+    {
+        // OIDs start with 0, 1, or 2, and consist of dot-separated numbers
+        if (preg_match('/^[0-2](\.\d+)+$/', $oid)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->names[$offset]) || isset($this->oids[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        if (isset($this->names[$offset])) {
+            return $this->names[$offset];
+        } elseif (isset($this->oids[$offset])) {
+            return $this->oids[$offset];
+        } else {
+            return null;
+        }
+    }
+
+    public function offsetSet($offset, $value) {
+        $oid = array_shift($offset);
+        if (! $this->validateOid($oid) {
+            throw \UnexpectedValueException("Invalid OID: $oid");
+        }
+
+        $self->oids[$oid] = $value;
+        foreach ($offset as $name) {
+            $self->names[$name] = $value;
+        }
+    }
+}
+
 trait ReadOnlyGetter
 {
     public function __get($property)
