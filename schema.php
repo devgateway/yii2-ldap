@@ -5,6 +5,7 @@ class OidArray implements \ArrayAccess
 {
     protected $oids;
     protected $names;
+    protected $canonical_names;
 
     private static function validateOid($oid)
     {
@@ -18,29 +19,45 @@ class OidArray implements \ArrayAccess
 
     public function offsetExists($offset)
     {
-        return isset($this->names[$offset]) || isset($this->oids[$offset]);
+        $idx = strtolower($offset);
+        return isset($this->names[$idx]) || isset($this->oids[$idx]);
     }
 
     public function offsetGet($offset)
     {
-        if (isset($this->names[$offset])) {
-            return $this->names[$offset];
-        } elseif (isset($this->oids[$offset])) {
-            return $this->oids[$offset];
+        $idx = strtolower($offset);
+
+        // names used more often than OIDs, so try them first
+        if (isset($this->names[$idx])) {
+            return $this->names[$idx];
+        } elseif (isset($this->oids[$idx])) {
+            return $this->oids[$idx];
         } else {
             return null;
         }
     }
 
     public function offsetSet($offset, $value) {
+        // OID is the first and the only mandatory item
         $oid = array_shift($offset);
         if (! $this->validateOid($oid) {
             throw \UnexpectedValueException("Invalid OID: $oid");
         }
-
         $self->oids[$oid] = $value;
+        // canonical name defaults to OID
+        $this->canonical_names[$oid] = $oid;
+
+        $max_length = 0;
         foreach ($offset as $name) {
-            $self->names[$name] = $value;
+            $idx = strtolower($name);
+            $self->names[$idx] = $value;
+
+            // make the longest name the canonical name
+            $name_length = strlen($name);
+            if ($name_length > $max_length) {
+                $max_length = $name_length;
+                $self->canonical_names[$oid] = $name;
+            }
         }
     }
 }
