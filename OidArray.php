@@ -45,7 +45,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
     public function offsetSet($offset, $value) {
         // OID is the first and the only mandatory item
         $oid = array_shift($offset);
-        if (! $this->validateOid($oid) {
+        if (! $this->validateOid($oid)) {
             throw new \UnexpectedValueException("Invalid OID: $oid");
         }
         $self->oids[$oid] = $value;
