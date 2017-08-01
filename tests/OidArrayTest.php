@@ -31,7 +31,8 @@ class TestOidArray extends TestCase
         $this->assertEquals($last_name, $by_attr_alias);
     }
 
-    public function testOidOnly() {
+    public function testOidOnly()
+    {
         $oid = '1.2.3.4.5';
         $just_oid = array($oid);
         $oa = new OidArray();
@@ -43,7 +44,8 @@ class TestOidArray extends TestCase
     /**
      * @dataProvider oidProvider
      */
-    public function testValidation($oid_array, $oid_valid) {
+    public function testValidation($oid_array, $oid_valid)
+    {
         $oa = new OidArray();
 
         if (!$oid_valid) {
@@ -53,7 +55,8 @@ class TestOidArray extends TestCase
         $oa[$oid_array] = 42;
     }
 
-    public function oidProvider() {
+    public function oidProvider()
+    {
         return [
             'just OID'       => [['2.84.73'],                       true],
             'ends with dot'  => [['1.2.3.', 'something'],           false],
@@ -64,7 +67,8 @@ class TestOidArray extends TestCase
         ];
     }
 
-    public function testExistence() {
+    public function testExistence()
+    {
         $first_name = 'John';
         $last_name = 'Doe';
 
