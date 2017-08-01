@@ -48,14 +48,14 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         if (! $this->validateOid($oid)) {
             throw new \UnexpectedValueException("Invalid OID: $oid");
         }
-        $self->oids[$oid] = $value;
+        $this->oids[$oid] = $value;
         // canonical name defaults to OID
         $canonical_name = $oid;
         $max_length = 0;
 
         foreach ($offset as $name) {
             $idx = strtolower($name);
-            $self->names[$idx] = $value;
+            $this->names[$idx] = $value;
 
             // make the longest name the canonical name
             $name_length = strlen($name);
@@ -71,7 +71,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
     public function offsetUnset($offset) {
         // this doesn't have to be efficient, it will be rarely used
 
-        $old_value = $self->offsetGet($offset);
+        $old_value = $this->offsetGet($offset);
 
         foreach ($this->oids as $oid => $value) {
             if ($value === $old_value) {
