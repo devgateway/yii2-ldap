@@ -10,7 +10,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
     private static function validateOid($oid)
     {
         // OIDs start with 0, 1, or 2, and consist of dot-separated numbers
-        if (preg_match('/^[0-2](\.\d+)+$/', $oid)) {
+        if (preg_match('/^[0-2](\.\d+)*$/', $oid)) {
             return true;
         } else {
             return false;
