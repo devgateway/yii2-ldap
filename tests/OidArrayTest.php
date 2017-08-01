@@ -4,41 +4,19 @@ use ldap\OidArray;
 
 class TestOidArray extends TestCase
 {
-    protected $gn;
-    protected $sn;
+    protected $gn = array('2.5.4.42', 'givenName', 'gn');
+    protected $sn = array('2.5.4.4', 'surname', 'sn');
+    protected $first_name = 'John';
+    protected $last_name = 'Doe';
 
-    public function setUp()
+    /**
+     * @dataProvider personProvider
+     */
+    public function testOffsetSetGet($oa)
     {
-        $this->gn = array('2.5.4.42', 'givenName', 'gn');
-        $this->sn = array('2.5.4.4', 'surname', 'sn');
-    }
-
-    public function testOffsetSetGet()
-    {
-        $first_name = 'John';
-        $last_name = 'Doe';
-
-        $oa = new OidArray();
-        $oa[$this->gn] = $first_name;
-        $oa[$this->sn] = $last_name;
-
-        $by_oid = $oa['2.5.4.4'];
-        $by_attr_name = $oa['surname'];
-        $by_attr_alias = $oa['sn'];
-
-        $this->assertEquals($last_name, $by_oid);
-        $this->assertEquals($last_name, $by_attr_name);
-        $this->assertEquals($last_name, $by_attr_alias);
-    }
-
-    public function testOidOnly()
-    {
-        $oid = '1.2.3.4.5';
-        $just_oid = array($oid);
-        $oa = new OidArray();
-        $oa[$just_oid] = 42;
-
-        $this->assertEquals(42, $oa[$oid]);
+        $this->assertEquals($this->last_name, $oa['2.5.4.4']);
+        $this->assertEquals($this->last_name, $oa['surname']);
+        $this->assertEquals($this->last_name, $oa['sn']);
     }
 
     /**
@@ -67,15 +45,24 @@ class TestOidArray extends TestCase
         ];
     }
 
-    public function testExistence()
+    /**
+     * @dataProvider personProvider
+     */
+    public function testExistence($oa)
     {
-        $first_name = 'John';
-        $last_name = 'Doe';
-
-        $oa = new OidArray();
-        $oa[$this->gn] = $first_name;
-
         $this->assertTrue(isset($oa['GIVENNAME']));
         $this->assertFalse(isset($oa['userPassword']));
+
+        unset($oa['surname']);
+        $this->assertFalse(isset($oa['surname']));
+    }
+
+    public function personProvider()
+    {
+        $oa = new OidArray();
+        $oa[$this->gn] = $this->first_name;
+        $oa[$this->sn] = $this->last_name;
+
+        return [[$oa]];
     }
 }
