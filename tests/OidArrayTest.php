@@ -2,21 +2,27 @@
 use PHPUnit\Framework\TestCase;
 use ldap\OidArray;
 
+define('ATTR_GN_OID',   '2.5.4.42');
+define('ATTR_GN_LONG',  'givenName');
+define('ATTR_GN_SHORT', 'gn');
+
+define('ATTR_SN_OID',   '2.5.4.4');
+define('ATTR_SN_LONG',  'surname');
+define('ATTR_SN_SHORT', 'sn');
+
 class TestOidArray extends TestCase
 {
-    protected $gn = array('2.5.4.42', 'givenName', 'gn');
-    protected $sn = array('2.5.4.4', 'surname', 'sn');
-    protected $first_name = 'John';
-    protected $last_name = 'Doe';
+    protected $given_name = 'John';
+    protected $surname = 'Doe';
 
     /**
      * @dataProvider personProvider
      */
     public function testOffsetSetGet($oa)
     {
-        $this->assertEquals($this->last_name, $oa['2.5.4.4']);
-        $this->assertEquals($this->last_name, $oa['surname']);
-        $this->assertEquals($this->last_name, $oa['sn']);
+        $this->assertEquals($this->surname, $oa[ATTR_SN_OID]);
+        $this->assertEquals($this->surname, $oa[ATTR_SN_LONG]);
+        $this->assertEquals($this->surname, $oa[ATTR_SN_SHORT]);
     }
 
     /**
@@ -53,15 +59,19 @@ class TestOidArray extends TestCase
         $this->assertTrue(isset($oa['GIVENNAME']));
         $this->assertFalse(isset($oa['userPassword']));
 
-        unset($oa['surname']);
-        $this->assertFalse(isset($oa['surname']));
+        unset($oa[ATTR_SN_LONG]);
+        $this->assertFalse(isset($oa[ATTR_SN_LONG]));
     }
 
     public function personProvider()
     {
         $oa = new OidArray();
-        $oa[$this->gn] = $this->first_name;
-        $oa[$this->sn] = $this->last_name;
+
+        $given_name = array(ATTR_GN_OID, ATTR_GN_LONG, ATTR_GN_SHORT);
+        $surname =    array(ATTR_SN_OID, ATTR_SN_LONG, ATTR_SN_SHORT);
+
+        $oa[$given_name] = $this->given_name;
+        $oa[$surname] =    $this->surname;
 
         return ['person' => [$oa]];
     }
@@ -76,11 +86,11 @@ class TestOidArray extends TestCase
             $props[$key] = $val;
         }
 
-        $this->assertArrayHasKey('givenName', $props);
-        $this->assertArrayHasKey('surname', $props);
+        $this->assertArrayHasKey(ATTR_GN_LONG, $props);
+        $this->assertArrayHasKey(ATTR_SN_LONG, $props);
 
-        $this->assertEquals($this->first_name, $props['givenName']);
-        $this->assertEquals($this->last_name, $props['surname']);
+        $this->assertEquals($this->given_name, $props[ATTR_GN_LONG]);
+        $this->assertEquals($this->surname,    $props[ATTR_SN_LONG]);
     }
 }
 
