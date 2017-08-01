@@ -31,11 +31,36 @@ class TestOidArray extends TestCase
         $this->assertEquals($last_name, $by_attr_alias);
     }
 
-    public function testBadOid() {
-        $bad_oid = array('9.9.9', 'Foobar');
+    public function testOidOnly() {
+        $oid = '1.2.3.4.5';
+        $just_oid = array($oid);
+        $oa = new OidArray();
+        $oa[$just_oid] = 42;
+
+        $this->assertEquals(42, $oa[$oid]);
+    }
+
+    /**
+     * @dataProvider oidProvider
+     */
+    public function testValidation($oid_array, $oid_valid) {
         $oa = new OidArray();
 
-        $this->expectException('UnexpectedValueException');
-        $oa[$bad_oid] = 42;
+        if (!$oid_valid) {
+            $this->expectException('UnexpectedValueException');
+        }
+
+        $oa[$oid_array] = 42;
+    }
+
+    public function oidProvider() {
+        return [
+            'just OID'       => [['2.84.73'],                       true],
+            'ends with dot'  => [['1.2.3.', 'something'],           false],
+            'two names'      => [['1.2.3', 'something', 'smth'],    true],
+            '1st number'     => [['9.9.9', 'incorrect'],            false],
+            'not dotted int' => [['foo', 'bar'],                    false],
+            'ISO node'       => [['1'],                             true]
+        ];
     }
 }
