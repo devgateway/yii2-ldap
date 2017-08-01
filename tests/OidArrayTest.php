@@ -63,6 +63,24 @@ class TestOidArray extends TestCase
         $oa[$this->gn] = $this->first_name;
         $oa[$this->sn] = $this->last_name;
 
-        return [[$oa]];
+        return ['person' => [$oa]];
+    }
+
+    /**
+     * @dataProvider personProvider
+     */
+    public function testIterator($oa)
+    {
+        $props = array();
+        foreach($oa as $key => $val) {
+            $props[$key] = $val;
+        }
+
+        $this->assertArrayHasKey('givenName', $props);
+        $this->assertArrayHasKey('surname', $props);
+
+        $this->assertEquals($this->first_name, $props['givenName']);
+        $this->assertEquals($this->last_name, $props['surname']);
     }
 }
+
