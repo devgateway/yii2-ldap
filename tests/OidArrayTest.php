@@ -92,5 +92,16 @@ class TestOidArray extends TestCase
         $this->assertEquals($this->given_name, $props[ATTR_GN_LONG]);
         $this->assertEquals($this->surname,    $props[ATTR_SN_LONG]);
     }
+
+    public function testSameObject()
+    {
+        $oa = new OidArray();
+        $value = new \Exception;
+        $given_name = array(ATTR_GN_OID, ATTR_GN_LONG, ATTR_GN_SHORT);
+        $oa[$given_name] = $value;
+
+        $this->assertTrue($oa[ATTR_GN_OID] === $oa[ATTR_GN_SHORT]);
+        $this->assertTrue($oa[ATTR_GN_OID] === $oa[ATTR_GN_LONG]);
+    }
 }
 
