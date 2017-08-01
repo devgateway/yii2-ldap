@@ -1,7 +1,7 @@
 <?php
 namespace ldap;
 
-class OidArray implements \ArrayAccess
+class OidArray implements \ArrayAccess, \IteratorAggregate
 {
     protected $oids;
     protected $names;
@@ -15,6 +15,11 @@ class OidArray implements \ArrayAccess
         } else {
             return false;
         }
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->canonical_names);
     }
 
     public function offsetExists($offset)
@@ -45,9 +50,9 @@ class OidArray implements \ArrayAccess
         }
         $self->oids[$oid] = $value;
         // canonical name defaults to OID
-        $this->canonical_names[$oid] = $oid;
-
+        $canonical_name = $oid;
         $max_length = 0;
+
         foreach ($offset as $name) {
             $idx = strtolower($name);
             $self->names[$idx] = $value;
@@ -56,19 +61,29 @@ class OidArray implements \ArrayAccess
             $name_length = strlen($name);
             if ($name_length > $max_length) {
                 $max_length = $name_length;
-                $self->canonical_names[$oid] = $name;
+                $canonical_name = $name;
             }
         }
+
+        $this->canonical_names[$canonical_name] = $value;
     }
 
     public function offsetUnset($offset) {
+        // this doesn't have to be efficient, it will be rarely used
+
         $old_value = $self->offsetGet($offset);
 
         foreach ($this->oids as $oid => $value) {
             if ($value === $old_value) {
                 unset($this->oids[$oid]);
-                unset($this->canonical_names[$oid]);
                 break; // values by OID are unique
+            }
+        }
+
+        foreach ($this->canonical_names as $cname => $value) {
+            if ($value === $old_value) {
+                unset($this->canonical_names[$cname]);
+                break; // values by canonical name are unique
             }
         }
 
