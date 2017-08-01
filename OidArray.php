@@ -19,7 +19,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
 
     public function getIterator()
     {
-        return new ArrayIterator($this->canonical_names);
+        return new \ArrayIterator($this->canonical_names);
     }
 
     public function offsetExists($offset)
