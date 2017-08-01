@@ -63,4 +63,15 @@ class TestOidArray extends TestCase
             'ISO node'       => [['1'],                             true]
         ];
     }
+
+    public function testExistence() {
+        $first_name = 'John';
+        $last_name = 'Doe';
+
+        $oa = new OidArray();
+        $oa[$this->gn] = $first_name;
+
+        $this->assertTrue(isset($oa['GIVENNAME']));
+        $this->assertFalse(isset($oa['userPassword']));
+    }
 }
