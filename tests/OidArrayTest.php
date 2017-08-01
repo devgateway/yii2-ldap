@@ -15,17 +15,20 @@ class TestOidArray extends TestCase
 
     public function testOffsetSetGet()
     {
-        $expected = 'Foobar';
+        $first_name = 'John';
+        $last_name = 'Doe';
 
         $oa = new OidArray();
-        $oa[$this->gn] = $expected;
-        $by_oid = $oa['2.5.4.42'];
-        $by_attr_name = $oa['givenName'];
-        $by_attr_alias = $oa['gn'];
+        $oa[$this->gn] = $first_name;
+        $oa[$this->sn] = $last_name;
 
-        $this->assertEquals($expected, $by_oid);
-        $this->assertEquals($expected, $by_attr_name);
-        $this->assertEquals($expected, $by_attr_alias);
+        $by_oid = $oa['2.5.4.4'];
+        $by_attr_name = $oa['surname'];
+        $by_attr_alias = $oa['sn'];
+
+        $this->assertEquals($last_name, $by_oid);
+        $this->assertEquals($last_name, $by_attr_name);
+        $this->assertEquals($last_name, $by_attr_alias);
     }
 
     public function testBadOid() {
