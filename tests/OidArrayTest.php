@@ -27,4 +27,12 @@ class TestOidArray extends TestCase
         $this->assertEquals($expected, $by_attr_name);
         $this->assertEquals($expected, $by_attr_alias);
     }
+
+    public function testBadOid() {
+        $bad_oid = array('9.9.9', 'Foobar');
+        $oa = new OidArray();
+
+        $this->expectException('UnexpectedValueException');
+        $oa[$bad_oid] = 42;
+    }
 }
