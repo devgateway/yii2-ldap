@@ -13,9 +13,18 @@ class TestOidArray extends TestCase
         $this->sn = array('2.5.4.4', 'surname', 'sn');
     }
 
-    public function testCreate()
+    public function testOffsetSetGet()
     {
+        $expected = 'Foobar';
+
         $oa = new OidArray();
-        $this->assertInstanceOf('ldap\\OidArray', $oa);
+        $oa[$this->gn] = $expected;
+        $by_oid = $oa['2.5.4.42'];
+        $by_attr_name = $oa['givenName'];
+        $by_attr_alias = $oa['gn'];
+
+        $this->assertEquals($expected, $by_oid);
+        $this->assertEquals($expected, $by_attr_name);
+        $this->assertEquals($expected, $by_attr_alias);
     }
 }
