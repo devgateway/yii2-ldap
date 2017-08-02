@@ -19,14 +19,14 @@ class LdapServer
     {
         require('settings.php');
         $this->base = $base;
-        $this->conn = ldap_connect($host, $port);
-        $this->filter = sprintf($filter, $user);
+        $safeUser = self::escapeFilter($user);
+        $this->filter = sprintf($filter, $safeUser);
 
+        $this->conn = ldap_connect($host, $port);
         if (!$this->conn) throw new LdapServerError();
 
         $result = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
         if (!$result) throw new LdapServerError();
-
 
         # search ldap tree for the user's DN
         $this->dn = $this->fetchDN($this->filter);
@@ -60,5 +60,21 @@ class LdapServer
         if (!$dn) throw new LdapServerError();
 
         return $dn;
+    }
+
+    # escapes dangerous characters from the input string
+    private static function escapeFilter($string) {
+        if (function_exists('ldap_escape')) {
+            return ldap_escape($string, '', LDAP_ESCAPE_FILTER);
+        } else {
+            $map = array(
+                '\\' => '\\5c', # gotta be first, see str_replace info
+                '*' => '\\2a',
+                '(' => '\\28',
+                ')' => '\\29',
+                "\0" => '\\00'
+            );
+            return str_replace(array_keys($map), $map, $string);
+        }
     }
 }
