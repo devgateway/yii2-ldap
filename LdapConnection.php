@@ -34,13 +34,15 @@ class LdapConnection
         ldap_unbind($this->conn);
     }
 
-    protected function fetchOneDN($filter)
+    protected function fetchOneDN($filter, $base=null)
     {
+        $base = $base ? $base : $this->base; # default to self
+
         # bind anonymously first and search for the RDN
         $result = ldap_bind($this->conn);
         if (!$result) throw new LdapConnectionError();
 
-        $result = ldap_search($this->conn, $this->base, $filter,
+        $result = ldap_search($this->conn, $base, $filter,
         array("dn"), 1, 1, 0, LDAP_DEREF_ALWAYS);
         if (!$result) throw new LdapConnectionError();
 
@@ -56,7 +58,8 @@ class LdapConnection
     }
 
     # escapes dangerous characters from the input string
-    public static function escapeFilter($string) {
+    public static function escapeFilter($string)
+    {
         if (function_exists('ldap_escape')) {
             return ldap_escape($string, '', LDAP_ESCAPE_FILTER);
         } else {
@@ -69,5 +72,17 @@ class LdapConnection
             );
             return str_replace(array_keys($map), $map, $string);
         }
+    }
+
+    protected function search($filter, $base = null, $attrs = null) {
+        $base = $base ? $base : $this->base; # default to self
+
+        $result = ldap_search($this->conn, $base, $filter);
+        if (!$result) throw new LDAPAuthError();
+
+        $first = ldap_first_entry($this->conn, $result);
+
+        #TODO: change to return a LdapSearchResult
+	return $first;
     }
 }

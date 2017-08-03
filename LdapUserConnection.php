@@ -20,5 +20,10 @@ class LdapUserConnection extends LdapConnection
         $result = ldap_bind($this->conn, $this->dn, $pass);
         if (!$result) throw new LdapAuthError();
     }
+
+    public function search($attr = null)
+    {
+        parent::search($this->filter, $this->dn);
+    }
 }
 
