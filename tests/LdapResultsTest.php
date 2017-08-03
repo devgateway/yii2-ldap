@@ -1,14 +1,17 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use devgateway\ldap\OidArray;
+use devgateway\ldap\LdapResults;
 
 class TestLdapResults extends TestCase
 {
     protected $conn;
+    protected $base;
 
     public function setUp()
     {
         require('settings.php');
+
+        $this->base = $base;
 
         $this->conn = ldap_connect($host, $port);
         if ($this->conn === false) {
@@ -28,6 +31,23 @@ class TestLdapResults extends TestCase
 
     public function testIterator()
     {
+        $filter = '(objectClass=*)';
+        $handle = @ldap_search($this->conn, $this->base, $filter, array(), 0, 1);
+        if ($handle === false) {
+            throw new \Exception('Search failed');
+        }
+        $search_results = new LdapResults($this->conn, $handle);
+
+        $this->assertInstanceOf('devgateway\\ldap\\LdapResults', $search_results);
+
+        $i = 0;
+        foreach($search_results as $key => $value) {
+            $this->assertNotEquals('', $key);
+            $this->assertArrayHasKey('count', $value);
+            $i++;
+        }
+
+        $this->assertNotEquals(0, $i);
     }
 
     public function tearDown()
