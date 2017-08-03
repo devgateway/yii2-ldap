@@ -1,38 +1,31 @@
 <?php
 namespace ldap;
 
-class LdapServerError extends \Exception
+class LdapConnectionError extends \Exception
 {
 }
 
 class LdapAuthError extends \Exception
 {
 }
-class LdapServer
-{
-    private $base;
-    private $conn;
-    private $filter;
-    private $dn;
 
-    public function __construct($user, $pass)
+class LdapConnection
+{
+    protected $base;
+    protected $conn;
+
+    public function __construct()
     {
         require('settings.php');
         $this->base = $base;
-        $safeUser = self::escapeFilter($user);
-        $this->filter = sprintf($filter, $safeUser);
-
         $this->conn = ldap_connect($host, $port);
-        if (!$this->conn) throw new LdapServerError();
+        if (!$this->conn) throw new LdapConnectionError();
 
         $result = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
-        if (!$result) throw new LdapServerError();
+        if (!$result) throw new LdapConnectionError();
 
-        # search ldap tree for the user's DN
-        $this->dn = $this->fetchDN($this->filter);
-
-        # re-bind with the DN found
-        $result = ldap_bind($this->conn, $this->dn, $pass);
+        # bind anonymously
+        $result = ldap_bind($this->conn);
         if (!$result) throw new LdapAuthError();
     }
 
@@ -41,29 +34,29 @@ class LdapServer
         ldap_unbind($this->conn);
     }
 
-    private function fetchDN($filter)
+    protected function fetchOneDN($filter)
     {
         # bind anonymously first and search for the RDN
         $result = ldap_bind($this->conn);
-        if (!$result) throw new LdapServerError();
+        if (!$result) throw new LdapConnectionError();
 
-        $result = ldap_search($this->conn, $this->base, $this->filter,
+        $result = ldap_search($this->conn, $this->base, $filter,
         array("dn"), 1, 1, 0, LDAP_DEREF_ALWAYS);
-        if (!$result) throw new LdapServerError();
+        if (!$result) throw new LdapConnectionError();
 
         # get first entry from the search result
         $first = ldap_first_entry($this->conn, $result);
-        if (!$first) throw new LdapServerError();
+        if (!$first) throw new LdapConnectionError();
 
         # extract dn from the first entry in the result
         $dn = ldap_get_dn($this->conn, $first);
-        if (!$dn) throw new LdapServerError();
+        if (!$dn) throw new LdapConnectionError();
 
         return $dn;
     }
 
     # escapes dangerous characters from the input string
-    private static function escapeFilter($string) {
+    public static function escapeFilter($string) {
         if (function_exists('ldap_escape')) {
             return ldap_escape($string, '', LDAP_ESCAPE_FILTER);
         } else {
