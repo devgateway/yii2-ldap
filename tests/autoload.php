@@ -2,7 +2,7 @@
 spl_autoload_register(function ($full_name) {
     $components = explode('\\', $full_name);
     $namespace = reset($components);
-    if ($namespace != 'ldap') {
+    if ($namespace != 'devgateway') {
         return;
     }
     $class_name = end($components);

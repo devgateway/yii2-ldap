@@ -1,5 +1,5 @@
 <?php
-namespace ldap;
+namespace devgateway\ldap;
 
 class OidArray implements \ArrayAccess, \IteratorAggregate
 {
