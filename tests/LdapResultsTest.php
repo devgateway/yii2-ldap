@@ -32,13 +32,17 @@ class TestLdapResults extends TestCase
     public function testIterator()
     {
         $filter = '(objectClass=*)';
-        $handle = @ldap_search($this->conn, $this->base, $filter, array(), 0, 1);
+				$limit = 1;
+
+        $handle = @ldap_search($this->conn, $this->base, $filter, array(), 0, $limit);
         if ($handle === false) {
             throw new \Exception('Search failed');
         }
+
         $search_results = new LdapResults($this->conn, $handle);
 
         $this->assertInstanceOf('devgateway\\ldap\\LdapResults', $search_results);
+        $this->assertEquals($limit, $search_results->count());
 
         $i = 0;
         foreach($search_results as $key => $value) {
@@ -47,7 +51,7 @@ class TestLdapResults extends TestCase
             $i++;
         }
 
-        $this->assertNotEquals(0, $i);
+        $this->assertEquals($limit, $i);
     }
 
     public function tearDown()
