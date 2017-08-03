@@ -11,13 +11,10 @@ class LdapAuthError extends \Exception
 
 class LdapConnection
 {
-    protected $base;
     protected $conn;
 
-    public function __construct()
+    public function __construct($host, $port = null)
     {
-        require('settings.php');
-        $this->base = $base;
         $this->conn = ldap_connect($host, $port);
         if (!$this->conn) throw new LdapConnectionError();
 
@@ -34,10 +31,8 @@ class LdapConnection
         ldap_unbind($this->conn);
     }
 
-    protected function fetchOneDN($filter, $base=null)
+    protected function fetchOneDN($base, $filter)
     {
-        $base = $base ? $base : $this->base; # default to self
-
         # bind anonymously first and search for the RDN
         $result = ldap_bind($this->conn);
         if (!$result) throw new LdapConnectionError();
@@ -74,13 +69,10 @@ class LdapConnection
         }
     }
 
-    protected function search($filter, $base = null, $attrs = null) {
-        $base = $base ? $base : $this->base; # default to self
-
+    public function search($base, $filter, $attrs = null)
+    {
         $result = ldap_search($this->conn, $base, $filter);
         if (!$result) throw new LDAPAuthError();
-
-        $first = ldap_first_entry($this->conn, $result);
 
         #TODO: change to return a LdapSearchResult
 	return $first;
