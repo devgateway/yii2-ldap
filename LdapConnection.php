@@ -1,6 +1,8 @@
 <?php
 namespace devgateway\ldap;
 
+use devgateway\ldap\LdapResults;
+
 class LdapConnectionError extends \Exception
 {
 }
@@ -74,7 +76,6 @@ class LdapConnection
         $result = ldap_search($this->conn, $base, $filter);
         if (!$result) throw new LDAPAuthError();
 
-        #TODO: change to return a LdapSearchResult
-	return $first;
+        return new LdapResults($this->conn, $result);
     }
 }
