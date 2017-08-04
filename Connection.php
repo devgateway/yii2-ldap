@@ -83,22 +83,9 @@ class Connection
         int $timelimit = 0,
         int $deref = LDAP_DEREF_NEVER
     ) {
-        // validate search scope
-        if (array_key_exists($scope, self::functions)) {
-            $function = self::functions[$scope];
-        } else {
-            $valid_scopes = implode(', ', array_keys(self::functions));
-            $message = "Scope must be one of: $valid_scopes, not $scope";
-            throw new \OutOfRangeException($message);
-        }
-
-        // send pagination control
-        if ($this->page_size) {
-        }
-
-        // call appropriate search function
-        $result = @$function(
+        return new PagedResults(
             $this->conn,
+            $scope,
             $base,
             $filter,
             $attrs,
@@ -106,11 +93,6 @@ class Connection
             $timelimit,
             $deref
         );
-        if (!$result) {
-            throw new LdapException();
-        }
-
-        return new PagedResults($this->conn, $result);
     }
 }
 
