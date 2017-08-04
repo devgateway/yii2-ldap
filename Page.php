@@ -47,10 +47,5 @@ class Page implements \Iterator
 
         return $n;
     }
-
-    public function __destruct()
-    {
-        ldap_free_result($this->result_id);
-    }
 }
 

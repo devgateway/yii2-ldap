@@ -10,20 +10,13 @@ class Connection
     constant SUBTREE = 2;
 
     protected $conn;
-    protected $page_size;
-    protected $page_critical;
 
     public function __construct(
         string $host,
         int $port = 389,
         $bind_dn = null,
-        $bind_pw = null,
-        int $page_size = 500,
-        bool $page_critical = false
+        $bind_pw = null
     ) {
-        $this->page_size = $page_size;
-        $this->page_critical = $page_critical;
-
         $this->bind($host, $port, $bind_dn, $bind_pw, $page_size, $page_critical);
     }
 
@@ -31,9 +24,7 @@ class Connection
         string $host,
         int $port = 389,
         $bind_dn = null,
-        $bind_pw = null,
-        int $page_size = 500,
-        bool $page_critical = false
+        $bind_pw = null
     ) {
         $this->conn = ldap_connect($host, $port);
         if (!$this->conn) {
@@ -81,7 +72,9 @@ class Connection
         array $attrs = [],
         int $sizelimit = 0,
         int $timelimit = 0,
-        int $deref = LDAP_DEREF_NEVER
+        int $deref = LDAP_DEREF_NEVER,
+        int $page_size = 500,
+        bool $page_critical = false
     ) {
         return new PagedResults(
             $this->conn,
@@ -91,7 +84,9 @@ class Connection
             $attrs,
             $sizelimit,
             $timelimit,
-            $deref
+            $deref,
+            $page_size,
+            $page_critical
         );
     }
 }
