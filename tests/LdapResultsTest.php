@@ -32,7 +32,7 @@ class TestLdapResults extends TestCase
     public function testIterator()
     {
         $filter = '(objectClass=*)';
-				$limit = 1;
+        $limit = 1;
 
         $handle = @ldap_search($this->conn, $this->base, $filter, array(), 0, $limit);
         if ($handle === false) {

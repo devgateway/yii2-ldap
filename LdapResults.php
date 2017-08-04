@@ -38,15 +38,15 @@ class LdapResults implements \Iterator
         return $this->current_entry !== false;
     }
 
-		public function count()
-		{
-			$n = ldap_count_entries($this->link_id, $this->result_id);
-			if ($n === false) {
-				throw new \RuntimeException('Can\'t count LDAP entries');
-			}
+    public function count()
+    {
+        $n = ldap_count_entries($this->link_id, $this->result_id);
+        if ($n === false) {
+            throw new \RuntimeException('Can\'t count LDAP entries');
+        }
 
-			return $n;
-		}
+        return $n;
+    }
 
     public function __destruct()
     {
