@@ -11,10 +11,6 @@ class LdapAuthError extends \Exception
 {
 }
 
-class LdapSearchScopeError extends \Exception
-{
-}
-
 class LdapConnection
 {
     protected $conn;
@@ -75,21 +71,25 @@ class LdapConnection
         }
     }
 
-    public function search($base, $filter, $scope, $attrs = null)
+    public function search($base, $filter, $attrs = null)
     {
-        if ($scope === 'LDAP_SCOPE_SUBTREE') {
-            $result = ldap_search($this->conn, $base, $filter);
-            if (!$result) throw new LdapAuthError();
-        } elseif ($scope === 'LDAP_SCOPE_ONELEVEL') {
-            $result = ldap_list($this->conn, $base, $filter);
-            if (!$result) throw new LdapAuthError();
-        } elseif ($scope === 'LDAP_SCOPE_BASE') {
-            $result = ldap_read($this->conn, $base, $filter);
-            if (!$result) throw new LdapAuthError();
-        } else {
-            throw new LdapSearchScopeError();
-        }
-
+        $result = ldap_search($this->conn, $base, $filter);
+        if (!$result) throw new LdapAuthError();
         return new LdapResults($this->conn, $result);
     }
+
+    public function read($base, $filter, $attrs = null)
+    {
+        $result = ldap_read($this->conn, $base, $filter);
+        if (!$result) throw new LdapAuthError();
+        return new LdapResults($this->conn, $result);
+    }
+
+    public function list($base, $filter, $attrs = null)
+    {
+        $result = ldap_list($this->conn, $base, $filter);
+        if (!$result) throw new LdapAuthError();
+        return new LdapResults($this->conn, $result);
+    }
+
 }
