@@ -13,10 +13,6 @@ class LdapException extends \RuntimeException
     }
 }
 
-class LdapAuthError extends \Exception
-{
-}
-
 class LdapSearchScopeError extends \Exception
 {
 }
@@ -28,14 +24,20 @@ class LdapConnection
     public function __construct($host, $port = null)
     {
         $this->conn = ldap_connect($host, $port);
-        if (!$this->conn) throw new LdapConnectionError();
+        if (!$this->conn) {
+            throw new \RuntimeException("LDAP settings invalid");
+        }
 
         $result = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
-        if (!$result) throw new LdapConnectionError();
+        if (!$result) {
+            throw new LdapException($this->conn);
+        }
 
         # bind anonymously
         $result = ldap_bind($this->conn);
-        if (!$result) throw new LdapAuthError();
+        if (!$result) {
+            throw new LdapException($this->conn);
+        }
     }
 
     public function __destruct()
@@ -85,13 +87,13 @@ class LdapConnection
     {
         if ($scope === 'LDAP_SCOPE_SUBTREE') {
             $result = ldap_search($this->conn, $base, $filter);
-            if (!$result) throw new LdapAuthError();
+            if (!$result) throw new LdapException($this->conn);
         } elseif ($scope === 'LDAP_SCOPE_ONELEVEL') {
             $result = ldap_list($this->conn, $base, $filter);
-            if (!$result) throw new LdapAuthError();
+            if (!$result) throw new LdapException($this->conn);
         } elseif ($scope === 'LDAP_SCOPE_BASE') {
             $result = ldap_read($this->conn, $base, $filter);
-            if (!$result) throw new LdapAuthError();
+            if (!$result) throw new LdapException($this->conn);
         } else {
             throw new LdapSearchScopeError();
         }
