@@ -25,17 +25,27 @@ class LdapResults implements \Iterator
 
     public function next()
     {
-        $this->current_entry = ldap_next_entry($this->link_id, $this->result_id);
+        $this->current_entry = @ldap_next_entry($this->link_id, $this->result_id);
     }
 
     public function rewind()
     {
-        $this->current_entry = ldap_first_entry($this->link_id, $this->result_id);
+        $this->current_entry = @ldap_first_entry($this->link_id, $this->result_id);
     }
 
     public function valid()
     {
         return $this->current_entry !== false;
+    }
+
+    public function count()
+    {
+        $n = ldap_count_entries($this->link_id, $this->result_id);
+        if ($n === false) {
+            throw new \RuntimeException('Can\'t count LDAP entries');
+        }
+
+        return $n;
     }
 
     public function __destruct()
