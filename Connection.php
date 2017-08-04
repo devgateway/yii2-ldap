@@ -91,12 +91,12 @@ class Connection
 
     private function search(
         $scope,
-        $base,
-        $filter,
-        $attrs = null,
-        $sizelimit = 0,
-        $timelimit = 0,
-        $deref = 0
+        string $base,
+        string $filter,
+        array $attrs = [],
+        int $sizelimit = 0,
+        int $timelimit = 0,
+        int $deref = LDAP_DEREF_NEVER
     ) {
         if (array_key_exists($scope, self::functions)) {
             $function = self::functions[$scope];
