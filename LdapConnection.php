@@ -50,27 +50,6 @@ class LdapConnection
         ldap_unbind($this->conn);
     }
 
-    protected function fetchOneDN($base, $filter)
-    {
-        # bind anonymously first and search for the RDN
-        $result = ldap_bind($this->conn);
-        if (!$result) throw new LdapConnectionError();
-
-        $result = ldap_search($this->conn, $base, $filter,
-        array("dn"), 1, 1, 0, LDAP_DEREF_ALWAYS);
-        if (!$result) throw new LdapConnectionError();
-
-        # get first entry from the search result
-        $first = ldap_first_entry($this->conn, $result);
-        if (!$first) throw new LdapConnectionError();
-
-        # extract dn from the first entry in the result
-        $dn = ldap_get_dn($this->conn, $first);
-        if (!$dn) throw new LdapConnectionError();
-
-        return $dn;
-    }
-
     # escapes dangerous characters from the input string
     public static function escapeFilter($string)
     {
