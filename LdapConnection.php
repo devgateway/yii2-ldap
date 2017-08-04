@@ -3,55 +3,47 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\LdapResults;
 
-class LdapConnectionError extends \Exception
+class LdapException extends \RuntimeException
 {
-}
-
-class LdapAuthError extends \Exception
-{
+    public function __construct($connection)
+    {
+        $code = @ldap_errno($connection);
+        $message = @ldap_err2str($code);
+        parent::__construct($message, $code);
+    }
 }
 
 class LdapConnection
 {
     protected $conn;
 
-    public function __construct($host, $port = null)
+    public function __construct($host, $port = null, $bind_dn = null, $bind_pw = null)
+    {
+        $this->bind($host, $port, $bind_dn, $bind_pw);
+    }
+
+    public function bind($host, $port = null, $bind_dn = null, $bind_pw = null)
     {
         $this->conn = ldap_connect($host, $port);
-        if (!$this->conn) throw new LdapConnectionError();
+        if (!$this->conn) {
+            throw new \RuntimeException("LDAP settings invalid");
+        }
 
         $result = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
-        if (!$result) throw new LdapConnectionError();
+        if (!$result) {
+            throw new LdapException($this->conn);
+        }
 
         # bind anonymously
         $result = ldap_bind($this->conn);
-        if (!$result) throw new LdapAuthError();
+        if (!$result) {
+            throw new LdapException($this->conn);
+        }
     }
 
     public function __destruct()
     {
         ldap_unbind($this->conn);
-    }
-
-    protected function fetchOneDN($base, $filter)
-    {
-        # bind anonymously first and search for the RDN
-        $result = ldap_bind($this->conn);
-        if (!$result) throw new LdapConnectionError();
-
-        $result = ldap_search($this->conn, $base, $filter,
-        array("dn"), 1, 1, 0, LDAP_DEREF_ALWAYS);
-        if (!$result) throw new LdapConnectionError();
-
-        # get first entry from the search result
-        $first = ldap_first_entry($this->conn, $result);
-        if (!$first) throw new LdapConnectionError();
-
-        # extract dn from the first entry in the result
-        $dn = ldap_get_dn($this->conn, $first);
-        if (!$dn) throw new LdapConnectionError();
-
-        return $dn;
     }
 
     # escapes dangerous characters from the input string
