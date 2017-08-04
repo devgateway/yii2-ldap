@@ -1,7 +1,7 @@
 <?php
 namespace devgateway\ldap;
 
-class LdapResults implements \Iterator
+class Results implements \Iterator
 {
     protected $current_entry = false;
     protected $link_id;

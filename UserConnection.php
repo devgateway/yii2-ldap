@@ -1,7 +1,7 @@
 <?php
 namespace devgateway\ldap;
 
-class LdapUserConnection extends LdapConnection
+class UserConnection extends Connection
 {
     private $base;
     private $filter;
@@ -19,7 +19,7 @@ class LdapUserConnection extends LdapConnection
 
         # re-bind with the DN found
         $result = ldap_bind($this->conn, $this->dn, $pass);
-        if (!$result) throw new LdapAuthError();
+        if (!$result) throw new AuthError();
     }
 }
 

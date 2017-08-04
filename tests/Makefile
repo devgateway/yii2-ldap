@@ -3,5 +3,5 @@
 test: OidArrayTest.php
 	phpunit --bootstrap autoload.php $^
 
-connection: LdapConnectionTest.php
+connection: ConnectionTest.php
 	phpunit --bootstrap autoload.php $^

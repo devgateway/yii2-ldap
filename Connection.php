@@ -1,7 +1,7 @@
 <?php
 namespace devgateway\ldap;
 
-use devgateway\ldap\LdapResults;
+use devgateway\ldap\Results;
 
 class LdapException extends \RuntimeException
 {
@@ -13,7 +13,7 @@ class LdapException extends \RuntimeException
     }
 }
 
-class LdapConnection
+class Connection
 {
     protected $conn;
 
@@ -66,22 +66,22 @@ class LdapConnection
     public function search($base, $filter, $attrs = null, $sizelimit = 0, $timelimit = 0, $deref = 0 )
     {
         $result = @ldap_search($this->conn, $base, $filter, $attrs, $sizelimit, $timelimit, $deref);
-        if (!$result) throw new LdapAuthError();
-        return new LdapResults($this->conn, $result);
+        if (!$result) throw new AuthError();
+        return new Results($this->conn, $result);
     }
 
     public function read($base, $filter, $attrs = null, $sizelimit = 0, $timelimit = 0, $deref = 0)
     {
         $result = @ldap_read($this->conn, $base, $filter, $attrs, $sizelimit, $timelimit, $deref);
-        if (!$result) throw new LdapAuthError();
-        return new LdapResults($this->conn, $result);
+        if (!$result) throw new AuthError();
+        return new Results($this->conn, $result);
     }
 
     public function list($base, $filter, $attrs = null, $sizelimit = 0, $timelimit = 0, $deref = 0)
     {
         $result = @ldap_list($this->conn, $base, $filter, $attrs, $sizelimit, $timelimit, $deref);
-        if (!$result) throw new LdapAuthError();
-        return new LdapResults($this->conn, $result);
+        if (!$result) throw new AuthError();
+        return new Results($this->conn, $result);
     }
 
 }

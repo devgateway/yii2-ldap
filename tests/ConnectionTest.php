@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use devgateway\ldap\LdapResults;
-use devgateway\ldap\LdapConnection;
+use devgateway\ldap\Results;
+use devgateway\ldap\Connection;
 
 class TestLdapResults extends TestCase
 {
@@ -13,7 +13,7 @@ class TestLdapResults extends TestCase
         require('settings.php');
 
         $this->base = $base;
-        $this->conn = new LdapConnection($host, $port, $bind_dn, $bind_pw);
+        $this->conn = new Connection($host, $port, $bind_dn, $bind_pw);
     }
 
     /**
@@ -21,7 +21,7 @@ class TestLdapResults extends TestCase
      */
     public function testEscape($unescaped, $escaped)
     {
-        $result = LdapConnection::escapeFilter($unescaped);
+        $result = Connection::escapeFilter($unescaped);
         $this->assertEquals($escaped, $result);
     }
 
@@ -30,14 +30,14 @@ class TestLdapResults extends TestCase
      */
     public function testSearchScopes($method)
     {
-        $this->assertInstanceOf('devgateway\\ldap\\LdapConnection', $this->conn);
+        $this->assertInstanceOf('devgateway\\ldap\\Connection', $this->conn);
 
         $filter = '(objectClass=*)';
         $limit = 1;
 
         $search_results = $this->conn->$method($this->base, $filter, array(), 0, $limit);
 
-        $this->assertInstanceOf('devgateway\\ldap\\LdapResults', $search_results);
+        $this->assertInstanceOf('devgateway\\ldap\\Results', $search_results);
         $this->assertEquals($limit, $search_results->count());
 
         $i = 0;
