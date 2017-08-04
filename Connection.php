@@ -1,7 +1,7 @@
 <?php
 namespace devgateway\ldap;
 
-use devgateway\ldap\Results;
+use devgateway\ldap\PagedResults;
 
 class Connection
 {
@@ -12,11 +12,6 @@ class Connection
     protected $conn;
     protected $page_size;
     protected $page_critical;
-    protected static $functions = [
-        BASE =>     'ldap_read',
-        ONELEVEL => 'ldap_list',
-        SUBTREE =>  'ldap_search'
-    ];
 
     public function __construct(
         string $host,
@@ -79,7 +74,7 @@ class Connection
         }
     }
 
-    private function search(
+    public function search(
         $scope,
         string $base,
         string $filter,
@@ -88,6 +83,7 @@ class Connection
         int $timelimit = 0,
         int $deref = LDAP_DEREF_NEVER
     ) {
+        // validate search scope
         if (array_key_exists($scope, self::functions)) {
             $function = self::functions[$scope];
         } else {
@@ -96,6 +92,11 @@ class Connection
             throw new \OutOfRangeException($message);
         }
 
+        // send pagination control
+        if ($this->page_size) {
+        }
+
+        // call appropriate search function
         $result = @$function(
             $this->conn,
             $base,
@@ -109,7 +110,7 @@ class Connection
             throw new LdapException();
         }
 
-        return new Results($this->conn, $result);
+        return new PagedResults($this->conn, $result);
     }
 }
 
