@@ -21,7 +21,12 @@ class LdapConnection
 {
     protected $conn;
 
-    public function __construct($host, $port = null)
+    public function __construct($host, $port = null, $bind_dn = null, $bind_pw = null)
+    {
+        $this->bind($host, $port, $bind_dn, $bind_pw);
+    }
+
+    public function bind($host, $port = null, $bind_dn = null, $bind_pw = null)
     {
         $this->conn = ldap_connect($host, $port);
         if (!$this->conn) {
