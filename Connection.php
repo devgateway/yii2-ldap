@@ -15,7 +15,16 @@ class LdapException extends \RuntimeException
 
 class Connection
 {
+    constant BASE = 0;
+    constant ONELEVEL = 1;
+    constant SUBTREE = 2;
+
     protected $conn;
+    protected static $functions = [
+        BASE =>     'ldap_read',
+        ONELEVEL => 'ldap_list',
+        SUBTREE =>  'ldap_search'
+    ];
 
     public function __construct($host, $port = null, $bind_dn = null, $bind_pw = null)
     {
@@ -63,25 +72,37 @@ class Connection
         }
     }
 
-    public function search($base, $filter, $attrs = null, $sizelimit = 0, $timelimit = 0, $deref = 0 )
+    private function search(
+        $scope,
+        $base,
+        $filter,
+        $attrs = null,
+        $sizelimit = 0,
+        $timelimit = 0,
+        $deref = 0)
     {
-        $result = @ldap_search($this->conn, $base, $filter, $attrs, $sizelimit, $timelimit, $deref);
-        if (!$result) throw new AuthError();
+        if (array_key_exists($scope, self::functions)) {
+            $function = self::functions[$scope];
+        } else {
+            $valid_scopes = implode(', ', array_keys(self::functions));
+            $message = "Scope must be one of: $valid_scopes, not $scope";
+            throw new \OutOfRangeException($message);
+        }
+
+        $result = @$function(
+            $this->conn,
+            $base,
+            $filter,
+            $attrs,
+            $sizelimit,
+            $timelimit,
+            $deref
+        );
+        if (!$result) {
+            throw new LdapException();
+        }
+
         return new Results($this->conn, $result);
     }
-
-    public function read($base, $filter, $attrs = null, $sizelimit = 0, $timelimit = 0, $deref = 0)
-    {
-        $result = @ldap_read($this->conn, $base, $filter, $attrs, $sizelimit, $timelimit, $deref);
-        if (!$result) throw new AuthError();
-        return new Results($this->conn, $result);
-    }
-
-    public function list($base, $filter, $attrs = null, $sizelimit = 0, $timelimit = 0, $deref = 0)
-    {
-        $result = @ldap_list($this->conn, $base, $filter, $attrs, $sizelimit, $timelimit, $deref);
-        if (!$result) throw new AuthError();
-        return new Results($this->conn, $result);
-    }
-
 }
+
