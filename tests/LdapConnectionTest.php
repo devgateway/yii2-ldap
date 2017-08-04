@@ -17,6 +17,15 @@ class TestLdapResults extends TestCase
     }
 
     /**
+     * @dataProvider escapeProvider
+     */
+    public function testEscape($unescaped, $escaped)
+    {
+        $result = LdapConnection::escapeFilter($unescaped);
+        $this->assertEquals($escaped, $result);
+    }
+
+    /**
      * @dataProvider scopeProvider
      */
     public function testSearchScopes($method)
@@ -47,6 +56,20 @@ class TestLdapResults extends TestCase
             'Subtree search' => ['search'],
             'One level search' => ['list'],
             'Base search' => ['read']
+        ];
+    }
+
+    public function escapeProvider()
+    {
+        $quotes = '\'single\' or "double"';
+        $no_escaping = 'Hello World!';
+        return [
+            'backslash & null' => ["input\\output\0", 'input\\5coutput\\00'],
+            'asterisk & paren' => ['free (or *libre*)', 'free \\28or \\2alibre\\2a\\29'],
+            'quotes' => [$quotes, $quotes],
+            'all together' => ["\0*NULL* char (\\0)", '\\00\\2aNULL\\2a char \\28\\5c0\\29'],
+            'empty' => ['', ''],
+            'no escaping' => [$no_escaping, $no_escaping],
         ];
     }
 
