@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use ldap\OidArray;
+use devgateway\ldap\OidArray;
 
 define('ATTR_GN_OID',   '2.5.4.42');
 define('ATTR_GN_LONG',  'givenName');

@@ -1,7 +1,5 @@
-.PHONY: test connection
+TEST_FILES := $(wildcard *Test.php)
+.PHONY: test
 
-test: OidArrayTest.php
-	phpunit --bootstrap autoload.php $^
-
-connection: ConnectionTest.php
-	phpunit --bootstrap autoload.php $^
+test: $(TEST_FILES)
+	phpunit --bootstrap autoload.php $(TEST_FILES)
