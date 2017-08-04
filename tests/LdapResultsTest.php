@@ -45,9 +45,9 @@ class TestLdapResults extends TestCase
         $this->assertEquals($limit, $search_results->count());
 
         $i = 0;
-        foreach($search_results as $key => $value) {
-            $this->assertNotEquals('', $key);
-            $this->assertArrayHasKey('count', $value);
+        foreach($search_results as $dn => $attrs) {
+            $this->assertNotEquals('', $dn);
+            $this->assertArrayHasKey('count', $attrs);
             $i++;
         }
 
