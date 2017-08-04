@@ -20,19 +20,36 @@ class Connection
     constant SUBTREE = 2;
 
     protected $conn;
+    protected $page_size;
+    protected $page_critical;
     protected static $functions = [
         BASE =>     'ldap_read',
         ONELEVEL => 'ldap_list',
         SUBTREE =>  'ldap_search'
     ];
 
-    public function __construct($host, $port = null, $bind_dn = null, $bind_pw = null)
-    {
-        $this->bind($host, $port, $bind_dn, $bind_pw);
+    public function __construct(
+        string $host,
+        int $port = 389,
+        $bind_dn = null,
+        $bind_pw = null,
+        int $page_size = 500,
+        bool $page_critical = false
+    ) {
+        $this->page_size = $page_size;
+        $this->page_critical = $page_critical;
+
+        $this->bind($host, $port, $bind_dn, $bind_pw, $page_size, $page_critical);
     }
 
-    public function bind($host, $port = null, $bind_dn = null, $bind_pw = null)
-    {
+    public function bind(
+        string $host,
+        int $port = 389,
+        $bind_dn = null,
+        $bind_pw = null,
+        int $page_size = 500,
+        bool $page_critical = false
+    ) {
         $this->conn = ldap_connect($host, $port);
         if (!$this->conn) {
             throw new \RuntimeException("LDAP settings invalid");
@@ -79,8 +96,8 @@ class Connection
         $attrs = null,
         $sizelimit = 0,
         $timelimit = 0,
-        $deref = 0)
-    {
+        $deref = 0
+    ) {
         if (array_key_exists($scope, self::functions)) {
             $function = self::functions[$scope];
         } else {

@@ -3,6 +3,10 @@ namespace devgateway\ldap;
 
 class Results implements \Iterator
 {
+}
+
+class Page implements \Iterator
+{
     protected $current_entry = false;
     protected $link_id;
     protected $result_id;
