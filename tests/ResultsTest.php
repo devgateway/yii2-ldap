@@ -1,6 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 use devgateway\ldap\Results;
+use devgateway\ldap\Connection;
 
 class TestLdapResults extends TestCase
 {
@@ -34,12 +35,12 @@ class TestLdapResults extends TestCase
         $filter = '(objectClass=*)';
         $limit = 1;
 
-        $handle = @ldap_search($this->conn, $this->base, $filter, array(), 0, $limit);
-        if ($handle === false) {
-            throw new \Exception('Search failed');
-        }
-
-        $search_results = new Results($this->conn, $handle);
+        $search_results = new Results(
+            $this->conn,
+            Connection::SUBTREE,
+            $this->base,
+            $filter
+        );
 
         $this->assertInstanceOf('devgateway\\ldap\\Results', $search_results);
         $this->assertEquals($limit, $search_results->count());
