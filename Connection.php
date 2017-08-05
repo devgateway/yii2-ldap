@@ -17,7 +17,7 @@ class Connection
         $bind_dn = null,
         $bind_pw = null
     ) {
-        $this->bind($host, $port, $bind_dn, $bind_pw, $page_size, $page_critical);
+        $this->bind($host, $port, $bind_dn, $bind_pw);
     }
 
     public function bind(
