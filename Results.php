@@ -105,7 +105,7 @@ class Results implements \Iterator
 
     public function next()
     {
-        $this->current_entry = @ldap_next_entry($this->conn, $this->search_result);
+        $this->current_entry = @ldap_next_entry($this->conn, $this->current_entry);
 
         // if pagination enabled, and current page read
         if ($this->page_size && !$this->current_entry) {
