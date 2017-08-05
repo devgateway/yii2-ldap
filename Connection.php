@@ -1,7 +1,7 @@
 <?php
 namespace devgateway\ldap;
 
-use devgateway\ldap\PagedResults;
+use devgateway\ldap\Results;
 
 class Connection
 {
@@ -76,7 +76,7 @@ class Connection
         int $page_size = 500,
         bool $page_critical = false
     ) {
-        return new PagedResults(
+        return new Results(
             $this->conn,
             $scope,
             $base,

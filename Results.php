@@ -3,7 +3,7 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\Connection;
 
-class PagedResults implements \Iterator
+class Results implements \Iterator
 {
     protected static $functions = [
         Connection::BASE =>     'ldap_read',
