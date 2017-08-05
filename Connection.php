@@ -5,9 +5,9 @@ use devgateway\ldap\Results;
 
 class Connection
 {
-    constant BASE = 0;
-    constant ONELEVEL = 1;
-    constant SUBTREE = 2;
+    const BASE = 0;
+    const ONELEVEL = 1;
+    const SUBTREE = 2;
 
     protected $conn;
 

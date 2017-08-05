@@ -31,10 +31,10 @@ class Results implements \Iterator
         $this->conn = $conn;
 
         // validate search scope
-        if (array_key_exists($scope, self::functions)) {
-            $self->search_function = self::functions[$scope];
+        if (array_key_exists($scope, self::$functions)) {
+            $self->search_function = self::$functions[$scope];
         } else {
-            $valid_scopes = implode(', ', array_keys(self::functions));
+            $valid_scopes = implode(', ', array_keys(self::$functions));
             $message = "Scope must be one of: $valid_scopes, not $scope";
             throw new \OutOfRangeException($message);
         }
