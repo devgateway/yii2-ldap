@@ -28,8 +28,6 @@ class Results implements \Iterator
         int $page_size = 500,
         bool $page_critical = false
     ) {
-        $this->conn = $conn;
-
         // validate search scope
         if (array_key_exists($scope, self::$functions)) {
             $this->search_function = self::$functions[$scope];
@@ -38,6 +36,16 @@ class Results implements \Iterator
             $message = "Scope must be one of: $valid_scopes, not $scope";
             throw new \OutOfRangeException($message);
         }
+
+        $this->conn = $conn;
+        $this->base = $base;
+        $this->filter = $filter;
+        $this->attrs = $attrs;
+        $this->sizelimit = $sizelimit;
+        $this->timelimit = $timelimit;
+        $this->deref = $deref;
+        $this->page_size = $page_size;
+        $this->page_critical = $page_critical;
     }
 
     private function sendPaginationControl()
@@ -56,17 +64,17 @@ class Results implements \Iterator
 
     private function doSearch()
     {
-        $this->search_result = @$this->search_function(
+        $this->search_result = @($this->search_function)(
             $this->conn,
-            $base,
-            $filter,
-            $attrs,
-            $sizelimit,
-            $timelimit,
-            $deref
+            $this->base,
+            $this->filter,
+            $this->attrs,
+            $this->sizelimit,
+            $this->timelimit,
+            $this->deref
         );
         if (!$this->search_result) {
-            throw new LdapException();
+            throw new LdapException($this->conn);
         }
     }
 
@@ -108,7 +116,7 @@ class Results implements \Iterator
                 $this->cookie
             );
             if (!$success) {
-                throw new LdapException();
+                throw new LdapException($this->conn);
             }
 
             // if the cookie is set

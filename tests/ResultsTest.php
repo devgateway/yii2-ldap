@@ -39,11 +39,12 @@ class TestLdapResults extends TestCase
             $this->conn,
             Connection::SUBTREE,
             $this->base,
-            $filter
+            $filter,
+            [],
+            $limit
         );
 
         $this->assertInstanceOf('devgateway\\ldap\\Results', $search_results);
-        $this->assertEquals($limit, $search_results->count());
 
         $i = 0;
         foreach($search_results as $dn => $attrs) {
