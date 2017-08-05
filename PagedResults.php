@@ -11,7 +11,7 @@ class PagedResults implements \Iterator
         Connection::SUBTREE =>  'ldap_search'
     ];
     protected $conn;
-    protected $function;
+    protected $search_function;
     protected $search_result;
     protected $cookie = '';
     protected $current_entry = false;
@@ -32,15 +32,31 @@ class PagedResults implements \Iterator
 
         // validate search scope
         if (array_key_exists($scope, self::functions)) {
-            $self->function = self::functions[$scope];
+            $self->search_function = self::functions[$scope];
         } else {
             $valid_scopes = implode(', ', array_keys(self::functions));
             $message = "Scope must be one of: $valid_scopes, not $scope";
             throw new \OutOfRangeException($message);
         }
+    }
 
-        // call appropriate search function
-        $this->search_result = @$function(
+    private function sendPaginationControl()
+    {
+        $pagination_supported = ldap_control_paged_result(
+            $this->conn,
+            $this->page_size,
+            $this->page_critical,
+            $this->cookie
+        );
+
+        if (!$pagination_supported) {
+            $this->page_size = 0;
+        }
+    }
+
+    private function doSearch()
+    {
+        $this->search_result = @$self->search_function(
             $this->conn,
             $base,
             $filter,
@@ -58,16 +74,13 @@ class PagedResults implements \Iterator
     {
         // send pagination control
         if ($this->page_size) {
-            $paging_supported = ldap_control_paged_result(
-                $this->conn,
-                $this->page_size,
-                $this->page_critical
-            );
-            if (!$paging_supported) {
-                $this->page_size = 0;
-            }
+            $this->sendPaginationControl();
         }
 
+        // call appropriate search function
+        $this->doSearch();
+
+        // retrieve the first result
         $this->current_entry = @ldap_first_entry($this->conn, $this->search_result);
     }
 
@@ -84,6 +97,27 @@ class PagedResults implements \Iterator
     public function next()
     {
         $this->current_entry = @ldap_next_entry($this->conn, $this->search_result);
+
+        // if pagination enabled, and current page read
+        if ($this->page_size && !$this->current_entry) {
+            // receive a cookie for the next search
+            $success = @ldap_control_paged_result_response(
+                $this->conn,
+                $this->page_size,
+                $this->page_critical,
+                $this->cookie
+            );
+            if (!$success) {
+                throw new LdapException();
+            }
+
+            // if the cookie is set
+            if (!is_null($this->cookie) && $this->cookie != '') {
+                // reissue a control with it, and continue searching
+                $this->sendPaginationControl();
+                $this->doSearch();
+            }
+        }
     }
 
     public function valid()
