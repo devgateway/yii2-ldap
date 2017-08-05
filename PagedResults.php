@@ -12,8 +12,9 @@ class PagedResults implements \Iterator
     ];
     protected $conn;
     protected $function;
-    protected $result_id;
+    protected $search_result;
     protected $cookie = '';
+    protected $current_entry = false;
 
     public function __construct(
         $conn,
@@ -38,12 +39,8 @@ class PagedResults implements \Iterator
             throw new \OutOfRangeException($message);
         }
 
-        // send pagination control
-        if ($this->page_size) {
-        }
-
         // call appropriate search function
-        $result = @$function(
+        $this->search_result = @$function(
             $this->conn,
             $base,
             $filter,
@@ -52,16 +49,51 @@ class PagedResults implements \Iterator
             $timelimit,
             $deref
         );
-        if (!$result) {
+        if (!$this->search_result) {
             throw new LdapException();
         }
+    }
 
-        return new Results($this->conn, $result);
+    public function rewind()
+    {
+        // send pagination control
+        if ($this->page_size) {
+            $paging_supported = ldap_control_paged_result(
+                $this->conn,
+                $this->page_size,
+                $this->page_critical
+            );
+            if (!$paging_supported) {
+                $this->page_size = 0;
+            }
+        }
+
+        $this->current_entry = @ldap_first_entry($this->conn, $this->search_result);
+    }
+
+    public function current()
+    {
+        return ldap_get_attributes($this->conn, $this->current_entry);
+    }
+
+    public function key()
+    {
+        return ldap_get_dn($this->conn, $this->current_entry);
+    }
+
+    public function next()
+    {
+        $this->current_entry = @ldap_next_entry($this->conn, $this->search_result);
+    }
+
+    public function valid()
+    {
+        return $this->current_entry !== false;
     }
 
     public function __destruct()
     {
-        ldap_free_result($this->result_id);
+        ldap_free_result($this->search_result);
     }
 }
 
