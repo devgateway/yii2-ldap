@@ -69,6 +69,7 @@ class Results implements \Iterator
             $this->base,
             $this->filter,
             $this->attrs,
+            0,
             $this->sizelimit,
             $this->timelimit,
             $this->deref
@@ -76,6 +77,9 @@ class Results implements \Iterator
         if (!$this->search_result) {
             throw new LdapException($this->conn);
         }
+
+        // retrieve the first result
+        $this->current_entry = ldap_first_entry($this->conn, $this->search_result);
     }
 
     public function rewind()
@@ -87,9 +91,6 @@ class Results implements \Iterator
 
         // call appropriate search function
         $this->doSearch();
-
-        // retrieve the first result
-        $this->current_entry = @ldap_first_entry($this->conn, $this->search_result);
     }
 
     public function current()
@@ -111,8 +112,7 @@ class Results implements \Iterator
             // receive a cookie for the next search
             $success = @ldap_control_paged_result_response(
                 $this->conn,
-                $this->page_size,
-                $this->page_critical,
+                $this->search_result,
                 $this->cookie
             );
             if (!$success) {
