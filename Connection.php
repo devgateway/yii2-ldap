@@ -66,7 +66,7 @@ class Connection
     }
 
     public function search(
-        $scope,
+        int $scope,
         string $base,
         string $filter,
         array $attrs = [],

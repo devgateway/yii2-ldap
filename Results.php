@@ -18,7 +18,7 @@ class Results implements \Iterator
 
     public function __construct(
         $conn,
-        $scope,
+        int $scope,
         string $base,
         string $filter,
         array $attrs = [],
@@ -32,7 +32,7 @@ class Results implements \Iterator
 
         // validate search scope
         if (array_key_exists($scope, self::$functions)) {
-            $self->search_function = self::$functions[$scope];
+            $this->search_function = self::$functions[$scope];
         } else {
             $valid_scopes = implode(', ', array_keys(self::$functions));
             $message = "Scope must be one of: $valid_scopes, not $scope";
@@ -56,7 +56,7 @@ class Results implements \Iterator
 
     private function doSearch()
     {
-        $this->search_result = @$self->search_function(
+        $this->search_result = @$this->search_function(
             $this->conn,
             $base,
             $filter,
