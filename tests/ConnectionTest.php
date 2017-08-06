@@ -28,17 +28,22 @@ class TestLdapResults extends TestCase
     /**
      * @dataProvider scopeProvider
      */
-    public function testSearchScopes($method)
+    public function testSearchScopes($scope)
     {
         $this->assertInstanceOf('devgateway\\ldap\\Connection', $this->conn);
 
         $filter = '(objectClass=*)';
         $limit = 1;
 
-        $search_results = $this->conn->$method($this->base, $filter, array(), 0, $limit);
+        $search_results = $this->conn->search(
+            $scope,
+            $this->base,
+            $filter,
+            [],
+            $limit
+        );
 
         $this->assertInstanceOf('devgateway\\ldap\\Results', $search_results);
-        $this->assertEquals($limit, $search_results->count());
 
         $i = 0;
         foreach($search_results as $dn => $attrs) {
@@ -53,9 +58,9 @@ class TestLdapResults extends TestCase
     public function scopeProvider()
     {
         return [
-            'Subtree search' => ['search'],
-            'One level search' => ['list'],
-            'Base search' => ['read']
+            'Subtree search' => [Connection::SUBTREE],
+            'One level search' => [Connection::ONELEVEL],
+            'Base search' => [Connection::BASE]
         ];
     }
 
