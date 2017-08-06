@@ -2,8 +2,9 @@
 namespace devgateway\ldap;
 
 use devgateway\ldap\Results;
+use yii\base\Component;
 
-class Connection
+class Connection extends Component
 {
     const BASE = 0;
     const ONELEVEL = 1;
