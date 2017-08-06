@@ -10,24 +10,17 @@ class Connection extends Component
     const ONELEVEL = 1;
     const SUBTREE = 2;
 
-    protected $conn;
+    protected $conn = false;
+    protected $bound = false;
 
-    public function __construct(
-        string $host,
-        int $port = 389,
-        $bind_dn = null,
-        $bind_pw = null
-    ) {
-        $this->bind($host, $port, $bind_dn, $bind_pw);
-    }
+    public $host = null;
+    public $port = 389;
+    public $bind_dn = null;
+    public $bind_pw = null;
 
-    public function bind(
-        string $host,
-        int $port = 389,
-        $bind_dn = null,
-        $bind_pw = null
-    ) {
-        $this->conn = ldap_connect($host, $port);
+    protected function connect()
+    {
+        $this->conn = ldap_connect($this->host, $this->port);
         if (!$this->conn) {
             throw new \RuntimeException("LDAP settings invalid");
         }
@@ -36,17 +29,40 @@ class Connection extends Component
         if (!$result) {
             throw new LdapException($this->conn);
         }
+    }
 
-        # bind anonymously
-        $result = ldap_bind($this->conn);
-        if (!$result) {
+    protected function bind()
+    {
+        if ($this->bound) {
+            return;
+        }
+
+        if ($this->conn === false) {
+            $this->connect();
+        }
+
+        $result = ldap_bind($this->conn, $this->bind_dn, $this->bind_pw);
+        if ($result) {
+            $this->bound = true;
+        } else {
             throw new LdapException($this->conn);
         }
     }
 
+    public function rebind($bind_dn, $bind_pw)
+    {
+        $this->bind_dn = $bind_dn;
+        $this->bind_pw = $bind_pw;
+
+        $this->bound = false;
+        $this->bind();
+    }
+
     public function __destruct()
     {
-        ldap_unbind($this->conn);
+        if ($this->conn !== false) {
+            ldap_unbind($this->conn);
+        }
     }
 
     # escapes dangerous characters from the input string
