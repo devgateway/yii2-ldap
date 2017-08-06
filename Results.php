@@ -15,6 +15,7 @@ class Results implements \Iterator
     protected $search_result;
     protected $cookie = '';
     protected $current_entry = false;
+    protected $entries_seen = 0;
 
     public function __construct(
         $conn,
@@ -84,6 +85,8 @@ class Results implements \Iterator
 
     public function rewind()
     {
+        $this->entries_seen = 0;
+
         // send pagination control
         if ($this->page_size) {
             $this->sendPaginationControl();
@@ -115,7 +118,8 @@ class Results implements \Iterator
                 $this->search_result,
                 $this->cookie
             );
-            if (!$success) {
+            // ignore errors if read enough entries
+            if (!$success && $this->entries_seen < $this->sizelimit) {
                 throw new LdapException($this->conn);
             }
 
@@ -130,7 +134,13 @@ class Results implements \Iterator
 
     public function valid()
     {
-        return $this->current_entry !== false;
+        $valid = $this->current_entry !== false;
+
+        if ($valid) {
+            $this->entries_seen++;
+        };
+
+        return $valid;
     }
 
     public function __destruct()
