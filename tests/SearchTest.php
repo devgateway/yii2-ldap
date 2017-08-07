@@ -10,11 +10,10 @@ class SearchTest extends TestCase
 
     public function setUp()
     {
-        require('settings.php');
-
+        $config = require('config.php');
         $this->base = $base;
 
-        $this->conn = ldap_connect($host, $port);
+        $this->conn = ldap_connect($config['host'], $config['port']);
         if ($this->conn === false) {
           throw new \Exception('Can\'t connect to LDAP server');
         }
@@ -24,7 +23,7 @@ class SearchTest extends TestCase
             throw new \Exception('Can\'t request LDAPv3');
         }
 
-        $result = ldap_bind($this->conn, $bind_dn, $bind_pw);
+        $result = ldap_bind($this->conn, $config['bind_dn'], $config['bind_pw']);
         if (!$result) {
             throw new \Exception('Can\'t bind to LDAP');
         }
