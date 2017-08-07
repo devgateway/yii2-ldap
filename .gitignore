@@ -1,3 +1,4 @@
 tests/config.php
 vendor
+docs
 composer.lock

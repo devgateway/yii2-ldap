@@ -4,6 +4,11 @@ namespace devgateway\ldap;
 use devgateway\ldap\Search;
 use yii\base\Component;
 
+/**
+ * Encapsulates a connection to LDAP server.
+ *
+ * Requires LDAPv3 support.
+ */
 class Connection extends Component
 {
     const BASE = 0;
@@ -18,6 +23,13 @@ class Connection extends Component
     public $bind_dn = null;
     public $bind_pw = null;
 
+    /**
+     * Initializes LDAP structures, or does nothing if already initialized.
+     *
+     * @throws \RuntimeException if settings are invalid.
+     * @throws LdapException if LDAPv3 not supported.
+     * @return void
+     */
     protected function connect()
     {
         if ($this->conn !== false) {
@@ -35,6 +47,12 @@ class Connection extends Component
         }
     }
 
+    /**
+     * Binds to LDAP server, if not already bound.
+     *
+     * @throws LdapException if bind failed.
+     * @return void
+     */
     protected function bind()
     {
         if ($this->bound) {
@@ -51,6 +69,13 @@ class Connection extends Component
         }
     }
 
+    /**
+     * Binds to LDAP under another DN within the existing connection.
+     *
+     * @param string|null $bind_dn Distinguished name to bind with.
+     * @param string|null $bind_pw Password to bind with.
+     * @return void
+     */
     public function rebind($bind_dn, $bind_pw)
     {
         $this->bind_dn = $bind_dn;
