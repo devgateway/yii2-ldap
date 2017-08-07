@@ -10,10 +10,10 @@ class ConnectionTest extends TestCase
 
     public function setUp()
     {
-        require('settings.php');
-
+        $config = require('config.php');
         $this->base = $base;
-        $this->conn = new Connection($host, $port, $bind_dn, $bind_pw);
+
+        $this->conn = new Connection($config);
     }
 
     /**

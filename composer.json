@@ -11,6 +11,10 @@
 	"autoload": {
 		"psr-4": {
 			"devgateway\\ldap\\": ""
-		}
+		},
+                "classmap": [
+                    "vendor/yiisoft/yii2/Yii.php",
+                    "vendor/yiisoft/yii2/BaseYii.php"
+                ]
 	}
 }
