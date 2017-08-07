@@ -1,9 +1,9 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use devgateway\ldap\Results;
+use devgateway\ldap\Search;
 use devgateway\ldap\Connection;
 
-class TestLdapResults extends TestCase
+class ConnectionTest extends TestCase
 {
     protected $conn;
     protected $base;
@@ -43,7 +43,7 @@ class TestLdapResults extends TestCase
             $limit
         );
 
-        $this->assertInstanceOf('devgateway\\ldap\\Results', $search_results);
+        $this->assertInstanceOf('devgateway\\ldap\\Search', $search_results);
 
         $i = 0;
         foreach($search_results as $dn => $attrs) {

@@ -3,7 +3,7 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\Connection;
 
-class Results implements \Iterator
+class Search implements \Iterator
 {
     protected static $functions = [
         Connection::BASE =>     'ldap_read',
@@ -23,8 +23,8 @@ class Results implements \Iterator
         string $base,
         string $filter,
         array $attrs = [],
-        int $sizelimit = 0,
-        int $timelimit = 0,
+        int $size_limit = 0,
+        int $time_limit = 0,
         int $deref = LDAP_DEREF_NEVER,
         int $page_size = 500,
         bool $page_critical = false
@@ -42,8 +42,8 @@ class Results implements \Iterator
         $this->base = $base;
         $this->filter = $filter;
         $this->attrs = $attrs;
-        $this->sizelimit = $sizelimit;
-        $this->timelimit = $timelimit;
+        $this->size_limit = $size_limit;
+        $this->time_limit = $time_limit;
         $this->deref = $deref;
         $this->page_size = $page_size;
         $this->page_critical = $page_critical;
@@ -71,8 +71,8 @@ class Results implements \Iterator
             $this->filter,
             $this->attrs,
             0,
-            $this->sizelimit,
-            $this->timelimit,
+            $this->size_limit,
+            $this->time_limit,
             $this->deref
         );
         if (!$this->search_result) {
@@ -119,7 +119,7 @@ class Results implements \Iterator
                 $this->cookie
             );
             // ignore errors if read enough entries
-            if (!$success && $this->entries_seen < $this->sizelimit) {
+            if (!$success && $this->entries_seen < $this->size_limit) {
                 throw new LdapException($this->conn);
             }
 

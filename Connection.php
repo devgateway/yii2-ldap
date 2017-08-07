@@ -1,7 +1,7 @@
 <?php
 namespace devgateway\ldap;
 
-use devgateway\ldap\Results;
+use devgateway\ldap\Search;
 use yii\base\Component;
 
 class Connection extends Component
@@ -29,8 +29,8 @@ class Connection extends Component
             throw new \RuntimeException("LDAP settings invalid");
         }
 
-        $result = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
-        if (!$result) {
+        $success = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
+        if (!$success) {
             throw new LdapException($this->conn);
         }
     }
@@ -43,8 +43,8 @@ class Connection extends Component
 
         $this->connect();
 
-        $result = ldap_bind($this->conn, $this->bind_dn, $this->bind_pw);
-        if ($result) {
+        $success = ldap_bind($this->conn, $this->bind_dn, $this->bind_pw);
+        if ($success) {
             $this->bound = true;
         } else {
             throw new LdapException($this->conn);
@@ -89,22 +89,22 @@ class Connection extends Component
         string $base,
         string $filter,
         array $attrs = [],
-        int $sizelimit = 0,
-        int $timelimit = 0,
+        int $size_limit = 0,
+        int $time_limit = 0,
         int $deref = LDAP_DEREF_NEVER,
         int $page_size = 500,
         bool $page_critical = false
     ) {
         $this->connect();
 
-        return new Results(
+        return new Search(
             $this->conn,
             $scope,
             $base,
             $filter,
             $attrs,
-            $sizelimit,
-            $timelimit,
+            $size_limit,
+            $time_limit,
             $deref,
             $page_size,
             $page_critical
