@@ -1,5 +1,9 @@
-TEST_FILES := $(wildcard tests/*Test.php)
+SOURCE_FILES := $(wildcard *.php)
 .PHONY: test
 
-test: $(TEST_FILES)
-	set -e; for test in $(TEST_FILES); do phpunit --bootstrap vendor/autoload.php $$test; done
+test:
+	phpunit --bootstrap vendor/autoload.php tests
+
+docs: ./vendor/bin/phpdoc $(SOURCE_FILES)
+	rm -rf $@
+	$< -t $@ $(foreach file,$(SOURCE_FILES),-f $(file))
