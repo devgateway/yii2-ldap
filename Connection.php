@@ -20,6 +20,10 @@ class Connection extends Component
 
     protected function connect()
     {
+        if ($this->conn !== false) {
+          return;
+        }
+
         $this->conn = ldap_connect($this->host, $this->port);
         if (!$this->conn) {
             throw new \RuntimeException("LDAP settings invalid");
@@ -37,9 +41,7 @@ class Connection extends Component
             return;
         }
 
-        if ($this->conn === false) {
-            $this->connect();
-        }
+        $this->connect();
 
         $result = ldap_bind($this->conn, $this->bind_dn, $this->bind_pw);
         if ($result) {
@@ -93,6 +95,8 @@ class Connection extends Component
         int $page_size = 500,
         bool $page_critical = false
     ) {
+        $this->connect();
+
         return new Results(
             $this->conn,
             $scope,
