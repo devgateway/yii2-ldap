@@ -20,13 +20,19 @@ class Connection extends Component
     /** @var bool $bound Flag indicating whether connection is in bound state. */
     protected $bound = false;
 
-    /** @var string|null $host LDAP server URI, may include port number. Can be multiple space-delimited URIs. */
+    /** @var string|null $host LDAP server URI, may include port number.
+     * Can be multiple space-delimited URIs.
+     */
     public $host = null;
-    /** @var int $port Port number. Only used if $host is a hostname or an IP address. IGNORED if $host is a URI. */
+    /** @var int $port Port number. Only used if $host is a hostname or an IP address.
+     * IGNORED if $host is a URI.
+     */
     public $port = 389;
     /** @var string|null Distinguished name for default bind. Anonymous bind used if null. */
     public $bind_dn = null;
-    /** @var string|null Password for default bind. WARNING: anonymous bind always used if null. */
+    /** @var string|null Password for default bind.
+     * Anonymous bind ALWAYS forced if null, even if $bind_dn is set.
+     */
     public $bind_pw = null;
 
     /**
@@ -120,6 +126,23 @@ class Connection extends Component
         }
     }
 
+    /**
+     * Return a Search object for lazy search.
+     *
+     * @see http://php.net/manual/en/function.ldap-search.php LDAP subtree search.
+     * @see http://php.net/manual/en/function.ldap-list.php LDAP one level search.
+     * @see http://php.net/manual/en/function.ldap-read.php LDAP base search.
+     * @param int $scope Search scope, one of Connection::BASE, ONELEVEL, or SUBTREE.
+     * @param string $base Search base.
+     * @param string $filter Search filter. Must be properly escaped.
+     * @param array $attrs Array of attributes to request from LDAP.
+     * @param int $size_limit Limit search to this many results; 0 for no limit.
+     * @param int $time_limit Limit search duration, in seconds; 0 for no limit.
+     * @param int $deref Dereference aliases.
+     * @param int $page_size Request paginated results, if supported.
+     * @param bool $page_critical Raise an exception if pagination is not supported.
+     * @return Search Iterator for lazy search.
+     */
     public function search(
         int $scope,
         string $base,
