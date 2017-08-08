@@ -7,7 +7,8 @@ use yii\base\Component;
 /**
  * Encapsulates a connection to LDAP server.
  *
- * Requires LDAPv3 support.
+ * Requires LDAPv3. Supports implicit paginated search, and falls back to
+ * normal search, unless critical flag requested.
  */
 class Connection extends Component
 {
