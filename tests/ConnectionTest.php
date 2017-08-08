@@ -55,6 +55,29 @@ class ConnectionTest extends TestCase
         $this->assertEquals($limit, $i);
     }
 
+    public function testAdd()
+    {
+        require('config.php');
+
+        $this->assertInstanceOf('devgateway\\ldap\\Connection', $this->conn);
+
+        $add_result = $this->conn->add($add_dn, $add_entry);
+
+        $filter = sprintf('(&(objectClass=virtualMachine)(cn=%s))', $add_entry['cn']);
+        $limit = 1;
+
+        $search_results = $this->conn->search(Connection::BASE, $add_dn, $filter, [], $limit);
+
+        $i = 0;
+        foreach($search_results as $dn => $attrs) {
+            $this->assertNotEquals('', $dn);
+            $this->assertArrayHasKey('count', $attrs);
+            $i++;
+        }
+
+        $this->assertEquals($limit, $i);
+    }
+
     public function scopeProvider()
     {
         return [
