@@ -15,6 +15,18 @@ class Connection extends Component
     const ONELEVEL = 1;
     const SUBTREE = 2;
 
+    const MOD = 0;
+    const MOD_ADD = 1;
+    const MOD_DEL = 2;
+    const MOD_REPLACE = 3;
+
+    protected static $modFunctions = [
+        MOD =>     'ldap_modify',
+        MOD_ADD => 'ldap_mod_add',
+        MOD_DEL => 'ldap_mod_del',
+        MOD_REPLACE => 'ldap_mod_replace'
+    ];
+
     /** @var resource|bool $conn LDAP connection handle. */
     protected $conn = false;
     /** @var bool $bound Flag indicating whether connection is in bound state. */
@@ -191,6 +203,27 @@ class Connection extends Component
         }
 
         $success = ldap_delete($this->conn, $dn);
+        if (!$success) return LdapException($this->conn);
+    }
+
+    public function modify($scope, $dn, $entry, $bind_dn=null, $bind_pw=null)
+    {
+        if ($bind_dn && $bind_pw) {
+            $this->rebind($bind_dn, $bind_pw);
+        } else {
+            $this->bind();
+        }
+
+        $modifyFunction;
+        if (array_key_exists($scope, self::$modFunctions)) {
+            $modifyFunction = self::$functions[$scope];
+        } else {
+            $validScopes = implode(', ', array_keys(self::$modFunctions));
+            $message = "Scope must be one of: $validScopes, not $scope";
+            throw new \OutOfRangeException($message);
+        }
+
+        $success = ($modifyFunction)($this->conn, $dn, $entry);
         if (!$success) return LdapException($this->conn);
     }
 }
