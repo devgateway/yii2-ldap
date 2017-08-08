@@ -159,7 +159,7 @@ class Connection extends Component
         int $page_size = 500,
         bool $page_critical = false
     ) {
-        $this->connect();
+        $this->bind();
 
         return new Search(
             $this->conn,
