@@ -169,5 +169,17 @@ class Connection extends Component
             $page_critical
         );
     }
+
+    public function add($dn, $entry, $bind_dn=null, $bind_pw=null)
+    {
+        if ($bind_dn && $bind_pw) {
+            $this->rebind($bind_dn, $bind_pw);
+        } else {
+            $this->bind();
+        }
+
+        $success = ldap_add($this->conn, $dn, $entry);
+        if (!$success) return LdapException($this->conn);
+    }
 }
 
