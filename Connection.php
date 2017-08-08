@@ -102,6 +102,7 @@ class Connection extends Component
         $this->bind();
     }
 
+    /** Unbind from LDAP server, and invalidate connection handle. */
     public function __destruct()
     {
         if ($this->conn !== false) {

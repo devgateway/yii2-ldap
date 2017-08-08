@@ -3,6 +3,7 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\Connection;
 
+/** Iterable search results implementing lazy search. */
 class Search implements \Iterator
 {
     /** @var array $functions Search scopes => PHP LDAP search functions. */
@@ -34,6 +35,20 @@ class Search implements \Iterator
      * Used to distinguish between client and server size limit hit. */
     protected $entries_seen = 0;
 
+    /**
+     * Initialize class members, and validate search scope.
+     *
+     * @param resource $conn LDAP connection handle.
+     * @param int $scope Search scope, one of Connection::BASE, ONELEVEL, or SUBTREE.
+     * @param string $base Search base.
+     * @param string $filter Search filter. Must be properly escaped.
+     * @param array $attrs Array of attributes to request from LDAP.
+     * @param int $size_limit Limit search to this many results; 0 for no limit.
+     * @param int $time_limit Limit search duration, in seconds; 0 for no limit.
+     * @param int $deref Dereference aliases.
+     * @param int $page_size Request paginated results, if supported.
+     * @param bool $page_critical Raise an exception if pagination is not supported.
+     */
     public function __construct(
         $conn,
         int $scope,
@@ -66,6 +81,10 @@ class Search implements \Iterator
         $this->page_critical = $page_critical;
     }
 
+    /**
+     * Request paginated results from server, and fall back to normal search if
+     * pagination not supported.
+     */
     private function sendPaginationControl()
     {
         $pagination_supported = ldap_control_paged_result(
@@ -80,6 +99,11 @@ class Search implements \Iterator
         }
     }
 
+    /**
+     * Call appropriate LDAP search function, and retrieve the first result.
+     *
+     * @throws LdapException if search fails.
+     */
     private function doSearch()
     {
         $this->search_result = @($this->search_function)(
@@ -100,6 +124,7 @@ class Search implements \Iterator
         $this->current_entry = ldap_first_entry($this->conn, $this->search_result);
     }
 
+    /** {@inheritdoc} */
     public function rewind()
     {
         $this->entries_seen = 0;
