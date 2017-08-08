@@ -5,16 +5,33 @@ use devgateway\ldap\Connection;
 
 class Search implements \Iterator
 {
+    /** @var array $functions Search scopes => PHP LDAP search functions. */
     protected static $functions = [
         Connection::BASE =>     'ldap_read',
         Connection::ONELEVEL => 'ldap_list',
         Connection::SUBTREE =>  'ldap_search'
     ];
+
+    /** @var resource $conn LDAP connection handle. */
     protected $conn;
+
+    /** @var string $search_function Name of PHP LDAP search function for
+     * indirect call */
     protected $search_function;
+
+    /** @var resource|bool $search_result Handle to LDAP search result or false
+     * if search failed. */
     protected $search_result;
+
+    /** @var string $cookie LDAP internal cookie for paged search results. */
     protected $cookie = '';
+
+    /** @var resource|bool $current_entry Handle to each entry in LDAP search
+     * results. Becomes false if no more entries left on current page. */
     protected $current_entry = false;
+
+    /** @var int $entries_seen Number of entries returned by LDAP search so far.
+     * Used to distinguish between client and server size limit hit. */
     protected $entries_seen = 0;
 
     public function __construct(
