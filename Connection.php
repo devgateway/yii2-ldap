@@ -17,6 +17,7 @@ class Connection extends Component
 
     /** @var resource|bool $conn LDAP connection handle. */
     protected $conn = false;
+
     /** @var bool $bound Flag indicating whether connection is in bound state. */
     protected $bound = false;
 
@@ -24,12 +25,15 @@ class Connection extends Component
      * Can be multiple space-delimited URIs.
      */
     public $host = null;
+
     /** @var int $port Port number. Only used if $host is a hostname or an IP address.
      * IGNORED if $host is a URI.
      */
     public $port = 389;
+
     /** @var string|null Distinguished name for default bind. Anonymous bind used if null. */
     public $bind_dn = null;
+
     /** @var string|null Password for default bind.
      * Anonymous bind ALWAYS forced if null, even if $bind_dn is set.
      */
