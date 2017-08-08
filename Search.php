@@ -1,4 +1,12 @@
 <?php
+/**
+ * Search class
+ *
+ * @link https://github.com/devgateway/yii-com-ldap
+ * @copyright 2017, Development Gateway, Inc
+ * @license GPL, version 3
+ */
+
 namespace devgateway\ldap;
 
 use devgateway\ldap\Connection;
@@ -125,7 +133,7 @@ class Search implements \Iterator
         $this->current_entry = ldap_first_entry($this->conn, $this->search_result);
     }
 
-    /** {@inheritdoc} */
+    /** Reset iterator, restart the search. */
     public function rewind()
     {
         $this->entries_seen = 0;
@@ -139,16 +147,27 @@ class Search implements \Iterator
         $this->doSearch();
     }
 
+    /**
+     * Return current value of the iterator.
+     *
+     * @return array Attributes of current entry.
+     */
     public function current()
     {
         return ldap_get_attributes($this->conn, $this->current_entry);
     }
 
+    /**
+     * Return current key of the iterator.
+     *
+     * @return string Distinguished name of current entry.
+     */
     public function key()
     {
         return ldap_get_dn($this->conn, $this->current_entry);
     }
 
+    /** Retrieve next page if required, retrieve next entry if possible. */
     public function next()
     {
         $this->current_entry = @ldap_next_entry($this->conn, $this->current_entry);
@@ -175,6 +194,11 @@ class Search implements \Iterator
         }
     }
 
+    /**
+     * Test if current entry may be retrieved by iterator.
+     *
+     * @return bool Whether current entry is valid.
+     */
     public function valid()
     {
         $valid = $this->current_entry !== false;
@@ -186,6 +210,7 @@ class Search implements \Iterator
         return $valid;
     }
 
+    /** Release and invalidate search result handle. */
     public function __destruct()
     {
         ldap_free_result($this->search_result);
