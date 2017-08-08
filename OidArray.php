@@ -1,12 +1,34 @@
 <?php
+/**
+ * OidArray class
+ *
+ * @link https://github.com/devgateway/yii-com-ldap
+ * @copyright 2017, Development Gateway, Inc
+ * @license GPL, version 3
+ */
+
 namespace devgateway\ldap;
 
+/**
+ * Dictionary of items by OID and, optionally, by case-insensitive symbolic names.
+ */
 class OidArray implements \ArrayAccess, \IteratorAggregate
 {
+    /** @var array $oids Items by OID. */
     protected $oids;
+
+    /** @var array $names Items by lowercase symbolic name. */
     protected $names;
+
+    /** @var array $canonical_names Items by "pretty" symbolic name. */
     protected $canonical_names;
 
+    /**
+     * Verify OID per ITU X.660 standard.
+     *
+     * @param string $oid OID to verify.
+     * @return bool Whether OID is valid.
+     */
     private static function validateOid($oid)
     {
         // OIDs start with 0, 1, or 2, and consist of dot-separated numbers
@@ -17,17 +39,34 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         }
     }
 
+    /**
+     * Return the iterator over "pretty" names and values.
+     *
+     * @return \ArrayIterator The iterator.
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->canonical_names);
     }
 
+    /**
+     * Check whether a key exists in the dictionary.
+     *
+     * @param string $offset OID or case-insensitive name of the element.
+     * @return bool true if it exists
+     */
     public function offsetExists($offset)
     {
         $idx = strtolower($offset);
         return isset($this->names[$idx]) || isset($this->oids[$idx]);
     }
 
+    /**
+     * Retrieve a value by OID or case-insensitive symbolic name.
+     *
+     * @param string $offset OID or case-insensitive name of the element.
+     * @return mixed Element value.
+     */
     public function offsetGet($offset)
     {
         $idx = strtolower($offset);
@@ -42,6 +81,14 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         }
     }
 
+    /**
+     * Set a value by all possible keys.
+     *
+     * @param array $offset List of possible keys. The first key must be an
+     * OID, the rest are optional symbolic names. The longest symbolic names
+     * becomes the "pretty" name; if no names given, OID is the "pretty" name.
+     * @param mixed $value The value of the element.
+     */
     public function offsetSet($offset, $value) {
         // OID is the first and the only mandatory item
         $oid = array_shift($offset);
@@ -68,6 +115,11 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         $this->canonical_names[$canonical_name] = $value;
     }
 
+    /**
+     * Remove the key, all its aliases, and the value from dictionary.
+     *
+     * @param string $offset OID or case-insensitive name to remove.
+     */
     public function offsetUnset($offset) {
         // this doesn't have to be efficient, it will be rarely used
 
