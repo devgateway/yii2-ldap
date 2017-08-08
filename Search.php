@@ -106,7 +106,8 @@ class Search implements \Iterator
      */
     private function doSearch()
     {
-        $this->search_result = @($this->search_function)(
+        $function = $this->search_function;
+        $this->search_result = @$function(
             $this->conn,
             $this->base,
             $this->filter,
