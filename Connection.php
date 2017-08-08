@@ -21,10 +21,10 @@ class Connection extends Component
     const MOD_REPLACE = 3;
 
     protected static $modFunctions = [
-        MOD =>     'ldap_modify',
-        MOD_ADD => 'ldap_mod_add',
-        MOD_DEL => 'ldap_mod_del',
-        MOD_REPLACE => 'ldap_mod_replace'
+        self::MOD =>     'ldap_modify',
+        self::MOD_ADD => 'ldap_mod_add',
+        self::MOD_DEL => 'ldap_mod_del',
+        self::MOD_REPLACE => 'ldap_mod_replace'
     ];
 
     /** @var resource|bool $conn LDAP connection handle. */
@@ -182,48 +182,36 @@ class Connection extends Component
         );
     }
 
-    public function add($dn, $entry, $bind_dn=null, $bind_pw=null)
+    public function add($dn, $entry)
     {
-        if ($bind_dn && $bind_pw) {
-            $this->rebind($bind_dn, $bind_pw);
-        } else {
-            $this->bind();
-        }
+        $this->bind();
 
         $success = ldap_add($this->conn, $dn, $entry);
         if (!$success) return LdapException($this->conn);
     }
 
-    public function delete($dn, $bind_dn=null, $bind_pw=null)
+    public function delete($dn)
     {
-        if ($bind_dn && $bind_pw) {
-            $this->rebind($bind_dn, $bind_pw);
-        } else {
-            $this->bind();
-        }
+        $this->bind();
 
         $success = ldap_delete($this->conn, $dn);
         if (!$success) return LdapException($this->conn);
     }
 
-    public function modify($scope, $dn, $entry, $bind_dn=null, $bind_pw=null)
+    public function modify($op, $dn, $entry)
     {
-        if ($bind_dn && $bind_pw) {
-            $this->rebind($bind_dn, $bind_pw);
-        } else {
-            $this->bind();
-        }
+        $this->bind();
 
         $modifyFunction;
-        if (array_key_exists($scope, self::$modFunctions)) {
-            $modifyFunction = self::$functions[$scope];
+        if (array_key_exists($op, self::$mod_functions)) {
+            $modifyFunction = self::$functions[$op];
         } else {
-            $validScopes = implode(', ', array_keys(self::$modFunctions));
-            $message = "Scope must be one of: $validScopes, not $scope";
+            $validOps = implode(', ', array_keys(self::$mod_functions));
+            $message = "Scope must be one of: $validOps, not $op";
             throw new \OutOfRangeException($message);
         }
 
-        $success = ($modifyFunction)($this->conn, $dn, $entry);
+        $success = $modifyFunction($this->conn, $dn, $entry);
         if (!$success) return LdapException($this->conn);
     }
 }
