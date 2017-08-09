@@ -20,7 +20,7 @@ class Connection extends Component
     const MOD_DEL = 2;
     const MOD_REPLACE = 3;
 
-    protected static $modFunctions = [
+    protected static $mod_functions = [
         self::MOD =>     'ldap_modify',
         self::MOD_ADD => 'ldap_mod_add',
         self::MOD_DEL => 'ldap_mod_del',
@@ -202,16 +202,16 @@ class Connection extends Component
     {
         $this->bind();
 
-        $modifyFunction;
+        $modify_function;
         if (array_key_exists($op, self::$mod_functions)) {
-            $modifyFunction = self::$functions[$op];
+            $modify_function = self::$mod_functions[$op];
         } else {
             $validOps = implode(', ', array_keys(self::$mod_functions));
             $message = "Scope must be one of: $validOps, not $op";
             throw new \OutOfRangeException($message);
         }
 
-        $success = $modifyFunction($this->conn, $dn, $entry);
+        $success = $modify_function($this->conn, $dn, $entry);
         if (!$success) return LdapException($this->conn);
     }
 }
