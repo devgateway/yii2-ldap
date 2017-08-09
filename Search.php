@@ -145,7 +145,9 @@ class Search implements \Iterator
 
     public function __destruct()
     {
-        ldap_free_result($this->search_result);
+        if ($this->search_result) {
+            ldap_free_result($this->search_result);
+        }
     }
 }
 

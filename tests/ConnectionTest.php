@@ -59,23 +59,54 @@ class ConnectionTest extends TestCase
     {
         require('config.php');
 
-        $this->assertInstanceOf('devgateway\\ldap\\Connection', $this->conn);
+        $this->conn->add($test_dn, $test_entry);
 
-        $add_result = $this->conn->add($add_dn, $add_entry);
-
-        $filter = sprintf('(&(objectClass=virtualMachine)(cn=%s))', $add_entry['cn']);
         $limit = 1;
-
-        $search_results = $this->conn->search(Connection::BASE, $add_dn, $filter, [], $limit);
-
+        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
         $i = 0;
-        foreach($search_results as $dn => $attrs) {
+
+        foreach ($search_results as $dn => $attrs) {
             $this->assertNotEquals('', $dn);
             $this->assertArrayHasKey('count', $attrs);
             $i++;
         }
 
         $this->assertEquals($limit, $i);
+    }
+
+    public function testDelete()
+    {
+        require('config.php');
+
+        $limit = 1;
+        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $i = 0;
+
+        foreach ($search_results as $dn => $attrs) {
+            $this->assertNotEquals('', $dn);
+            $this->assertArrayHasKey('count', $attrs);
+            $i++;
+        }
+
+        $this->assertEquals($limit, $i);
+
+        $this->conn->delete($test_dn);
+
+        try {
+            $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+            $i = 0;
+
+            foreach ($search_results as $result) {
+                $i++;
+            }
+
+            $this->assertEquals(0, $i);
+        } catch (\Exception $e) {
+            $expected_msg = "No such object";
+            $error_msg = $e->getMessage();
+            $this->assertEquals($expected_msg, $error_msg);
+        }
+
     }
 
     public function scopeProvider()
