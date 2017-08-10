@@ -24,6 +24,18 @@ class Connection extends Component
     const ONELEVEL = 1;
     const SUBTREE = 2;
 
+    const MOD = 0;
+    const MOD_ADD = 1;
+    const MOD_DEL = 2;
+    const MOD_REPLACE = 3;
+
+    protected static $mod_functions = [
+        self::MOD =>     'ldap_modify',
+        self::MOD_ADD => 'ldap_mod_add',
+        self::MOD_DEL => 'ldap_mod_del',
+        self::MOD_REPLACE => 'ldap_mod_replace'
+    ];
+
     /** @var resource|bool $conn LDAP connection handle. */
     protected $conn = false;
 
@@ -182,6 +194,64 @@ class Connection extends Component
             $page_size,
             $page_critical
         );
+    }
+
+    /**
+     * Adds entries in directory
+     *
+     * @param string $dn distinguished name to be added
+     * @param associative array $entry where key is attribute name and value is attribute value
+     * @throws LdapException if add failed.
+     * @return void
+     */
+    public function add($dn, $entry)
+    {
+        $this->bind();
+
+        $success = ldap_add($this->conn, $dn, $entry);
+        if (!$success) throw new LdapException($this->conn);
+    }
+
+    /**
+     * Deletes a particular entry from directory
+     *
+     * @param string $dn distinguished name to be deleted
+     * @throws LdapException if delete failed.
+     * @return void
+     */
+    public function delete($dn)
+    {
+        $this->bind();
+
+        $success = ldap_delete($this->conn, $dn);
+        if (!$success) throw new LdapException($this->conn);
+    }
+
+    /**
+     * Modifies an object or an object attribute depending on $op
+     *
+     * @param string $op one MOD, MOD_ADD, MOD_DEL, MOD_REPLACE
+     * @param string $dn distinguished name to be modified
+     * @param associative array $entry where key is attribute name and value is attribute value
+     * @throws OutOfRangeException if $op not one of predefined constants
+     * @throws LdapException if modify failed.
+     * @return void
+     */
+    public function modify($op, $dn, $entry)
+    {
+        $this->bind();
+
+        $modify_function;
+        if (array_key_exists($op, self::$mod_functions)) {
+            $modify_function = self::$mod_functions[$op];
+        } else {
+            $validOps = implode(', ', array_keys(self::$mod_functions));
+            $message = "Scope must be one of: $validOps, not $op";
+            throw new \OutOfRangeException($message);
+        }
+
+        $success = $modify_function($this->conn, $dn, $entry);
+        if (!$success) throw new LdapException($this->conn);
     }
 }
 

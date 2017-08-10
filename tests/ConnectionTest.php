@@ -55,6 +55,60 @@ class ConnectionTest extends TestCase
         $this->assertEquals($limit, $i);
     }
 
+    public function testAdd()
+    {
+        require('config.php');
+
+        $this->conn->add($test_dn, $test_entry);
+
+        $limit = 1;
+        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $i = 0;
+
+        foreach ($search_results as $dn => $attrs) {
+            $this->assertNotEquals('', $dn);
+            $this->assertArrayHasKey('count', $attrs);
+            $i++;
+        }
+
+        $this->assertEquals($limit, $i);
+    }
+
+    public function testDelete()
+    {
+        require('config.php');
+
+        $limit = 1;
+        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $i = 0;
+
+        foreach ($search_results as $dn => $attrs) {
+            $this->assertNotEquals('', $dn);
+            $this->assertArrayHasKey('count', $attrs);
+            $i++;
+        }
+
+        $this->assertEquals($limit, $i);
+
+        $this->conn->delete($test_dn);
+
+        try {
+            $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+            $i = 0;
+
+            foreach ($search_results as $result) {
+                $i++;
+            }
+
+            $this->assertEquals(0, $i);
+        } catch (\Exception $e) {
+            $expected_code = 0x20;
+            $error_code = $e->getCode();
+            $this->assertEquals($expected_code, $error_code);
+        }
+
+    }
+
     public function scopeProvider()
     {
         return [
