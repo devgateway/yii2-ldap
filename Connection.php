@@ -187,7 +187,7 @@ class Connection extends Component
         $this->bind();
 
         $success = ldap_add($this->conn, $dn, $entry);
-        if (!$success) return LdapException($this->conn);
+        if (!$success) throw new LdapException($this->conn);
     }
 
     public function delete($dn)
@@ -195,7 +195,7 @@ class Connection extends Component
         $this->bind();
 
         $success = ldap_delete($this->conn, $dn);
-        if (!$success) return LdapException($this->conn);
+        if (!$success) throw new LdapException($this->conn);
     }
 
     public function modify($op, $dn, $entry)
@@ -212,7 +212,7 @@ class Connection extends Component
         }
 
         $success = $modify_function($this->conn, $dn, $entry);
-        if (!$success) return LdapException($this->conn);
+        if (!$success) throw new LdapException($this->conn);
     }
 }
 
