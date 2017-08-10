@@ -102,9 +102,9 @@ class ConnectionTest extends TestCase
 
             $this->assertEquals(0, $i);
         } catch (\Exception $e) {
-            $expected_msg = "No such object";
-            $error_msg = $e->getMessage();
-            $this->assertEquals($expected_msg, $error_msg);
+            $expected_code = 0x20;
+            $error_code = $e->getCode();
+            $this->assertEquals($expected_code, $error_code);
         }
 
     }
