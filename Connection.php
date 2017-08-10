@@ -1,6 +1,5 @@
 <?php
 namespace devgateway\ldap;
-
 use devgateway\ldap\Search;
 use yii\base\Component;
 
@@ -237,6 +236,24 @@ class Connection extends Component
         }
 
         $success = $modify_function($this->conn, $dn, $entry);
+        if (!$success) throw new LdapException($this->conn);
+    }
+
+    /**
+     * Renames an LDAP entry
+     *
+     * @param string $dn distinguished name to be modified
+     * @param string $newRDN new RDN
+     * @param string $newParent new parent/superior entry
+     * @param boolean $deleteOldRDN
+     * @throws LdapException if rename failed.
+     * @return void
+     */
+    public function rename($dn, $newRDN, $newParent, $deleteOldRDN )
+    {
+        $this->bind();
+
+        $success = ldap_rename($this->conn, $dn, $newRDN, $newParent, $deleteOldRDN);
         if (!$success) throw new LdapException($this->conn);
     }
 }
