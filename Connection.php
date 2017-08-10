@@ -182,6 +182,14 @@ class Connection extends Component
         );
     }
 
+    /**
+     * Adds entries in directory
+     *
+     * @param string $dn distinguished name to be added
+     * @param associative array $entry where key is attribute name and value is attribute value
+     * @throws LdapException if add failed.
+     * @return void
+     */
     public function add($dn, $entry)
     {
         $this->bind();
@@ -190,6 +198,13 @@ class Connection extends Component
         if (!$success) throw new LdapException($this->conn);
     }
 
+    /**
+     * Deletes a particular entry from directory
+     *
+     * @param string $dn distinguished name to be deleted
+     * @throws LdapException if delete failed.
+     * @return void
+     */
     public function delete($dn)
     {
         $this->bind();
@@ -198,6 +213,16 @@ class Connection extends Component
         if (!$success) throw new LdapException($this->conn);
     }
 
+    /**
+     * Modifies an object or an object attribute depending on $op
+     *
+     * @param string $op one MOD, MOD_ADD, MOD_DEL, MOD_REPLACE
+     * @param string $dn distinguished name to be modified
+     * @param associative array $entry where key is attribute name and value is attribute value
+     * @throws OutOfRangeException if $op not one of predefined constants
+     * @throws LdapException if modify failed.
+     * @return void
+     */
     public function modify($op, $dn, $entry)
     {
         $this->bind();
