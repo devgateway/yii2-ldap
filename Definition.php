@@ -12,24 +12,46 @@ namespace devgateway\ldap;
 abstract class Definition
 {
     protected $oid;
-    protected $names;
-    protected $sup;
+    protected $name = [];
+    protected $desc = '';
+    protected $obsolete = false;
+    protected $sup = null;
 
-    public function __construct(
-        string $oid,
-        array $names = [],
-        $sup = null
-    ) {
-        $this->$oid = $oid;
-        $this->$names = $names;
-        $this->$sup = $sup;
+    protected $properties;
+    protected $short_name;
+
+    abstract protected function parseSchema(string $schema);
+
+    public function __construct(string $schema, OidArray &$definitions)
+    {
+        $properties = $this->parseSchema($schema);
+
+        foreach ($properties as $name => $value) {
+            $this->properties[$name] = $value;
+        }
+
+        $this->short_name = self::getShortName(
+            $this->properties['oid'],
+            $this->properties['name']
+        );
     }
 
-    public function __get($property)
+    public function getShortName()
     {
-        if (property_exists($this, $property)) {
-            return $this->$$property;
+        $max_length = 0;
+        foreach ($self->name as $name) {
+            $length = strlen($name);
+            if ($length > $max_length) {
+                $max_length = $length;
+                $short_name = $name;
+            }
         }
+
+        return isset($short_name) ? $short_name : $self->oid;
+    }
+    public function __get(string $name)
+    {
+        return property_exists($this, $name) ? $this->$name : null;
     }
 }
 
