@@ -248,10 +248,16 @@ class IntegerSyntax extends Syntax
 
     public static function serialize($value)
     {
+        if (is_integer($value)) {
+            return strval($value);
+        } else {
+            throw new SyntaxException($value);
+        }
     }
 
     public static function unserialize(string $serialized)
     {
+        return intval($serialized);
     }
 }
 
@@ -261,6 +267,11 @@ class JpegSyntax extends Syntax
 
     public static function serialize($value)
     {
+        if (is_string($value)) {
+            return $value;
+        } else {
+            throw new SyntaxException('<non-string data>');
+        }
     }
 
     public static function unserialize(string $serialized)
