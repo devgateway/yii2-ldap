@@ -15,9 +15,6 @@ class AttributeDefinition extends Definition
 {
     protected $desc;
     protected $obsolete;
-    protected $equality;
-    protected $ordering;
-    protected $substr;
     protected $syntax;
     protected $singlevalue;
     protected $collective;
