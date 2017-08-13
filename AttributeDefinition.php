@@ -27,9 +27,6 @@ class AttributeDefinition extends Definition
         string $oid,
         array $names,
         string $desc,
-        MatchingRule $equality,
-        Ordering $ordering,
-        Substring $substr,
         Syntax $syntax,
         bool $singlevalue = false,
         bool $obsolete = false,
@@ -38,3 +35,4 @@ class AttributeDefinition extends Definition
     ) {
     }
 }
+
