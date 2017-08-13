@@ -11,39 +11,6 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\Definition;
 
-interface ISyntax
-{
-    public function validate($value);
-}
-
-interface IMatchingRule
-{
-    public function eq($op1, $op2);
-    public function gt($op1, $op2);
-    public function lt($op1, $op2);
-    public function sub($main_str, $str);
-}
-
-abstract class Syntax
-{
-}
-
-abstract class BaseMatchingRule
-{
-}
-
-class MatchingRule extends BaseMatchingRule
-{
-}
-
-class Ordering extends BaseMatchingRule
-{
-}
-
-class Substring extends BaseMatchingRule
-{
-}
-
 class AttributeDefinition extends Definition
 {
     protected $desc;
