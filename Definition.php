@@ -2,6 +2,7 @@
 /**
  * Definition class
  *
+ * @link https://tools.ietf.org/html/rfc4512
  * @link https://github.com/devgateway/yii-com-ldap
  * @copyright 2017, Development Gateway, Inc
  * @license GPL, version 3
@@ -9,12 +10,11 @@
 
 namespace devgateway\ldap;
 
-abstract class Definition
+abstract class Definition extends AbstractObject
 {
     protected $desc = '';
-    protected $obsolete = false;
     protected $sup = null;
-    protected $short_name;
+    protected $obsolete = false;
 
     abstract public static function parse(string $definition);
 
@@ -22,12 +22,17 @@ abstract class Definition
         string $oid,
         array $name,
         string $desc = '',
-        $sup = null,
+        Definition $sup = null,
         bool $obsolete = false
     ) {
+        $this->desc = $desc;
+        $this->sup = $sup;
+        $this->obsolete = $obsolete;
+
+        parent::__construct($oid, $name);
     }
 
-    protected function getShortName()
+    protected function makeShortName()
     {
         $max_length = 0;
         foreach ($self->name as $name) {

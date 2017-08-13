@@ -13,6 +13,9 @@ class AbstractObject
 {
     protected $oid;
     protected $name;
+    protected $short_name;
+
+    abstract protected function makeShortName();
 
     public function __construct(string $oid, array $name)
     {

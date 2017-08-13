@@ -29,7 +29,7 @@ class SyntaxException extends \RuntimeException
 
 abstract class Syntax extends AbstractObject
 {
-    public function getShortName()
+    protected function makeShortName()
     {
         return $this->oid;
     }
