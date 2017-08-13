@@ -23,9 +23,7 @@ class AttributeDefinition extends Definition
         Syntax $syntax = null,
         Definition $sup = null,
         string $desc = '',
-        bool $singlevalue = false,
-        bool $obsolete = false,
-        bool $nousermodification = false
+        bool $singlevalue = false
     ) {
         $this->singlevalue = $singlevalue;
 
@@ -47,6 +45,10 @@ class AttributeDefinition extends Definition
             $sup,
             $obsolete
         );
+    }
+
+    public static function parse(string $definition)
+    {
     }
 }
 
