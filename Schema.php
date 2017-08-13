@@ -55,7 +55,7 @@ class Schema
         ];
 
         foreach ($syntaxes as $syntax) {
-            $self->schema[$syntax->getShortName()] = new $syntax();
+            $self->schema[$syntax->short_name] = new $syntax();
         }
     }
 }

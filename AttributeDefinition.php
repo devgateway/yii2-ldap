@@ -18,17 +18,17 @@ class AttributeDefinition extends Definition
     protected $syntax;
     protected $singlevalue;
     protected $collective;
-    protected $nousermod;
+    protected $nousermodification;
 
     public function __construct(
         string $oid,
-        array $names,
-        string $desc,
+        array $name,
         Syntax $syntax,
+        string $desc = '',
         bool $singlevalue = false,
         bool $obsolete = false,
         bool $collective = false,
-        bool $nousermod = false
+        bool $nousermodification = false
     ) {
     }
 }

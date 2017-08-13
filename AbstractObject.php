@@ -14,8 +14,6 @@ class AbstractObject
     protected $oid;
     protected $name;
 
-    abstract public function getShortName();
-
     public function __construct(string $oid, array $name)
     {
         $this->oid = $oid;
@@ -29,4 +27,10 @@ class AbstractObject
 
         return $index;
     }
+
+    public function __get(string $name)
+    {
+        return property_exists($this, $name) ? $this->$name : null;
+    }
 }
+
