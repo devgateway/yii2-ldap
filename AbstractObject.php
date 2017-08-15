@@ -9,7 +9,7 @@
 
 namespace devgateway\ldap;
 
-class AbstractObject
+abstract class AbstractObject
 {
     protected $oid;
     protected $name;
