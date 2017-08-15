@@ -47,8 +47,10 @@ class AttributeDefinition extends Definition
         );
     }
 
-    public static function parse(string $definition)
+    public static function parse(string $description)
     {
+        $description = str_replace("\n ", '', $description);
+        $description = preg_replace('/(^\s*\(\s+)|(\s+\)\s*$)/', '', $description);
     }
 }
 

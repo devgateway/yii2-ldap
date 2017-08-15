@@ -16,7 +16,7 @@ abstract class Definition extends AbstractObject
     protected $sup = null;
     protected $obsolete = false;
 
-    abstract public static function parse(string $definition);
+    abstract public static function parse(string $description);
 
     public function __construct(
         string $oid,
