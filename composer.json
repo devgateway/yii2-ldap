@@ -5,6 +5,7 @@
 	"keywords": ["ldap", "yii2"],
 	"license": "GPL v3+",
 	"require": {
+		"php": ">=5.4.0",
 		"yiisoft/yii2": "~2.0.5",
                 "ext-ldap": "*"
 	},

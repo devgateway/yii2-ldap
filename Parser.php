@@ -45,32 +45,52 @@ class Parser
         // find first non-blank character, move position there
         $matches = [];
         $matched = preg_match(
-            '/\s*(\S)/',
+            '/ *([^ ])/',
             $this->description,
             $matches,
             0,
             $this->position
         );
         if ($matched) {
+            // found beginning of next token, continue
             $first_char = $matches[1];
             $this->position += strlen($matches[0]) - 1;
         } else {
+            // no more tokens
             return false;
         }
 
+        // return string until $char, and move past it, or throw exception
+        $find_until = function ($char, $error) {
+            $end = strpos($this->description, $char, $this->position);
+            if ($end === false) {
+                throw new ParsingException($error);
+            }
+            $token = substr($this->description, $this->position, $end - 1);
+            $this->position = $end + 1;
+            return $token;
+        };
+
         switch ($first_char) {
             case ')':
-                return false;
-            case '\'':
-                $end = strpos($this->description, '\'', $this->position + 1);
-                if ($end === false) {
-                    throw new ParsingException('unbalanced single quote');
-                }
-                $this->tokens[] = substr($this->description, $this->position + 1, $end - 1);
-                $this->position = $end + 1;
+                $token = false;
                 break;
+
             case '(':
+                // TODO
+                break;
+
+            case '\'':
+                $this->position++; // skip opening quote
+                $token = $find_until('\'', 'unbalanced single quote');
+                // TODO: unescape single quote and backslash
+                break;
+
+            default:
+                $token = $find_until(' ', 'unterminated bareword');
         }
+
+        return $token;
     }
 
     protected function stripOid(string $description)
