@@ -77,7 +77,16 @@ class Parser
                 break;
 
             case '(':
-                // TODO
+                $token = [];
+                $this->position++; // skip opening paren
+                while (true) {
+                    $subtoken = $this->getToken();
+                    if ($subtoken === false) {
+                        break;
+                    } else {
+                        $token[] = $subtoken;
+                    }
+                }
                 break;
 
             case '\'':
