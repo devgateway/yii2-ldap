@@ -14,7 +14,7 @@ class ParsingException extends \RuntimeException
 {
     public function __construct(string $msg)
     {
-        $info = "Error at character ${this->position}: $msg";
+        $info = "Error at character {$this->position}: $msg";
         parent::__construct($info);
     }
 }
@@ -42,6 +42,7 @@ class Parser
 
     protected function getToken()
     {
+
         // find first non-blank character, move position there
         $matches = [];
         $matched = preg_match(
@@ -66,7 +67,11 @@ class Parser
             if ($end === false) {
                 throw new ParsingException($error);
             }
-            $token = substr($this->description, $this->position, $end - 1);
+            $token = substr(
+                $this->description,
+                $this->position,
+                $end - $this->position
+            );
             $this->position = $end + 1;
             return $token;
         };
