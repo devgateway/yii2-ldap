@@ -12,12 +12,10 @@ namespace devgateway\ldap;
 
 class ParsingException extends \RuntimeException
 {
-    public function __construct(string $msg = '')
+    public function __construct(string $msg)
     {
-        if (!$msg) {
-            $msg = "Schema parsing error at position ${this->position}";
-        }
-        parent::__construct($msg);
+        $info = "Error at character ${this->position}: $msg";
+        parent::__construct($info);
     }
 }
 
@@ -37,7 +35,7 @@ class Parser
 
         $this->tokens = $this->getToken();
         if (!is_array($this->tokens)) {
-            $msg = 'Schema description must be enclosed in paretheses';
+            $msg = 'schema description must be enclosed in paretheses';
             throw new ParsingException($msg);
         }
     }
@@ -66,7 +64,7 @@ class Parser
             case '\'':
                 $end = strpos($this->description, '\'', $this->position + 1);
                 if ($end === false) {
-                    throw new ParsingException();
+                    throw new ParsingException('unbalanced single quote');
                 }
                 $this->tokens[] = substr($this->description, $this->position + 1, $end - 1);
                 $this->position = $end + 1;
