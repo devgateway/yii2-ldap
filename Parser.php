@@ -93,21 +93,6 @@ class Parser
         return $token;
     }
 
-    protected function stripOid(string $description)
-    {
-
-        // match OID
-        $matches = [];
-        $description_regex = '/^\s* \( \s+ ( [0-2](\.\d+)* ) \s+ (.+) \s+ \) \s*/x';
-        $found = preg_match($description_regex, $description, $matches);
-        if ($found) {
-            $this->properties['oid'] = $matches[1];
-            return $matches[3];
-        } else {
-            throw new \RuntimeException('Unable to parse description');
-        }
-    }
-
     public function __get(string $name)
     {
         //$name = strtolower(str_replace('-', '_', $name));
