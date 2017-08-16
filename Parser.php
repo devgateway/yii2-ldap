@@ -96,8 +96,15 @@ class Parser
 
             case '\'':
                 $this->position++; // skip opening quote
-                $token = $find_until('\'', 'unbalanced single quote');
-                // TODO: unescape single quote and backslash
+                $quoted_token = $find_until('\'', 'unbalanced single quote');
+
+                // unescape single quote and backslash
+                $quoting = [
+                    '\5c' => '\\',
+                    '\5C' => '\\',
+                    '\27' => '\''
+                ];
+                $token = str_replace(array_keys($quoting), $quoting, $quoted_token);
                 break;
 
             default:
