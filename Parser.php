@@ -18,6 +18,10 @@ class LexingException extends \RuntimeException
     }
 }
 
+class ParsingException extends \RuntimeException
+{
+}
+
 class Parser
 {
     const TYPE_BOOL =   0;
@@ -45,7 +49,8 @@ class Parser
         'obsolete'             => false,
         'single_value'         => false,
         'collective'           => false,
-        'no_user_modification' => false
+        'no_user_modification' => false,
+        'usage'                => 'userApplications'
     ];
     protected static $objectclass_keywords = [
         'NAME'                 => self::TYPE_ARRAY,
@@ -187,6 +192,42 @@ class Parser
 
                 $index = strtolower(str_replace('-', '_', $keyword));
                 $properties[$index] = $value;
+            }
+        }
+
+        // validate properties
+        if ($is_attribute) {
+            if (!isset($properties['sup'])) {
+                if (!isset($properties['syntax'])) {
+                    $msg = 'Either SUP or SYNTAX must be set';
+                    throw new ParsingException($msg);
+                }
+                if (
+                    $properties['collective'] &&
+                    $properties['usage'] != 'userApplications'
+                ) {
+                    $msg = 'COLLECTIVE requires USAGE userApplications';
+                    throw new ParsingException($msg);
+                }
+                if (
+                    $properties['no_user_modification'] &&
+                    $usage == 'userApplications'
+                ) {
+                    $msg = 'NO-USER-MODIFICATION requires operational attribute';
+                    throw new ParsingException($msg);
+                }
+            }
+        } else {
+            $i = 0;
+            $kinds = ['structural', 'abstract', 'auxiliary'];
+            foreach ($kinds as $kind) {
+                if ($properties[$kind]) {
+                    $i++;
+                }
+                if ($i > 1) {
+                    $msg = 'Object class must be STRUCTURAL, ABSTRACT, or AUXILIARY';
+                    throw new ParsingException($msg);
+                }
             }
         }
 
