@@ -42,7 +42,6 @@ class Parser
 
     protected function getToken()
     {
-
         // find first non-blank character, move position there
         $matches = [];
         $matched = preg_match(
@@ -78,6 +77,7 @@ class Parser
 
         switch ($first_char) {
             case ')':
+                $this->position++; // skip paren
                 $token = false;
                 break;
 
