@@ -14,8 +14,7 @@ class LexingException extends \RuntimeException
 {
     public function __construct(string $msg)
     {
-        $info = "Error at character {$this->position}: $msg";
-        parent::__construct($info);
+        parent::__construct("Error at character {$this->position}: $msg");
     }
 }
 
@@ -26,7 +25,6 @@ class Parser
     const TYPE_ARRAY =  2;
 
     protected $description;
-    protected $length;
     protected $position = 0;
 
     protected static $attribute_keywords = [
@@ -73,7 +71,6 @@ class Parser
     {
         // unwrap long lines
         $this->description = str_replace("\n ", '', $description);
-        $this->length = strlen($this->description);
     }
 
     protected function getTokens()
