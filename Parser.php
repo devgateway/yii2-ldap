@@ -61,7 +61,7 @@ class Parser
         }
 
         // return string until $char, and move past it, or throw exception
-        $find_until = function ($char, $error) {
+        $read_until = function ($char, $error) {
             $end = strpos($this->description, $char, $this->position);
             if ($end === false) {
                 throw new ParsingException($error);
@@ -96,7 +96,7 @@ class Parser
 
             case '\'':
                 $this->position++; // skip opening quote
-                $quoted_token = $find_until('\'', 'unbalanced single quote');
+                $quoted_token = $read_until('\'', 'unbalanced single quote');
 
                 // unescape single quote and backslash
                 $quoting = [
@@ -108,7 +108,7 @@ class Parser
                 break;
 
             default:
-                $token = $find_until(' ', 'unterminated bareword');
+                $token = $read_until(' ', 'unterminated bareword');
         }
 
         return $token;
