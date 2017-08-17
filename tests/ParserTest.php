@@ -33,8 +33,8 @@ class ParserTest extends TestCase
             'entity is known by","SUP","name"]'
         );
         $escaped = json_decode(
-            '["1.1.1.1.1","NAME","sarcasm","DESC","\'Why test backup\\restore\', they said. \'It' .
-            '\'ll be fine\', they said."]'
+            '["1.1.1.1.1","NAME","sarcasm","DESC","\'Why test backup\\\\restore\', they said. \'' .
+            'It\'ll be fine\', they said."]'
         );
         $business_cat_inline = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
@@ -72,12 +72,17 @@ EOF;
        DESC 'RFC2256: common name(s) for which the entity is known by'
        SUP name )
 EOF;
+        $escaped_def = <<<'EOF'
+( 1.1.1.1.1 NAME sarcasm DESC '\27Why test backup\5crestore\27,
+  they said. \27It\27ll be fine\27, they said.')
+EOF;
 
         return [
             'inline' =>      [$business_cat, $business_cat_inline],
             'wrapped' =>     [$business_cat, $business_cat_wrapped],
             'padded' =>      [$business_cat, $business_cat_padded],
-            'multi-value' => [$common_name,  $common_name_def]
+            'multi-value' => [$common_name,  $common_name_def],
+            'escaped' =>     [$escaped,      $escaped_def]
         ];
     }
 }
