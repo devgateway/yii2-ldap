@@ -30,9 +30,11 @@ class ParserTest extends TestCase
         );
 
         return [
-            'inline' => [$business_cat, <<<'EOF'
-( 2.5.4.15 NAME 'businessCategory' DESC 'RFC2256: business category' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{128} )
-EOF
+            'inline' => [
+                $business_cat,
+                '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business category\' EQUALIT' .
+                'Y caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.1' .
+                '21.1.15{128} )'
             ],
             'wrapped' => [$business_cat, <<<'EOF'
 ( 2.5.
