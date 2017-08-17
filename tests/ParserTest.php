@@ -36,10 +36,10 @@ class ParserTest extends TestCase
             '["1.1.1.1.1","NAME","sarcasm","DESC","\'Why test backup\\\\restore\', they said. \'' .
             'It\'ll be fine\', they said."]'
         );
-        $business_cat_inline = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+        $inline = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128} )';
-        $business_cat_wrapped = <<<'EOF'
+        $wrapped = <<<'EOF'
 ( 2.5.
  4.15 NAME 'businessCat
  egory'
@@ -53,7 +53,7 @@ class ParserTest extends TestCase
   SYNTAX 1.3.6.1.4.1.1466
  .115.121.1.15{128} )
 EOF;
-        $business_cat_padded = <<<'EOF'
+        $padded = <<<'EOF'
 (   2.5.
  4.15    NAME 'businessCat
  egory'
@@ -67,22 +67,22 @@ EOF;
   SYNTAX     1.3.6.1.4.1.1466
  .115.121.1.15{128}    )
 EOF;
-        $common_name_def = <<<'EOF'
+        $cn_definition = <<<'EOF'
 ( 2.5.4.3 NAME ( 'cn' 'commonName' )
        DESC 'RFC2256: common name(s) for which the entity is known by'
        SUP name )
 EOF;
-        $escaped_def = <<<'EOF'
+        $esc_definition = <<<'EOF'
 ( 1.1.1.1.1 NAME sarcasm DESC '\27Why test backup\5crestore\27,
   they said. \27It\27ll be fine\27, they said.')
 EOF;
 
         return [
-            'inline' =>      [$business_cat, $business_cat_inline],
-            'wrapped' =>     [$business_cat, $business_cat_wrapped],
-            'padded' =>      [$business_cat, $business_cat_padded],
-            'multi-value' => [$common_name,  $common_name_def],
-            'escaped' =>     [$escaped,      $escaped_def]
+            'inline' =>      [$business_cat, $inline],
+            'wrapped' =>     [$business_cat, $wrapped],
+            'padded' =>      [$business_cat, $padded],
+            'multi-value' => [$common_name,  $cn_definition],
+            'escaped' =>     [$escaped,      $esc_definition]
         ];
     }
 }
