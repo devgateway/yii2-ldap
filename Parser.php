@@ -10,7 +10,7 @@
 
 namespace devgateway\ldap;
 
-class ParsingException extends \RuntimeException
+class LexingException extends \RuntimeException
 {
     public function __construct(string $msg)
     {
@@ -66,7 +66,7 @@ class Parser
         $this->tokens = $this->getToken();
         if (!is_array($this->tokens)) {
             $msg = 'schema description must be enclosed in paretheses';
-            throw new ParsingException($msg);
+            throw new LexingException($msg);
         }
     }
 
@@ -94,7 +94,7 @@ class Parser
         $read_until = function ($char, $error) {
             $end = strpos($this->description, $char, $this->position);
             if ($end === false) {
-                throw new ParsingException($error);
+                throw new LexingException($error);
             }
             $token = substr(
                 $this->description,
