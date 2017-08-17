@@ -28,6 +28,8 @@ class ParserTest extends TestCase
             ',"caseIgnoreMatch","SUBSTR","caseIgnoreSubstringsMatch", "SYNTAX","1.3.6.1.4.1.1466.' .
             '115.121.1.15{128}"]'
         );
+        $common_name = json_decode('["2.5.4.3","NAME",["cn","commonName"],"DESC","RFC2256: common' .
+            ' name(s) for which the entity is known by","SUP","name"]');
 
         return [
             'inline' => [
@@ -65,7 +67,13 @@ EOF
   SYNTAX     1.3.6.1.4.1.1466
  .115.121.1.15{128}    )
 EOF
-            ]
+            ],
+            'multi-value' => [$common_name, <<<'EOF'
+( 2.5.4.3 NAME ( 'cn' 'commonName' )
+       DESC 'RFC2256: common name(s) for which the entity is known by'
+       SUP name )
+EOF
+            ],
         ];
     }
 }
