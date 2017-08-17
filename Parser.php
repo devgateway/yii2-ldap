@@ -25,7 +25,6 @@ class Parser
     const TYPE_SCALAR = 1;
     const TYPE_ARRAY =  2;
 
-    protected $tokens;
     protected $description;
     protected $length;
     protected $position = 0;
@@ -75,15 +74,9 @@ class Parser
         // unwrap long lines
         $this->description = str_replace("\n ", '', $description);
         $this->length = strlen($this->description);
-
-        $this->tokens = $this->getToken();
-        if (!is_array($this->tokens)) {
-            $msg = 'schema description must be enclosed in paretheses';
-            throw new LexingException($msg);
-        }
     }
 
-    protected function getToken()
+    protected function getTokens()
     {
         // find first non-blank character, move position there
         $matches = [];
@@ -128,7 +121,7 @@ class Parser
                 $token = [];
                 $this->position++; // skip opening paren
                 while (true) {
-                    $subtoken = $this->getToken();
+                    $subtoken = $this->getTokens();
                     if ($subtoken === false) {
                         break;
                     } else {
@@ -159,6 +152,12 @@ class Parser
 
     public function parse($is_attribute)
     {
+        $tokens = $this->getTokens();
+        if (!is_array($tokens)) {
+            $msg = 'schema description must be enclosed in parentheses';
+            throw new LexingException($msg);
+        }
+
         if ($is_attribute) {
             $properties = self::$attribute_defaults;
             $keywords = &self::$attribute_keywords;
@@ -168,10 +167,10 @@ class Parser
         }
 
         // OID is always the first element
-        $properties['oid'] = array_shift($this->tokens);
+        $properties['oid'] = array_shift($tokens);
 
         foreach ($keywords as $keyword => $type) {
-            $position = array_search($keyword, $this->tokens);
+            $position = array_search($keyword, $tokens);
             if ($position !== false) {
                 switch ($type) {
                     case self::TYPE_BOOL:
@@ -179,11 +178,11 @@ class Parser
                         break;
 
                     case self::TYPE_SCALAR:
-                        $value = $this->tokens[$position + 1];
+                        $value = $tokens[$position + 1];
                         break;
 
                     case self::TYPE_ARRAY:
-                        $value = $this->tokens[$position + 1];
+                        $value = $tokens[$position + 1];
                         if (!is_array($value)) {
                             $value = [$value];
                         }
