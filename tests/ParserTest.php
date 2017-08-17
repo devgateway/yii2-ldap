@@ -28,17 +28,18 @@ class ParserTest extends TestCase
             ',"caseIgnoreMatch","SUBSTR","caseIgnoreSubstringsMatch", "SYNTAX","1.3.6.1.4.1.1466.' .
             '115.121.1.15{128}"]'
         );
-        $common_name = json_decode('["2.5.4.3","NAME",["cn","commonName"],"DESC","RFC2256: common' .
-            ' name(s) for which the entity is known by","SUP","name"]');
-
-        return [
-            'inline' => [
-                $business_cat,
-                '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business category\' EQUALIT' .
-                'Y caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.1' .
-                '21.1.15{128} )'
-            ],
-            'wrapped' => [$business_cat, <<<'EOF'
+        $common_name = json_decode(
+            '["2.5.4.3","NAME",["cn","commonName"],"DESC","RFC2256: common name(s) for which the ' .
+            'entity is known by","SUP","name"]'
+        );
+        $escaped = json_decode(
+            '["1.1.1.1.1","NAME","sarcasm","DESC","\'Why test backup\\restore\', they said. \'It' .
+            '\'ll be fine\', they said."]'
+        );
+        $business_cat_inline = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128} )';
+        $business_cat_wrapped = <<<'EOF'
 ( 2.5.
  4.15 NAME 'businessCat
  egory'
@@ -51,9 +52,8 @@ class ParserTest extends TestCase
  reSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466
  .115.121.1.15{128} )
-EOF
-            ],
-            'wrapped & padded' => [$business_cat, <<<'EOF'
+EOF;
+        $business_cat_padded = <<<'EOF'
 (   2.5.
  4.15    NAME 'businessCat
  egory'
@@ -66,14 +66,18 @@ EOF
  reSubstringsMatch
   SYNTAX     1.3.6.1.4.1.1466
  .115.121.1.15{128}    )
-EOF
-            ],
-            'multi-value' => [$common_name, <<<'EOF'
+EOF;
+        $common_name_def = <<<'EOF'
 ( 2.5.4.3 NAME ( 'cn' 'commonName' )
        DESC 'RFC2256: common name(s) for which the entity is known by'
        SUP name )
-EOF
-            ],
+EOF;
+
+        return [
+            'inline' =>      [$business_cat, $business_cat_inline],
+            'wrapped' =>     [$business_cat, $business_cat_wrapped],
+            'padded' =>      [$business_cat, $business_cat_padded],
+            'multi-value' => [$common_name,  $common_name_def]
         ];
     }
 }
