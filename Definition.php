@@ -35,7 +35,7 @@ abstract class Definition extends AbstractObject
     protected function makeShortName()
     {
         $max_length = 0;
-        foreach ($self->name as $name) {
+        foreach ($this->name as $name) {
             $length = strlen($name);
             if ($length > $max_length) {
                 $max_length = $length;
@@ -43,7 +43,7 @@ abstract class Definition extends AbstractObject
             }
         }
 
-        return isset($short_name) ? $short_name : $self->oid;
+        return isset($short_name) ? $short_name : $this->oid;
     }
 }
 

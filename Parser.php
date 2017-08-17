@@ -27,6 +27,36 @@ class Parser
     protected $length;
     protected $position = 0;
 
+    protected static $attribute_keywords = [
+	'NAME'                 => TYPE_ARRAY,
+	'DESC'                 => TYPE_SCALAR,
+	'OBSOLETE'             => TYPE_BOOL,
+	'SUP'                  => TYPE_SCALAR,
+	'EQUALITY'             => TYPE_SCALAR,
+	'ORDERING'             => TYPE_SCALAR,
+	'SUBSTR'               => TYPE_SCALAR,
+	'SYNTAX'               => TYPE_SCALAR,
+	'SINGLE-VALUE'         => TYPE_BOOL,
+	'COLLECTIVE'           => TYPE_BOOL,
+	'NO-USER-MODIFICATION' => TYPE_BOOL,
+	'USAGE'                => TYPE_SCALAR
+    ];
+    protected static $objectclass_keywords = [
+	'NAME'                 => TYPE_ARRAY,
+	'DESC'                 => TYPE_SCALAR,
+	'OBSOLETE'             => TYPE_BOOL,
+	'SUP'                  => TYPE_SCALAR,
+	'ABSTRACT'             => TYPE_BOOL,
+	'STRUCTURAL'           => TYPE_BOOL,
+	'AUXILIARY'            => TYPE_BOOL,
+        'MUST'                 => TYPE_ARRAY,
+        'MAY'                  => TYPE_ARRAY
+    ];
+
+    const TYPE_BOOL =   0;
+    const TYPE_SCALAR = 1;
+    const TYPE_ARRAY =  2;
+
     public function __construct(string $description)
     {
         // unwrap long lines
@@ -118,5 +148,11 @@ class Parser
     {
         //$name = strtolower(str_replace('-', '_', $name));
         return array_key_exists($name, $this->properties) ? $this->properties : null;
+    }
+
+    public function parseAttribute()
+    {
+        $properties = [];
+        foreach (self::$attribute_keywords
     }
 }
