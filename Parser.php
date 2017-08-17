@@ -21,41 +21,54 @@ class LexingException extends \RuntimeException
 
 class Parser
 {
+    const TYPE_BOOL =   0;
+    const TYPE_SCALAR = 1;
+    const TYPE_ARRAY =  2;
+
     protected $tokens;
-    protected $properties = [];
     protected $description;
     protected $length;
     protected $position = 0;
 
     protected static $attribute_keywords = [
-	'NAME'                 => TYPE_ARRAY,
-	'DESC'                 => TYPE_SCALAR,
-	'OBSOLETE'             => TYPE_BOOL,
-	'SUP'                  => TYPE_SCALAR,
-	'EQUALITY'             => TYPE_SCALAR,
-	'ORDERING'             => TYPE_SCALAR,
-	'SUBSTR'               => TYPE_SCALAR,
-	'SYNTAX'               => TYPE_SCALAR,
-	'SINGLE-VALUE'         => TYPE_BOOL,
-	'COLLECTIVE'           => TYPE_BOOL,
-	'NO-USER-MODIFICATION' => TYPE_BOOL,
-	'USAGE'                => TYPE_SCALAR
+        'NAME'                 => self::TYPE_ARRAY,
+        'DESC'                 => self::TYPE_SCALAR,
+        'OBSOLETE'             => self::TYPE_BOOL,
+        'SUP'                  => self::TYPE_SCALAR,
+        'EQUALITY'             => self::TYPE_SCALAR,
+        'ORDERING'             => self::TYPE_SCALAR,
+        'SUBSTR'               => self::TYPE_SCALAR,
+        'SYNTAX'               => self::TYPE_SCALAR,
+        'SINGLE-VALUE'         => self::TYPE_BOOL,
+        'COLLECTIVE'           => self::TYPE_BOOL,
+        'NO-USER-MODIFICATION' => self::TYPE_BOOL,
+        'USAGE'                => self::TYPE_SCALAR
+    ];
+    protected static $attribute_defaults = [
+        'obsolete'             => false,
+        'single_value'         => false,
+        'collective'           => false,
+        'no_user_modification' => false
     ];
     protected static $objectclass_keywords = [
-	'NAME'                 => TYPE_ARRAY,
-	'DESC'                 => TYPE_SCALAR,
-	'OBSOLETE'             => TYPE_BOOL,
-	'SUP'                  => TYPE_SCALAR,
-	'ABSTRACT'             => TYPE_BOOL,
-	'STRUCTURAL'           => TYPE_BOOL,
-	'AUXILIARY'            => TYPE_BOOL,
-        'MUST'                 => TYPE_ARRAY,
-        'MAY'                  => TYPE_ARRAY
+        'NAME'                 => self::TYPE_ARRAY,
+        'DESC'                 => self::TYPE_SCALAR,
+        'OBSOLETE'             => self::TYPE_BOOL,
+        'SUP'                  => self::TYPE_SCALAR,
+        'ABSTRACT'             => self::TYPE_BOOL,
+        'STRUCTURAL'           => self::TYPE_BOOL,
+        'AUXILIARY'            => self::TYPE_BOOL,
+        'MUST'                 => self::TYPE_ARRAY,
+        'MAY'                  => self::TYPE_ARRAY
     ];
-
-    const TYPE_BOOL =   0;
-    const TYPE_SCALAR = 1;
-    const TYPE_ARRAY =  2;
+    protected static $objectclass_defaults = [
+        'structural'           => true,
+        'auxiliary'            => false,
+        'abstract'             => false,
+        'obsolete'             => false,
+        'must'                 => [],
+        'may'                  => []
+    ];
 
     public function __construct(string $description)
     {
@@ -144,15 +157,43 @@ class Parser
         return $token;
     }
 
-    public function __get(string $name)
+    public function parse($is_attribute)
     {
-        //$name = strtolower(str_replace('-', '_', $name));
-        return array_key_exists($name, $this->properties) ? $this->properties : null;
-    }
+        if ($is_attribute) {
+            $properties = self::$attribute_defaults;
+            $keywords = &self::$attribute_keywords;
+        } else {
+            $properties = self::$objectclass_defaults;
+            $keywords = &self::$objectclass_keywords;
+        }
 
-    public function parseAttribute()
-    {
-        $properties = [];
-        foreach (self::$attribute_keywords
+        // OID is always the first element
+        $properties['oid'] = array_shift($this->tokens);
+
+        foreach ($keywords as $keyword => $type) {
+            $position = array_search($keyword, $this->tokens);
+            if ($position !== false) {
+                switch ($type) {
+                    case self::TYPE_BOOL:
+                        $value = true;
+                        break;
+
+                    case self::TYPE_SCALAR:
+                        $value = $this->tokens[$position + 1];
+                        break;
+
+                    case self::TYPE_ARRAY:
+                        $value = $this->tokens[$position + 1];
+                        if (!is_array($value)) {
+                            $value = [$value];
+                        }
+                }
+
+                $index = strtolower(str_replace('-', '_', $keyword));
+                $properties[$index] = $value;
+            }
+        }
+
+        return $properties;
     }
 }
