@@ -6,7 +6,7 @@ class MockParser extends Parser
 {
     public function getTokens()
     {
-        return $this->tokens;
+        return parent::getTokens();
     }
 }
 
