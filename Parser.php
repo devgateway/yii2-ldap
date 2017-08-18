@@ -56,7 +56,7 @@ class Parser
         'NAME'                 => self::TYPE_ARRAY,
         'DESC'                 => self::TYPE_SCALAR,
         'OBSOLETE'             => self::TYPE_BOOL,
-        'SUP'                  => self::TYPE_SCALAR,
+        'SUP'                  => self::TYPE_ARRAY,
         'ABSTRACT'             => self::TYPE_BOOL,
         'STRUCTURAL'           => self::TYPE_BOOL,
         'AUXILIARY'            => self::TYPE_BOOL,
