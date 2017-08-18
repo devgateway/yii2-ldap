@@ -108,7 +108,7 @@ EOF;
         $unbalanced_quote = '( 2.5.4.15 NAME \'businessCategory DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128} )';
-        $unterminated_bareword = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+        $bareword = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128})';
         $bareword_quote = '( 2.5.4.15 NAME businessCategory\' DESC \'RFC2256: business cat' .
@@ -125,16 +125,19 @@ EOF;
         $no_user_mod = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128} NO-USER-MODIFICATION )';
+        $two_kinds = '( 2.5.6.3 NAME \'locality\' DESC \'RFC2256: a locality\' SUP' .
+            ' top STRUCTURAL ABSTRACT MAY ( street $ st $ l $ description ) )';
 
         return [
-            'missing parens' => [$missing_parens, true, $lexing_exception],
-            'unbalanced quote' => [$unbalanced_quote, true, $lexing_exception],
-            'unterminated bareword' => [$unterminated_bareword, true, $lexing_exception],
-            'bareword quote' => [$bareword_quote, true, $lexing_exception],
-            'bareword backslash' => [$bareword_bkslash, true, $lexing_exception],
-            'no syntax no sup' => [$no_syntax, true, $parsing_exception],
-            'collective usage' => [$collective_usage, true, $parsing_exception],
-            'no user modification' => [$no_user_mod, true, $parsing_exception],
+            'missing parens' =>        [$missing_parens,   true,  $lexing_exception],
+            'unbalanced quote' =>      [$unbalanced_quote, true,  $lexing_exception],
+            'unterminated bareword' => [$bareword,         true,  $lexing_exception],
+            'bareword quote' =>        [$bareword_quote,   true,  $lexing_exception],
+            'bareword backslash' =>    [$bareword_bkslash, true,  $lexing_exception],
+            'no syntax no sup' =>      [$no_syntax,        true,  $parsing_exception],
+            'collective usage' =>      [$collective_usage, true,  $parsing_exception],
+            'no user modification' =>  [$no_user_mod,      true,  $parsing_exception],
+            'two class kinds' =>       [$two_kinds,        false, $parsing_exception]
         ];
     }
 }
