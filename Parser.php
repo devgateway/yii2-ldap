@@ -217,7 +217,7 @@ class Parser
                 }
                 if (
                     $properties['no_user_modification'] &&
-                    $usage == 'userApplications'
+                    $usage = 'userApplications'
                 ) {
                     $msg = 'NO-USER-MODIFICATION requires operational attribute';
                     throw new ParsingException($msg);

@@ -117,6 +117,14 @@ EOF;
         $bareword_bkslash = '( 2.5.\4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128} )';
+        $no_syntax = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch )';
+        $collective_usage = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128} COLLECTIVE USAGE directoryOperation )';
+        $no_user_mod = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128} NO-USER-MODIFICATION )';
 
         return [
             'missing parens' => [$missing_parens, true, $lexing_exception],
@@ -124,6 +132,9 @@ EOF;
             'unterminated bareword' => [$unterminated_bareword, true, $lexing_exception],
             'bareword quote' => [$bareword_quote, true, $lexing_exception],
             'bareword backslash' => [$bareword_bkslash, true, $lexing_exception],
+            'no syntax no sup' => [$no_syntax, true, $parsing_exception],
+            'collective usage' => [$collective_usage, true, $parsing_exception],
+            'no user modification' => [$no_user_mod, true, $parsing_exception],
         ];
     }
 }
