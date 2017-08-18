@@ -12,9 +12,9 @@ namespace devgateway\ldap;
 
 class LexingException extends \RuntimeException
 {
-    public function __construct(string $msg)
+    public function __construct(int $position, string $msg)
     {
-        parent::__construct("Error at character {$this->position}: $msg");
+        parent::__construct("Error at character $position: $msg");
     }
 }
 
@@ -102,7 +102,7 @@ class Parser
         $read_until = function ($char, $error) {
             $end = strpos($this->description, $char, $this->position);
             if ($end === false) {
-                throw new LexingException($error);
+                throw new LexingException($this->position, $error);
             }
             $token = substr(
                 $this->description,
@@ -157,7 +157,7 @@ class Parser
         $tokens = $this->getTokens();
         if (!is_array($tokens)) {
             $msg = 'schema description must be enclosed in parentheses';
-            throw new LexingException($msg);
+            throw new LexingException($this->position, $msg);
         }
 
         if ($is_attribute) {
