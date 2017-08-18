@@ -111,11 +111,19 @@ EOF;
         $unterminated_bareword = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128})';
+        $bareword_quote = '( 2.5.4.15 NAME businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128} )';
+        $bareword_bkslash = '( 2.5.\4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128} )';
 
         return [
             'missing parens' => [$missing_parens, true, $lexing_exception],
             'unbalanced quote' => [$unbalanced_quote, true, $lexing_exception],
             'unterminated bareword' => [$unterminated_bareword, true, $lexing_exception],
+            'bareword quote' => [$bareword_quote, true, $lexing_exception],
+            'bareword backslash' => [$bareword_bkslash, true, $lexing_exception],
         ];
     }
 }
