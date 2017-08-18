@@ -115,7 +115,7 @@ class Parser
 
         switch ($first_char) {
             case ')':
-                $this->position++; // skip paren
+                $this->position++; // skip closing paren
                 $token = false;
                 break;
 
@@ -126,7 +126,7 @@ class Parser
                     $subtoken = $this->getTokens();
                     if ($subtoken === false) {
                         break;
-                    } else {
+                    } elseif ($subtoken != '$') {
                         $token[] = $subtoken;
                     }
                 }
