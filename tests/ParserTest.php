@@ -140,5 +140,53 @@ EOF;
             'two class kinds' =>       [$two_kinds,        false, $parsing_exception]
         ];
     }
+
+    /**
+     * @dataProvider parsingProvider
+     */
+    public function testParsing($desc, $expected, $is_attribute)
+    {
+        $parser = new Parser($desc);
+        $actual = $parser->parse($is_attribute);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function parsingProvider()
+    {
+        $device_desc = <<<'EOF'
+( 2.5.6.14 NAME 'device'
+  DESC 'RFC2256: a device'
+  SUP top STRUCTURAL
+  MUST cn
+  MAY ( serialNumber $ seeAlso $ owner $ ou $ o $ l $ description ) )
+EOF;
+        $device_props = json_decode(
+            '{"structural":true,"auxiliary":false,"abstract":false' .
+            ',"obsolete":false,"must":["cn"],"may":["serialNumber","seeAlso","owner","ou","o","l"' .
+            ',"description"],"oid":"2.5.6.14","name":["device"],"desc":"RFC2256: a device","sup":' .
+            '["top"]}',
+            true
+        );
+
+        $unique_member_desc = <<<'EOF'
+( 2.5.4.50 NAME 'uniqueMember'
+  DESC 'RFC2256: unique member of a group'
+  EQUALITY uniqueMemberMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.34 )
+EOF;
+        $unique_member_props = json_decode(
+            '{"obsolete":false,"single_value":false,"collective":false,' .
+            '"no_user_modification":false,"usage":"userApplications","oid":"2.5.4.50","name":["un' .
+            'iqueMember"],"desc":"RFC2256: unique member of a group","equality":"uniqueMemberMatc' .
+            'h","syntax":"1.3.6.1.4.1.1466.115.121.1.34"}',
+            true
+        );
+
+        return [
+            'device' =>       [$device_desc,        $device_props,        false],
+            'uniqueMember' => [$unique_member_desc, $unique_member_props, true]
+        ];
+    }
 }
 
