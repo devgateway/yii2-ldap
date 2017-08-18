@@ -147,6 +147,12 @@ class Parser
 
             default:
                 $token = $read_until(' ', 'unterminated bareword');
+                if (strpbrk($token, '\\\'') !== false) {
+                    throw new LexingException(
+                        $this->position,
+                        'bareword contains backslash or quote'
+                    );
+                }
         }
 
         return $token;

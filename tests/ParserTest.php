@@ -101,12 +101,21 @@ EOF;
     {
         $lexing_exception = 'devgateway\ldap\LexingException';
         $parsing_exception = 'devgateway\ldap\ParsingException';
+
         $missing_parens = '2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128}';
+        $unbalanced_quote = '( 2.5.4.15 NAME \'businessCategory DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128} )';
+        $unterminated_bareword = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
+            'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
+            '.1466.115.121.1.15{128})';
 
         return [
             'missing parens' => [$missing_parens, true, $lexing_exception],
+            'unbalanced quote' => [$unbalanced_quote, true, $lexing_exception],
+            'unterminated bareword' => [$unterminated_bareword, true, $lexing_exception],
         ];
     }
 }
