@@ -29,9 +29,6 @@ class Parser
     const TYPE_SCALAR = 1;
     const TYPE_ARRAY =  2;
 
-    protected $description;
-    protected $position = 0;
-
     protected static $attribute_keywords = [
         'NAME'                 => self::TYPE_ARRAY,
         'DESC'                 => self::TYPE_SCALAR,
@@ -75,60 +72,58 @@ class Parser
 
     public function __construct(string $description)
     {
-        // unwrap long lines
-        $this->description = str_replace("\n ", '', $description);
     }
 
-    protected function getTokens()
+    protected function getTokens($description, &$position)
     {
         // find first non-blank character, move position there
         $matches = [];
         $matched = preg_match(
             '/ *([^ ])/',
-            $this->description,
+            $description,
             $matches,
             0,
-            $this->position
+            $position
         );
         if ($matched) {
             // found beginning of next token, continue
             $first_char = $matches[1];
-            $this->position += strlen($matches[0]) - 1;
+            $position += strlen($matches[0]) - 1;
         } else {
             // no more tokens
             return false;
         }
 
         // return string until $char, and move past it, or throw exception
-        $read_until = function ($char, $error) {
-            $end = strpos($this->description, $char, $this->position);
+        $read_until = function ($char, $error) use ($description, &$position) {
+            $end = strpos($description, $char, $position);
             if ($end === false) {
                 throw new LexingException(
-                    $this->description,
-                    $this->position,
+                    $description,
+                    $position,
                     $error
                 );
             }
             $token = substr(
-                $this->description,
-                $this->position,
-                $end - $this->position
+                $description,
+                $position,
+                $end - $position
             );
-            $this->position = $end + 1;
+            $position = $end + 1;
             return $token;
         };
 
         switch ($first_char) {
             case ')':
-                $this->position++; // skip closing paren
+                $position++; // skip closing paren
                 $token = false;
                 break;
 
             case '(':
                 $token = [];
-                $this->position++; // skip opening paren
+                $position++; // skip opening paren
                 while (true) {
-                    $subtoken = $this->getTokens();
+                    $subtoken = $this->getTokens($description, $position);
                     if ($subtoken === false) {
                         break;
                     } elseif ($subtoken != '$') {
@@ -138,7 +133,7 @@ class Parser
                 break;
 
             case '\'':
-                $this->position++; // skip opening quote
+                $position++; // skip opening quote
                 $quoted_token = $read_until('\'', 'Unbalanced single quote');
 
                 // unescape single quote and backslash
@@ -154,8 +149,8 @@ class Parser
                 $token = $read_until(' ', 'Unterminated bareword');
                 if (strpbrk($token, '\\\'') !== false) {
                     throw new LexingException(
-                        $this->description,
-                        $this->position,
+                        $description,
+                        $position,
                         'Bareword contains backslash or quote'
                     );
                 }
@@ -166,6 +161,10 @@ class Parser
 
     public function parseAttributeDefinition()
     {
+        // unwrap long lines
+        $description = str_replace("\n ", '', $description);
+        $tokens = $this->getTokens();
+
         $properties = this->parse(
             self::$attribute_defaults,
             &self::$attribute_keywords
@@ -219,14 +218,19 @@ class Parser
         return $properties;
     }
 
-    protected function parse($properties, &$keywords)
+    protected function parse($description, $properties, &$keywords)
     {
-        $tokens = $this->getTokens();
+        // unwrap long lines
+        $description = str_replace("\n ", '', $description);
+
+        // tokenize the string
+        $position = 0;
+        $tokens = $this->getTokens($description, $position);
         if (!is_array($tokens)) {
             $msg = 'Schema description must be enclosed in parentheses';
             throw new LexingException(
-                $this->description,
-                $this->position,
+                $description,
+                $position,
                 $msg
             );
         }
@@ -235,19 +239,19 @@ class Parser
         $properties['oid'] = array_shift($tokens);
 
         foreach ($keywords as $keyword => $type) {
-            $position = array_search($keyword, $tokens);
-            if ($position !== false) {
+            $index = array_search($keyword, $tokens);
+            if ($index !== false) {
                 switch ($type) {
                     case self::TYPE_BOOL:
                         $value = true;
                         break;
 
                     case self::TYPE_SCALAR:
-                        $value = $tokens[$position + 1];
+                        $value = $tokens[$index + 1];
                         break;
 
                     case self::TYPE_ARRAY:
-                        $value = $tokens[$position + 1];
+                        $value = $tokens[$index + 1];
                         if (!is_array($value)) {
                             $value = [$value];
                         }
