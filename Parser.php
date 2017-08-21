@@ -12,9 +12,10 @@ namespace devgateway\ldap;
 
 class LexingException extends \RuntimeException
 {
-    public function __construct(int $position, string $msg)
+    public function __construct(string &$description, int $position, string $msg)
     {
-        parent::__construct("Error at character $position: $msg");
+        $desc = substr($description, 0, 47) . "...";
+        parent::__construct("$msg at position $position in: $desc");
     }
 }
 
@@ -102,7 +103,11 @@ class Parser
         $read_until = function ($char, $error) {
             $end = strpos($this->description, $char, $this->position);
             if ($end === false) {
-                throw new LexingException($this->position, $error);
+                throw new LexingException(
+                    $this->description,
+                    $this->position,
+                    $error
+                );
             }
             $token = substr(
                 $this->description,
@@ -134,7 +139,7 @@ class Parser
 
             case '\'':
                 $this->position++; // skip opening quote
-                $quoted_token = $read_until('\'', 'unbalanced single quote');
+                $quoted_token = $read_until('\'', 'Unbalanced single quote');
 
                 // unescape single quote and backslash
                 $quoting = [
@@ -146,11 +151,12 @@ class Parser
                 break;
 
             default:
-                $token = $read_until(' ', 'unterminated bareword');
+                $token = $read_until(' ', 'Unterminated bareword');
                 if (strpbrk($token, '\\\'') !== false) {
                     throw new LexingException(
+                        $this->description,
                         $this->position,
-                        'bareword contains backslash or quote'
+                        'Bareword contains backslash or quote'
                     );
                 }
         }
@@ -217,8 +223,12 @@ class Parser
     {
         $tokens = $this->getTokens();
         if (!is_array($tokens)) {
-            $msg = 'schema description must be enclosed in parentheses';
-            throw new LexingException($this->position, $msg);
+            $msg = 'Schema description must be enclosed in parentheses';
+            throw new LexingException(
+                $this->description,
+                $this->position,
+                $msg
+            );
         }
 
         // OID is always the first element
