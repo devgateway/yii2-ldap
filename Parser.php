@@ -161,13 +161,9 @@ class Parser
 
     public function parseAttributeDefinition()
     {
-        // unwrap long lines
-        $description = str_replace("\n ", '', $description);
-        $tokens = $this->getTokens();
-
-        $properties = this->parse(
+        $properties = $this->parse(
             self::$attribute_defaults,
-            &self::$attribute_keywords
+            self::$attribute_keywords
         );
 
         // validate
@@ -197,9 +193,9 @@ class Parser
 
     public function parseObjectDefinition()
     {
-        $properties = this->parse(
+        $properties = $this->parse(
             self::$objectclass_defaults,
-            &self::$objectclass_keywords
+            self::$objectclass_keywords
         );
 
         // validate
