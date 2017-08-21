@@ -2,11 +2,15 @@
 use PHPUnit\Framework\TestCase;
 use devgateway\ldap\Parser;
 
+define('LEXING_EXCEPTION', 'devgateway\ldap\LexingException');
+define('PARSING_EXCEPTION', 'devgateway\ldap\ParsingException');
+
+
 class MockParser extends Parser
 {
-    public function getTokens()
+    public function getTokens($description, &$position)
     {
-        return parent::getTokens();
+        return parent::getTokens($description, $position);
     }
 }
 
@@ -17,8 +21,10 @@ class ParserTest extends TestCase
      */
     public function testLexer($expected, $desc)
     {
-        $parser = new MockParser($desc);
-        $this->assertEquals($expected, $parser->getTokens());
+        $parser = new MockParser();
+        $position = 0;
+        $tokens = $parser->getTokens($desc, $position);
+        $this->assertEquals($expected, $tokens);
     }
 
     public function descriptionProvider()
@@ -87,21 +93,18 @@ EOF;
     }
 
     /**
-     * @dataProvider badDescriptionProvider
+     * @dataProvider badAttributeDescriptionProvider
      */
-    public function testExceptions($desc, $is_attribute, $exception_name)
+    public function testAttributeExceptions($desc, $exception_name)
     {
-        $parser = new Parser($desc);
+        $parser = new Parser();
 
         $this->expectException($exception_name);
-        $parser->parse($is_attribute);
+        $parser->parseAttributeDefinition($desc);
     }
 
-    public function badDescriptionProvider()
+    public function badAttributeDescriptionProvider()
     {
-        $lexing_exception = 'devgateway\ldap\LexingException';
-        $parsing_exception = 'devgateway\ldap\ParsingException';
-
         $missing_parens = '2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128}';
@@ -125,43 +128,50 @@ EOF;
         $no_user_mod = '( 2.5.4.15 NAME \'businessCategory\' DESC \'RFC2256: business cat' .
             'egory\' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1' .
             '.1466.115.121.1.15{128} NO-USER-MODIFICATION )';
-        $two_kinds = '( 2.5.6.3 NAME \'locality\' DESC \'RFC2256: a locality\' SUP' .
-            ' top STRUCTURAL ABSTRACT MAY ( street $ st $ l $ description ) )';
 
         return [
-            'missing parens' =>        [$missing_parens,   true,  $lexing_exception],
-            'unbalanced quote' =>      [$unbalanced_quote, true,  $lexing_exception],
-            'unterminated bareword' => [$bareword,         true,  $lexing_exception],
-            'bareword quote' =>        [$bareword_quote,   true,  $lexing_exception],
-            'bareword backslash' =>    [$bareword_bkslash, true,  $lexing_exception],
-            'no syntax no sup' =>      [$no_syntax,        true,  $parsing_exception],
-            'collective usage' =>      [$collective_usage, true,  $parsing_exception],
-            'no user modification' =>  [$no_user_mod,      true,  $parsing_exception],
-            'two class kinds' =>       [$two_kinds,        false, $parsing_exception]
+            'missing parens' =>        [$missing_parens,   LEXING_EXCEPTION],
+            'unbalanced quote' =>      [$unbalanced_quote, LEXING_EXCEPTION],
+            'unterminated bareword' => [$bareword,         LEXING_EXCEPTION],
+            'bareword quote' =>        [$bareword_quote,   LEXING_EXCEPTION],
+            'bareword backslash' =>    [$bareword_bkslash, LEXING_EXCEPTION],
+            'no syntax no sup' =>      [$no_syntax,        PARSING_EXCEPTION],
+            'collective usage' =>      [$collective_usage, PARSING_EXCEPTION],
+            'no user modification' =>  [$no_user_mod,      PARSING_EXCEPTION],
         ];
     }
 
     /**
-     * @dataProvider parsingProvider
+     * @dataProvider badObjectDescriptionProvider
      */
-    public function testParsing($desc, $expected, $is_attribute)
+    public function testObjectExceptions($desc, $exception_name)
     {
-        $parser = new Parser($desc);
-        $actual = $parser->parse($is_attribute);
+        $parser = new Parser();
 
-        $this->assertEquals($expected, $actual);
+        $this->expectException($exception_name);
+        $parser->parseObjectDefinition($desc);
     }
 
-    public function parsingProvider()
+    public function badObjectDescriptionProvider()
     {
-        $device_desc = <<<'EOF'
+        $two_kinds = '( 2.5.6.3 NAME \'locality\' DESC \'RFC2256: a locality\' SUP' .
+            ' top STRUCTURAL ABSTRACT MAY ( street $ st $ l $ description ) )';
+
+        return [
+            'two class kinds' => [$two_kinds, PARSING_EXCEPTION]
+        ];
+    }
+
+    public function testObjectParsing()
+    {
+        $description = <<<'EOF'
 ( 2.5.6.14 NAME 'device'
   DESC 'RFC2256: a device'
   SUP top STRUCTURAL
   MUST cn
   MAY ( serialNumber $ seeAlso $ owner $ ou $ o $ l $ description ) )
 EOF;
-        $device_props = json_decode(
+        $expected = json_decode(
             '{"structural":true,"auxiliary":false,"abstract":false' .
             ',"obsolete":false,"must":["cn"],"may":["serialNumber","seeAlso","owner","ou","o","l"' .
             ',"description"],"oid":"2.5.6.14","name":["device"],"desc":"RFC2256: a device","sup":' .
@@ -169,24 +179,32 @@ EOF;
             true
         );
 
-        $unique_member_desc = <<<'EOF'
+        $parser = new Parser();
+        $actual = $parser->parseAttributeDefinition($description);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    public function testAttributeParsing()
+    {
+        $description = <<<'EOF'
 ( 2.5.4.50 NAME 'uniqueMember'
   DESC 'RFC2256: unique member of a group'
   EQUALITY uniqueMemberMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.34 )
 EOF;
-        $unique_member_props = json_decode(
+        $expected = json_decode(
             '{"obsolete":false,"single_value":false,"collective":false,' .
             '"no_user_modification":false,"usage":"userApplications","oid":"2.5.4.50","name":["un' .
             'iqueMember"],"desc":"RFC2256: unique member of a group","equality":"uniqueMemberMatc' .
             'h","syntax":"1.3.6.1.4.1.1466.115.121.1.34"}',
             true
         );
+        $parser = new Parser();
+        $actual = $parser->parseAttributeDefinition($description);
 
-        return [
-            'device' =>       [$device_desc,        $device_props,        false],
-            'uniqueMember' => [$unique_member_desc, $unique_member_props, true]
-        ];
+        $this->assertEquals($expected, $actual);
     }
 }
 
