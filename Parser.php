@@ -158,20 +158,67 @@ class Parser
         return $token;
     }
 
-    public function parse($is_attribute)
+    public function parseAttributeDefinition()
+    {
+        $properties = this->parse(
+            self::$attribute_defaults,
+            &self::$attribute_keywords
+        );
+
+        // validate
+        if (!isset($properties['sup'])) {
+            if (!isset($properties['syntax'])) {
+                $msg = 'Either SUP or SYNTAX must be set';
+                throw new ParsingException($msg);
+            }
+            if (
+                $properties['collective'] &&
+                $properties['usage'] != 'userApplications'
+            ) {
+                $msg = 'COLLECTIVE requires USAGE userApplications';
+                throw new ParsingException($msg);
+            }
+            if (
+                $properties['no_user_modification'] &&
+                $usage = 'userApplications'
+            ) {
+                $msg = 'NO-USER-MODIFICATION requires operational attribute';
+                throw new ParsingException($msg);
+            }
+        }
+
+        return $properties;
+    }
+
+    public function parseObjectDefinition()
+    {
+        $properties = this->parse(
+            self::$objectclass_defaults,
+            &self::$objectclass_keywords
+        );
+
+        // validate
+        $i = 0;
+        $kinds = ['structural', 'abstract', 'auxiliary'];
+        foreach ($kinds as $kind) {
+            if ($properties[$kind]) {
+                $i++;
+            }
+            if ($i > 1) {
+                $msg = 'Object class must be STRUCTURAL, ABSTRACT, or AUXILIARY';
+                throw new ParsingException($msg);
+            }
+        }
+
+        return $properties;
+    }
+
+    protected function parse($properties, &$keywords)
     {
         $tokens = $this->getTokens();
         if (!is_array($tokens)) {
             $msg = 'schema description must be enclosed in parentheses';
             throw new LexingException($this->position, $msg);
-        }
-
-        if ($is_attribute) {
-            $properties = self::$attribute_defaults;
-            $keywords = &self::$attribute_keywords;
-        } else {
-            $properties = self::$objectclass_defaults;
-            $keywords = &self::$objectclass_keywords;
         }
 
         // OID is always the first element
@@ -198,42 +245,6 @@ class Parser
 
                 $index = strtolower(str_replace('-', '_', $keyword));
                 $properties[$index] = $value;
-            }
-        }
-
-        // validate properties
-        if ($is_attribute) {
-            if (!isset($properties['sup'])) {
-                if (!isset($properties['syntax'])) {
-                    $msg = 'Either SUP or SYNTAX must be set';
-                    throw new ParsingException($msg);
-                }
-                if (
-                    $properties['collective'] &&
-                    $properties['usage'] != 'userApplications'
-                ) {
-                    $msg = 'COLLECTIVE requires USAGE userApplications';
-                    throw new ParsingException($msg);
-                }
-                if (
-                    $properties['no_user_modification'] &&
-                    $usage = 'userApplications'
-                ) {
-                    $msg = 'NO-USER-MODIFICATION requires operational attribute';
-                    throw new ParsingException($msg);
-                }
-            }
-        } else {
-            $i = 0;
-            $kinds = ['structural', 'abstract', 'auxiliary'];
-            foreach ($kinds as $kind) {
-                if ($properties[$kind]) {
-                    $i++;
-                }
-                if ($i > 1) {
-                    $msg = 'Object class must be STRUCTURAL, ABSTRACT, or AUXILIARY';
-                    throw new ParsingException($msg);
-                }
             }
         }
 
