@@ -70,10 +70,6 @@ class Parser
         'may'                  => []
     ];
 
-    public function __construct(string $description)
-    {
-    }
-
     protected function getTokens($description, &$position)
     {
         // find first non-blank character, move position there
@@ -159,9 +155,10 @@ class Parser
         return $token;
     }
 
-    public function parseAttributeDefinition()
+    public function parseAttributeDefinition($description)
     {
         $properties = $this->parse(
+            $description,
             self::$attribute_defaults,
             self::$attribute_keywords
         );
@@ -191,9 +188,10 @@ class Parser
         return $properties;
     }
 
-    public function parseObjectDefinition()
+    public function parseObjectDefinition($description)
     {
         $properties = $this->parse(
+            $description,
             self::$objectclass_defaults,
             self::$objectclass_keywords
         );
