@@ -19,11 +19,15 @@ class ParserTest extends TestCase
     /**
      * @dataProvider descriptionProvider
      */
-    public function testLexer($expected, $desc)
+    public function testLexer($expected, $description)
     {
+        // unwrap long lines
+        $description = str_replace("\n ", '', $description);
+
         $parser = new MockParser();
         $position = 0;
-        $tokens = $parser->getTokens($desc, $position);
+        $tokens = $parser->getTokens($description, $position);
+
         $this->assertEquals($expected, $tokens);
     }
 
