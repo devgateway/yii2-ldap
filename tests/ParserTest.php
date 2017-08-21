@@ -184,7 +184,7 @@ EOF;
         );
 
         $parser = new Parser();
-        $actual = $parser->parseAttributeDefinition($description);
+        $actual = $parser->parseObjectDefinition($description);
 
         $this->assertEquals($expected, $actual);
     }
