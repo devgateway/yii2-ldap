@@ -10,7 +10,39 @@
 
 namespace devgateway\ldap;
 
-use devgateway\ldap\AbstractObject;
+define('SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION',     3);
+define('SYNTAX_BIT_STRING',                     6);
+define('SYNTAX_BOOLEAN',                        7);
+define('SYNTAX_COUNTRY_STRING',                 11);
+define('SYNTAX_DELIVERY_METHOD',                14);
+define('SYNTAX_DIRECTORY_STRING',               15);
+define('SYNTAX_DIT_CONTENT_RULE_DESCRIPTION',   16);
+define('SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION', 17);
+define('SYNTAX_DN',                             12);
+define('SYNTAX_ENHANCED_GUIDE',                 21);
+define('SYNTAX_FACSIMILE_TELEPHONE_NUMBER',     22);
+define('SYNTAX_FAX',                            23);
+define('SYNTAX_GENERALIZED_TIME',               24);
+define('SYNTAX_GUIDE',                          25);
+define('SYNTAX_IA5_STRING',                     26);
+define('SYNTAX_INTEGER',                        27);
+define('SYNTAX_JPEG',                           28);
+define('SYNTAX_LDAP_SYNTAX_DESCRIPTION',        54);
+define('SYNTAX_MATCHING_RULE_DESCRIPTION',      30);
+define('SYNTAX_MATCHING_RULE_USE_DESCRIPTION',  31);
+define('SYNTAX_NAME_AND_OPTIONAL_UID',          34);
+define('SYNTAX_NAME_FORM_DESCRIPTION',          35);
+define('SYNTAX_NUMERIC_STRING',                 36);
+define('SYNTAX_OBJECT_CLASS_DESCRIPTION',       37);
+define('SYNTAX_OCTET_STRING',                   40);
+define('SYNTAX_OTHER_MAILBOX',                  39);
+define('SYNTAX_POSTAL_ADDRESS',                 41);
+define('SYNTAX_PRINTABLE_STRING',               44);
+define('SYNTAX_SUBSTRING_ASSERTION',            58);
+define('SYNTAX_TELEPHONE_NUMBER',               50);
+define('SYNTAX_TELETEX_TERMINAL_IDENTIFIER',    51);
+define('SYNTAX_TELEX_NUMBER',                   52);
+define('SYNTAX_UTC_TIME',                       53);
 
 class SyntaxException extends \RuntimeException
 {
@@ -27,40 +59,61 @@ class SyntaxException extends \RuntimeException
     }
 }
 
-abstract class Syntax extends AbstractObject
+class Syntax
 {
-    protected function makeShortName()
+    protected static $syntax_ids = [
+        SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION,
+        SYNTAX_BIT_STRING,
+        SYNTAX_BOOLEAN,
+        SYNTAX_COUNTRY_STRING,
+        SYNTAX_DELIVERY_METHOD,
+        SYNTAX_DIRECTORY_STRING,
+        SYNTAX_DIT_CONTENT_RULE_DESCRIPTION,
+        SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION,
+        SYNTAX_DN,
+        SYNTAX_ENHANCED_GUIDE,
+        SYNTAX_FACSIMILE_TELEPHONE_NUMBER,
+        SYNTAX_FAX,
+        SYNTAX_GENERALIZED_TIME,
+        SYNTAX_GUIDE,
+        SYNTAX_IA5_STRING,
+        SYNTAX_INTEGER,
+        SYNTAX_JPEG,
+        SYNTAX_LDAP_SYNTAX_DESCRIPTION,
+        SYNTAX_MATCHING_RULE_DESCRIPTION,
+        SYNTAX_MATCHING_RULE_USE_DESCRIPTION,
+        SYNTAX_NAME_AND_OPTIONAL_UID,
+        SYNTAX_NAME_FORM_DESCRIPTION,
+        SYNTAX_NUMERIC_STRING,
+        SYNTAX_OBJECT_CLASS_DESCRIPTION,
+        SYNTAX_OCTET_STRING,
+        SYNTAX_OTHER_MAILBOX,
+        SYNTAX_POSTAL_ADDRESS,
+        SYNTAX_PRINTABLE_STRING,
+        SYNTAX_SUBSTRING_ASSERTION,
+        SYNTAX_TELEPHONE_NUMBER,
+        SYNTAX_TELETEX_TERMINAL_IDENTIFIER,
+        SYNTAX_TELEX_NUMBER,
+        SYNTAX_UTC_TIME
+    ];
+
+    public static function getAll()
     {
-        return $this->oid;
+        $all = [];
+        foreach (self::$syntax_ids as $id) {
+            $oid = "1.3.6.1.4.1.1466.115.121.1.$id";
+            $all[$oid] = new Syntax($id);
+        }
+
+        return $all;
+    }
+
+    public function __construct(int $syntax_id)
+    {
     }
 }
 
-class AttributeTypeDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.3';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class BitStringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.6';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
+/*
 class BooleanSyntax extends Syntax
 {
     protected static $oid = '1.3.6.1.4.1.1466.115.121.1.7';
@@ -82,162 +135,6 @@ class BooleanSyntax extends Syntax
             default:
                 throw new SyntaxException($serialized, ['TRUE', 'FALSE']);
         }
-    }
-}
-
-class CountryStringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.11';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class DeliveryMethodSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.14';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class DirectoryStringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.15';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class DitContentRuleDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.16';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class DitStructureRuleDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.17';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class DnSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.12';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class EnhancedGuideSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.21';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class FacsimileTelephoneNumberSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.22';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class FaxSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.23';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class GeneralizedTimeSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.24';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class GuideSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.25';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class Ia5StringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.26';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
     }
 }
 
@@ -277,212 +174,5 @@ class JpegSyntax extends Syntax
     {
     }
 }
-
-class LdapSyntaxDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.54';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class MatchingRuleDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.30';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class MatchingRuleUseDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.31';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class NameAndOptionalUidSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.34';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class NameFormDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.35';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class NumericStringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.36';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class ObjectClassDescriptionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.37';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class OctetStringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.40';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class OtherMailboxSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.39';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class PostalAddressSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.41';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class PrintableStringSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.44';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class SubstringAssertionSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.58';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class TelephoneNumberSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.50';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class TeletexTerminalIdentifierSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.51';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class TelexNumberSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.52';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
-
-class UtcTimeSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.53';
-
-    public static function serialize($value)
-    {
-    }
-
-    public static function unserialize(string $serialized)
-    {
-    }
-}
+ */
 
