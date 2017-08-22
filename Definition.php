@@ -26,8 +26,6 @@ abstract class Definition extends AbstractObject
         $this->desc = $desc;
         $this->sup = $sup;
         $this->obsolete = $obsolete;
-
-        parent::__construct($oid, $name);
     }
 
     protected function makeShortName()

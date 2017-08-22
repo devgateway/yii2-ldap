@@ -1,12 +1,12 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use devgateway\ldap\Parser;
+use devgateway\ldap\Schema;
 
 define('LEXING_EXCEPTION', 'devgateway\ldap\LexingException');
 define('PARSING_EXCEPTION', 'devgateway\ldap\ParsingException');
 
 
-class MockParser extends Parser
+class MockSchema extends Schema
 {
     public function getTokens($description, &$position)
     {
@@ -24,9 +24,9 @@ class ParserTest extends TestCase
         // unwrap long lines
         $description = str_replace("\n ", '', $description);
 
-        $parser = new MockParser();
+        $schema = new MockSchema();
         $position = 0;
-        $tokens = $parser->getTokens($description, $position);
+        $tokens = $schema->getTokens($description, $position);
 
         $this->assertEquals($expected, $tokens);
     }
@@ -101,10 +101,10 @@ EOF;
      */
     public function testAttributeExceptions($desc, $exception_name)
     {
-        $parser = new Parser();
+        $schema = new Schema();
 
         $this->expectException($exception_name);
-        $parser->parseAttributeDefinition($desc);
+        $schema->parseAttributeDefinition($desc);
     }
 
     public function badAttributeDescriptionProvider()
@@ -150,10 +150,10 @@ EOF;
      */
     public function testObjectExceptions($desc, $exception_name)
     {
-        $parser = new Parser();
+        $schema = new Schema();
 
         $this->expectException($exception_name);
-        $parser->parseObjectDefinition($desc);
+        $schema->parseObjectDefinition($desc);
     }
 
     public function badObjectDescriptionProvider()
@@ -183,8 +183,8 @@ EOF;
             true
         );
 
-        $parser = new Parser();
-        $actual = $parser->parseObjectDefinition($description);
+        $schema = new Schema();
+        $actual = $schema->parseObjectDefinition($description);
 
         $this->assertEquals($expected, $actual);
     }
@@ -205,8 +205,8 @@ EOF;
             'h","syntax":"1.3.6.1.4.1.1466.115.121.1.34"}',
             true
         );
-        $parser = new Parser();
-        $actual = $parser->parseAttributeDefinition($description);
+        $schema = new Schema();
+        $actual = $schema->parseAttributeDefinition($description);
 
         $this->assertEquals($expected, $actual);
     }

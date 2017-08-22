@@ -11,26 +11,6 @@ namespace devgateway\ldap;
 
 abstract class AbstractObject
 {
-    protected $oid;
-    protected $name;
-    protected $short_name;
-
-    abstract protected function makeShortName();
-
-    public function __construct(string $oid, array $name)
-    {
-        $this->oid = $oid;
-        $this->name = $name;
-    }
-
-    public function getIndex()
-    {
-        $index = $this->name;
-        array_unshift($index, $this->oid);
-
-        return $index;
-    }
-
     public function __get(string $name)
     {
         return property_exists($this, $name) ? $this->$name : null;
