@@ -159,7 +159,7 @@ class Connection extends Component
      * @see http://php.net/manual/en/function.ldap-read.php LDAP base search.
      * @param int $scope Search scope, one of Connection::BASE, ONELEVEL, or SUBTREE.
      * @param string $base Search base.
-     * @param string $filter Search filter. Must be properly escaped.
+     * @param string $filter Properly escaped search filter; default: '(objectClass=*)'.
      * @param array $attrs Array of attributes to request from LDAP.
      * @param int $size_limit Limit search to this many results; 0 for no limit.
      * @param int $time_limit Limit search duration, in seconds; 0 for no limit.
@@ -171,7 +171,7 @@ class Connection extends Component
     public function search(
         int $scope,
         string $base,
-        string $filter,
+        string $filter = '(objectClass=*)',
         array $attrs = [],
         int $size_limit = 0,
         int $time_limit = 0,
@@ -180,6 +180,10 @@ class Connection extends Component
         bool $page_critical = false
     ) {
         $this->bind();
+
+        if ($filter == '') {
+            $filter = '(objectClass=*)';
+        }
 
         return new Search(
             $this->conn,
