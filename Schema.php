@@ -11,6 +11,7 @@
 namespace devgateway\ldap;
 
 use devgateway\ldap\Syntax;
+use devgateway\ldap\OidArray;
 
 class LexingException extends \RuntimeException
 {
@@ -25,7 +26,7 @@ class ParsingException extends \RuntimeException
 {
 }
 
-class Schema
+class Schema extends OidArray
 {
     const TYPE_BOOL =   0;
     const TYPE_SCALAR = 1;
@@ -71,8 +72,6 @@ class Schema
         'must'                 => [],
         'may'                  => []
     ];
-
-    protected $schema;
 
     protected function getTokens($description, &$position)
     {
@@ -265,9 +264,8 @@ class Schema
 
     public function __construct()
     {
-        $this->schema = new OidArray();
         foreach (Syntax::getAll() as $oid => $syntax) {
-            $this->schema[[$oid]] = $syntax;
+            $this[[$oid]] = $syntax;
         }
     }
 }
