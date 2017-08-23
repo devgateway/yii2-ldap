@@ -14,37 +14,16 @@ use devgateway\ldap\Definition;
 
 class AttributeDefinition extends Definition
 {
-    protected $syntax;
-    protected $singlevalue;
+    public function __construct(array $properties) {
+        $self->properties['single_value'] =         $properties['single_value'];
+        $self->properties['no_user_modification'] = $properties['no_user_modification'];
 
-    public function __construct(
-        string $oid,
-        array $name,
-        Syntax $syntax = null,
-        Definition $sup = null,
-        string $desc = '',
-        bool $singlevalue = false
-    ) {
-        $this->singlevalue = $singlevalue;
-
-        if (is_null($syntax)) {
-            if (is_null($sup)) {
-                $msg = 'Syntax and supertype can\'t both be null';
-                throw new \RuntimeException($msg);
-            } else {
-                $this->syntax = $sup->syntax;
-            }
+        if ($properties['syntax']) {
         } else {
-            $this->syntax = $syntax;
+            // sup
         }
 
-        parent::__construct(
-            $oid,
-            $name,
-            $desc,
-            $sup,
-            $obsolete
-        );
+        parent::__construct($properties);
     }
 }
 
