@@ -10,7 +10,7 @@
 
 namespace devgateway\ldap;
 
-abstract class Definition extends AbstractObject
+abstract class Definition
 {
     protected $desc = '';
     protected $sup = null;
@@ -40,6 +40,11 @@ abstract class Definition extends AbstractObject
         }
 
         return isset($short_name) ? $short_name : $this->oid;
+    }
+
+    public function __get(string $name)
+    {
+        return property_exists($this, $name) ? $this->$name : null;
     }
 }
 
