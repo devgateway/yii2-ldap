@@ -12,6 +12,7 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\Syntax;
 use devgateway\ldap\OidArray;
+use devgateway\ldap\Connection;
 
 class LexingException extends \RuntimeException
 {
@@ -267,6 +268,10 @@ class Schema extends OidArray
         foreach (Syntax::getAll() as $oid => $syntax) {
             $this[[$oid]] = $syntax;
         }
+    }
+
+    public function load(Connection $conn)
+    {
     }
 }
 
