@@ -272,6 +272,27 @@ class Schema extends OidArray
 
     public function load(Connection $conn)
     {
+        $search_result = $conn->search(
+            Connection::BASE,
+            '', // root DSE
+            '',
+            ['subschemaSubentry']
+        );
+
+        foreach ($search_result as $root_dse) {
+            $subschema_subentry = $root_dse['subschemaSubentry'][0];
+        }
+
+        $search_result = $conn->search(
+            Connection::BASE,
+            $subschema_subentry,
+            '',
+            ['attributeTypes', 'objectClasses']
+        );
+
+        foreach ($search_result as $subschema) {
+            return $subschema;
+        }
     }
 }
 
