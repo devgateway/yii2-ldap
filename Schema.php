@@ -10,6 +10,8 @@
 
 namespace devgateway\ldap;
 
+use devgateway\ldap\Syntax;
+
 class LexingException extends \RuntimeException
 {
     public function __construct(string &$description, int $position, string $msg)
@@ -264,6 +266,9 @@ class Schema
     public function __construct()
     {
         $this->schema = new OidArray();
+        foreach (Syntax::getAll() as $oid => $syntax) {
+            $this->schema[[$oid]] = $syntax;
+        }
     }
 }
 

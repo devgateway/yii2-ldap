@@ -61,7 +61,8 @@ class SyntaxException extends \RuntimeException
 
 class Syntax
 {
-    protected static $syntax_ids = [
+    protected $syntax_type;
+    protected static $types = [
         SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION,
         SYNTAX_BIT_STRING,
         SYNTAX_BOOLEAN,
@@ -100,79 +101,128 @@ class Syntax
     public static function getAll()
     {
         $all = [];
-        foreach (self::$syntax_ids as $id) {
-            $oid = "1.3.6.1.4.1.1466.115.121.1.$id";
-            $all[$oid] = new Syntax($id);
+        foreach (self::$types as $syntax_type) {
+            $oid = "1.3.6.1.4.1.1466.115.121.1.$syntax_type";
+            $all[$oid] = new Syntax($syntax_type);
         }
 
         return $all;
     }
 
-    public function __construct(int $syntax_id)
+    public function __construct(int $syntax_type)
     {
-    }
-}
-
-/*
-class BooleanSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.7';
-
-    public static function serialize($value)
-    {
-        return $value ? 'TRUE' : 'FALSE';
-    }
-
-    public static function unserialize(string $serialized)
-    {
-        switch ($serialized) {
-            case 'TRUE':
-                return true;
-                break;
-            case 'FALSE':
-                return false;
-                break;
-            default:
-                throw new SyntaxException($serialized, ['TRUE', 'FALSE']);
-        }
-    }
-}
-
-class IntegerSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.27';
-
-    public static function serialize($value)
-    {
-        if (is_integer($value)) {
-            return strval($value);
+        if (in_array($syntax_type, self::$types)) {
+            $this->syntax_type = $syntax_type;
         } else {
-            throw new SyntaxException($value);
+            throw new \OutOfRangeException("Unknown syntax 1.3.6.1.4.1.1466.115.121.1.$syntax_type");
         }
     }
-
-    public static function unserialize(string $serialized)
-    {
-        return intval($serialized);
-    }
-}
-
-class JpegSyntax extends Syntax
-{
-    protected static $oid = '1.3.6.1.4.1.1466.115.121.1.28';
 
     public static function serialize($value)
     {
-        if (is_string($value)) {
-            return $value;
-        } else {
-            throw new SyntaxException('<non-string data>');
+        switch ($this->syntax_type) {
+            case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
+            case SYNTAX_BIT_STRING:
+            case SYNTAX_BOOLEAN:
+                return $value ? 'TRUE' : 'FALSE';
+
+            case SYNTAX_COUNTRY_STRING:
+            case SYNTAX_DELIVERY_METHOD:
+            case SYNTAX_DIRECTORY_STRING:
+            case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
+            case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
+            case SYNTAX_DN:
+            case SYNTAX_ENHANCED_GUIDE:
+            case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
+            case SYNTAX_FAX:
+            case SYNTAX_GENERALIZED_TIME:
+            case SYNTAX_GUIDE:
+            case SYNTAX_IA5_STRING:
+            case SYNTAX_INTEGER:
+                if (is_integer($value)) {
+                    return strval($value);
+                } else {
+                    throw new SyntaxException($value);
+                }
+
+            case SYNTAX_JPEG:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException('<non-string data>');
+                }
+
+            case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
+            case SYNTAX_MATCHING_RULE_DESCRIPTION:
+            case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
+            case SYNTAX_NAME_AND_OPTIONAL_UID:
+            case SYNTAX_NAME_FORM_DESCRIPTION:
+            case SYNTAX_NUMERIC_STRING:
+            case SYNTAX_OBJECT_CLASS_DESCRIPTION:
+            case SYNTAX_OCTET_STRING:
+            case SYNTAX_OTHER_MAILBOX:
+            case SYNTAX_POSTAL_ADDRESS:
+            case SYNTAX_PRINTABLE_STRING:
+            case SYNTAX_SUBSTRING_ASSERTION:
+            case SYNTAX_TELEPHONE_NUMBER:
+            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
+            case SYNTAX_TELEX_NUMBER:
+            case SYNTAX_UTC_TIME:
+
         }
     }
 
     public static function unserialize(string $serialized)
     {
+        switch ($this->syntax_type) {
+            case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
+            case SYNTAX_BIT_STRING:
+            case SYNTAX_BOOLEAN:
+                switch ($serialized) {
+                    case 'TRUE':
+                        return true;
+                        break;
+                    case 'FALSE':
+                        return false;
+                        break;
+                    default:
+                        throw new SyntaxException($serialized, ['TRUE', 'FALSE']);
+                }
+
+            case SYNTAX_COUNTRY_STRING:
+            case SYNTAX_DELIVERY_METHOD:
+            case SYNTAX_DIRECTORY_STRING:
+            case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
+            case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
+            case SYNTAX_DN:
+            case SYNTAX_ENHANCED_GUIDE:
+            case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
+            case SYNTAX_FAX:
+            case SYNTAX_GENERALIZED_TIME:
+            case SYNTAX_GUIDE:
+            case SYNTAX_IA5_STRING:
+            case SYNTAX_INTEGER:
+                return intval($serialized);
+
+            case SYNTAX_JPEG:
+            case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
+            case SYNTAX_MATCHING_RULE_DESCRIPTION:
+            case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
+            case SYNTAX_NAME_AND_OPTIONAL_UID:
+            case SYNTAX_NAME_FORM_DESCRIPTION:
+            case SYNTAX_NUMERIC_STRING:
+            case SYNTAX_OBJECT_CLASS_DESCRIPTION:
+            case SYNTAX_OCTET_STRING:
+            case SYNTAX_OTHER_MAILBOX:
+            case SYNTAX_POSTAL_ADDRESS:
+            case SYNTAX_PRINTABLE_STRING:
+            case SYNTAX_SUBSTRING_ASSERTION:
+            case SYNTAX_TELEPHONE_NUMBER:
+            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
+            case SYNTAX_TELEX_NUMBER:
+            case SYNTAX_UTC_TIME:
+
+        }
     }
 }
- */
 
