@@ -265,16 +265,21 @@ class Schema extends OidArray
         return $properties;
     }
 
-    public function __construct()
+    public function __construct(Connection $conn)
     {
+        $this->conn = $conn;
+
         foreach (Syntax::getAll() as $oid => $syntax) {
             $this[[$oid]] = $syntax;
         }
+
+        // TODO: try load from cache
+        $definitions = $this->loadFromDse();
     }
 
-    public function load(Connection $conn)
+    protected function loadFromDse()
     {
-        $search_result = $conn->search(
+        $search_result = $this->conn->search(
             Connection::BASE,
             '', // root DSE
             '',
@@ -285,15 +290,25 @@ class Schema extends OidArray
             $subschema_subentry = $root_dse['subschemaSubentry'][0];
         }
 
-        $search_result = $conn->search(
+        $search_result = $this->conn->search(
             Connection::BASE,
             $subschema_subentry,
             '',
             ['attributeTypes', 'objectClasses']
         );
 
-        foreach ($search_result as $subschema) {
-            return $subschema;
+        foreach ($search_result as $subschema) { // just one iteration
+            foreach ($subschema['attributeTypes'] as $definition) {
+                $definition = $this->parseAttributeDefinition($definition);
+                $definition['_type'] = ATTRIBUTE;
+                $self->append($definition);
+            }
+
+            foreach ($subschema['objectClasses'] as $definition) {
+                $definition = $this->parseObjectDefinition($definition);
+                $definition['_type'] = OBJECT_CLASS;
+                $self->append($definition);
+            }
         }
     }
 }
