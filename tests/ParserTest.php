@@ -186,7 +186,6 @@ EOF;
      */
     public function testObjectParsing($description, $expected)
     {
-
         $schema = new MockSchema();
         $actual = $schema->parseObjectDefinition($description);
 
@@ -199,7 +198,9 @@ EOF;
             "ABSTRACT MUST objectClass )";
         $top_obj = json_decode(
             '{"oid":"2.5.6.0","name":["top"],"desc":"top of the superclass chain","structural":f' .
-            'alse,"abstract":true,"auxiliary":false,"must":["objectClass"]}'
+            'alse,"abstract":true,"auxiliary":false,"must":["objectClass"],"obsolete":false,"may' .
+            '":[]}',
+            true
         );
 
         $device_desc = <<<'EOF'
