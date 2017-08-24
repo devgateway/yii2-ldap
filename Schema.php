@@ -311,5 +311,23 @@ class Schema extends OidArray
             }
         }
     }
+
+    public function offsetGet($offset)
+    {
+        $value = parent::offsetGet($offset);
+
+        if (is_array($value)) {
+            if ($value['_type'] == ATTRIBUTE) {
+                $value = new AttributeDefinition($self, $value);
+            } else {
+                $value = new ObjectDefinition($self, $value);
+            }
+        }
+
+        $offset = class::offsetMake($value);
+        $self->offsetSet($offset, $value);
+
+        return $value;
+    }
 }
 
