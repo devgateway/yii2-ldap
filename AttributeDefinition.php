@@ -23,7 +23,7 @@ class AttributeDefinition extends Definition
 
     public function __construct(Schema $schema, array $definition)
     {
-        if ($definition['syntax']) {
+        if (isset($definition['syntax'])) {
             $oid = $definition['syntax'];
             $syntax = $schema[$oid];
         } else {
