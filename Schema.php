@@ -328,15 +328,16 @@ class Schema extends OidArray
         $value = parent::offsetGet($offset);
 
         if (is_array($value)) {
+            $offset = self::offsetMake($value);
+
             if ($value['_type'] == ATTRIBUTE) {
                 $value = new AttributeDefinition($this, $value);
             } else {
                 $value = new ObjectDefinition($this, $value);
             }
-        }
 
-        $offset = self::offsetMake($value);
-        $this->offsetSet($offset, $value);
+            $this->offsetSet($offset, $value);
+        }
 
         return $value;
     }

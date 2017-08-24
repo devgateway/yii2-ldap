@@ -62,7 +62,7 @@ class ObjectDefinition extends Definition
             $this->properties[$key] = $definition[$key];
         }
 
-        parent::__construct($properties);
+        parent::__construct($definition);
     }
 }
 
