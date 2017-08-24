@@ -68,7 +68,7 @@ class Schema extends OidArray
         'MAY'                  => TYPE_ARRAY
     ];
     protected static $objectclass_defaults = [
-        'structural'           => true,
+        'structural'           => false, // defaults to true during validation
         'auxiliary'            => false,
         'abstract'             => false,
         'obsolete'             => false,
@@ -213,6 +213,10 @@ class Schema extends OidArray
                 $msg = 'Object class must be STRUCTURAL, ABSTRACT, or AUXILIARY';
                 throw new ParsingException($msg);
             }
+        }
+
+        if ($i == 0) {
+            $properties['structural'] = true;
         }
 
         return $properties;
