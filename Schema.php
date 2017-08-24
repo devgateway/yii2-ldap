@@ -14,6 +14,12 @@ use devgateway\ldap\Syntax;
 use devgateway\ldap\OidArray;
 use devgateway\ldap\Connection;
 
+define('TYPE_BOOL',     0);
+define('TYPE_SCALAR',   1);
+define('TYPE_ARRAY',    2);
+define('ATTRIBUTE',     0);
+define('OBJECT_CLASS',  1);
+
 class LexingException extends \RuntimeException
 {
     public function __construct(string &$description, int $position, string $msg)
@@ -29,23 +35,19 @@ class ParsingException extends \RuntimeException
 
 class Schema extends OidArray
 {
-    const TYPE_BOOL =   0;
-    const TYPE_SCALAR = 1;
-    const TYPE_ARRAY =  2;
-
     protected static $attribute_keywords = [
-        'NAME'                 => self::TYPE_ARRAY,
-        'DESC'                 => self::TYPE_SCALAR,
-        'OBSOLETE'             => self::TYPE_BOOL,
-        'SUP'                  => self::TYPE_SCALAR,
-        'EQUALITY'             => self::TYPE_SCALAR,
-        'ORDERING'             => self::TYPE_SCALAR,
-        'SUBSTR'               => self::TYPE_SCALAR,
-        'SYNTAX'               => self::TYPE_SCALAR,
-        'SINGLE-VALUE'         => self::TYPE_BOOL,
-        'COLLECTIVE'           => self::TYPE_BOOL,
-        'NO-USER-MODIFICATION' => self::TYPE_BOOL,
-        'USAGE'                => self::TYPE_SCALAR
+        'NAME'                 => TYPE_ARRAY,
+        'DESC'                 => TYPE_SCALAR,
+        'OBSOLETE'             => TYPE_BOOL,
+        'SUP'                  => TYPE_SCALAR,
+        'EQUALITY'             => TYPE_SCALAR,
+        'ORDERING'             => TYPE_SCALAR,
+        'SUBSTR'               => TYPE_SCALAR,
+        'SYNTAX'               => TYPE_SCALAR,
+        'SINGLE-VALUE'         => TYPE_BOOL,
+        'COLLECTIVE'           => TYPE_BOOL,
+        'NO-USER-MODIFICATION' => TYPE_BOOL,
+        'USAGE'                => TYPE_SCALAR
     ];
     protected static $attribute_defaults = [
         'obsolete'             => false,
@@ -55,15 +57,15 @@ class Schema extends OidArray
         'usage'                => 'userApplications'
     ];
     protected static $objectclass_keywords = [
-        'NAME'                 => self::TYPE_ARRAY,
-        'DESC'                 => self::TYPE_SCALAR,
-        'OBSOLETE'             => self::TYPE_BOOL,
-        'SUP'                  => self::TYPE_ARRAY,
-        'ABSTRACT'             => self::TYPE_BOOL,
-        'STRUCTURAL'           => self::TYPE_BOOL,
-        'AUXILIARY'            => self::TYPE_BOOL,
-        'MUST'                 => self::TYPE_ARRAY,
-        'MAY'                  => self::TYPE_ARRAY
+        'NAME'                 => TYPE_ARRAY,
+        'DESC'                 => TYPE_SCALAR,
+        'OBSOLETE'             => TYPE_BOOL,
+        'SUP'                  => TYPE_ARRAY,
+        'ABSTRACT'             => TYPE_BOOL,
+        'STRUCTURAL'           => TYPE_BOOL,
+        'AUXILIARY'            => TYPE_BOOL,
+        'MUST'                 => TYPE_ARRAY,
+        'MAY'                  => TYPE_ARRAY
     ];
     protected static $objectclass_defaults = [
         'structural'           => true,
@@ -240,15 +242,15 @@ class Schema extends OidArray
             $index = array_search($keyword, $tokens);
             if ($index !== false) {
                 switch ($type) {
-                    case self::TYPE_BOOL:
+                    case TYPE_BOOL:
                         $value = true;
                         break;
 
-                    case self::TYPE_SCALAR:
+                    case TYPE_SCALAR:
                         $value = $tokens[$index + 1];
                         break;
 
-                    case self::TYPE_ARRAY:
+                    case TYPE_ARRAY:
                         $value = $tokens[$index + 1];
                         if (!is_array($value)) {
                             $value = [$value];
