@@ -154,7 +154,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
 
     public static function offsetMake(array $value)
     {
-        $offset = in_array('name', $value) ?  $value['name'] : [];
+        $offset = array_key_exists('name', $value) ?  $value['name'] : [];
         array_unshift($offset, $value['oid']);
     }
 }
