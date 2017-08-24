@@ -22,9 +22,10 @@ abstract class Definition
     protected $properties = [];
     protected $short_name;
 
-    public function __construct(array $properties) {
+    public function __construct(array $properties)
+    {
         foreach (self::$keys as $key) {
-            $self->properties[$key] = $properties[$key];
+            $this->properties[$key] = $properties[$key];
         }
 
         $this->short_name = $this->getShortName();

@@ -11,16 +11,29 @@
 namespace devgateway\ldap;
 
 use devgateway\ldap\Definition;
+use devgateway\ldap\Schema;
 
 class AttributeDefinition extends Definition
 {
-    public function __construct(array $properties) {
-        $self->properties['single_value'] =         $properties['single_value'];
-        $self->properties['no_user_modification'] = $properties['no_user_modification'];
+    protected static $keys = [
+        'single_value',
+        'no_user_modification',
+        'syntax'
+    ];
 
-        if ($properties['syntax']) {
+    public function __construct(Schema $schema, array $definition)
+    {
+        if ($definition['syntax']) {
+            $oid = $definition['syntax'];
+            $syntax = $schema[$oid];
         } else {
-            // sup
+            $sup = $schema[$definition['sup']];
+            $syntax = $schema[$sup]->syntax;
+        }
+        $definition['syntax'] = $syntax;
+
+        foreach (self::$keys as $key) {
+            $this->properties[$key] = $definition[$key];
         }
 
         parent::__construct($properties);
