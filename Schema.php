@@ -184,7 +184,7 @@ class Schema extends OidArray
             }
             if (
                 $properties['no_user_modification'] &&
-                $usage = 'userApplications'
+                $properties['usage'] == 'userApplications'
             ) {
                 $msg = 'NO-USER-MODIFICATION requires operational attribute';
                 throw new ParsingException($msg);
