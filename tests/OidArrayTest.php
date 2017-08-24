@@ -142,5 +142,16 @@ class TestOidArray extends TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider valueProvider
+     */
+    public function testAppend($value, $ignored)
+    {
+        $oa = new OidArray();
+        $oa->append($value);
+
+        $this->assertEquals($value, $oa[ATTR_GN_OID]);
+    }
 }
 
