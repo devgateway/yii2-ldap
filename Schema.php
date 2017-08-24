@@ -159,7 +159,7 @@ class Schema extends OidArray
         return $token;
     }
 
-    public function parseAttributeDefinition($description)
+    protected function parseAttributeDefinition($description)
     {
         $properties = $this->parse(
             $description,
@@ -192,7 +192,7 @@ class Schema extends OidArray
         return $properties;
     }
 
-    public function parseObjectDefinition($description)
+    protected function parseObjectDefinition($description)
     {
         $properties = $this->parse(
             $description,

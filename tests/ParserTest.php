@@ -12,6 +12,21 @@ class MockSchema extends Schema
     {
         return parent::getTokens($description, $position);
     }
+
+    public function __construct()
+    {
+    }
+
+    public function parseAttributeDefinition($description)
+    {
+        return parent::parseAttributeDefinition($description);
+    }
+
+    public function parseObjectDefinition($description)
+    {
+        return parent::parseObjectDefinition($description);
+    }
+
 }
 
 class ParserTest extends TestCase
@@ -101,7 +116,7 @@ EOF;
      */
     public function testAttributeExceptions($desc, $exception_name)
     {
-        $schema = new Schema();
+        $schema = new MockSchema();
 
         $this->expectException($exception_name);
         $schema->parseAttributeDefinition($desc);
@@ -150,7 +165,7 @@ EOF;
      */
     public function testObjectExceptions($desc, $exception_name)
     {
-        $schema = new Schema();
+        $schema = new MockSchema();
 
         $this->expectException($exception_name);
         $schema->parseObjectDefinition($desc);
@@ -183,7 +198,7 @@ EOF;
             true
         );
 
-        $schema = new Schema();
+        $schema = new MockSchema();
         $actual = $schema->parseObjectDefinition($description);
 
         $this->assertEquals($expected, $actual);
@@ -205,7 +220,7 @@ EOF;
             'h","syntax":"1.3.6.1.4.1.1466.115.121.1.34"}',
             true
         );
-        $schema = new Schema();
+        $schema = new MockSchema();
         $actual = $schema->parseAttributeDefinition($description);
 
         $this->assertEquals($expected, $actual);
