@@ -181,22 +181,11 @@ EOF;
         ];
     }
 
-    public function testObjectParsing()
+    /**
+     * @dataProvider objectDefinitionProvider
+     */
+    public function testObjectParsing($description, $expected)
     {
-        $description = <<<'EOF'
-( 2.5.6.14 NAME 'device'
-  DESC 'RFC2256: a device'
-  SUP top STRUCTURAL
-  MUST cn
-  MAY ( serialNumber $ seeAlso $ owner $ ou $ o $ l $ description ) )
-EOF;
-        $expected = json_decode(
-            '{"structural":true,"auxiliary":false,"abstract":false' .
-            ',"obsolete":false,"must":["cn"],"may":["serialNumber","seeAlso","owner","ou","o","l"' .
-            ',"description"],"oid":"2.5.6.14","name":["device"],"desc":"RFC2256: a device","sup":' .
-            '["top"]}',
-            true
-        );
 
         $schema = new MockSchema();
         $actual = $schema->parseObjectDefinition($description);
@@ -204,6 +193,35 @@ EOF;
         $this->assertEquals($expected, $actual);
     }
 
+    public function objectDefinitionProvider()
+    {
+        $top_desc = "( 2.5.6.0 NAME 'top' DESC 'top of the superclass chain' " .
+            "ABSTRACT MUST objectClass )";
+        $top_obj = json_decode(
+            '{"oid":"2.5.6.0","name":["top"],"desc":"top of the superclass chain","structural":f' .
+            'alse,"abstract":true,"auxiliary":false,"must":["objectClass"]}'
+        );
+
+        $device_desc = <<<'EOF'
+( 2.5.6.14 NAME 'device'
+  DESC 'RFC2256: a device'
+  SUP top STRUCTURAL
+  MUST cn
+  MAY ( serialNumber $ seeAlso $ owner $ ou $ o $ l $ description ) )
+EOF;
+        $device_obj = json_decode(
+            '{"structural":true,"auxiliary":false,"abstract":false' .
+            ',"obsolete":false,"must":["cn"],"may":["serialNumber","seeAlso","owner","ou","o","l"' .
+            ',"description"],"oid":"2.5.6.14","name":["device"],"desc":"RFC2256: a device","sup":' .
+            '["top"]}',
+            true
+        );
+
+        return [
+            'top' => [$top_desc, $top_obj],
+            'device' => [$device_desc, $device_obj]
+        ];
+    }
 
     public function testAttributeParsing()
     {
