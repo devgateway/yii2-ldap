@@ -18,19 +18,34 @@ class AttributeDefinition extends Definition
     protected static $keys = [
         'single_value',
         'no_user_modification',
-        'syntax'
+        'syntax',
+        '_len'
     ];
 
     public function __construct(Schema $schema, array $definition)
     {
         if (isset($definition['syntax'])) {
-            $oid = $definition['syntax'];
-            $syntax = $schema[$oid];
+            $matches = [];
+            $matched = preg_match(
+                '/^ ([^{]+) ( (\{ (\d+) \})? ) $/x',
+                $definition['syntax'],
+                $matches
+            );
+            if ($matched) {
+                $syntax = $schema[$matches[1]];
+                $len = $matches[2] ? intval($matches[3]) : 0;
+            } else {
+                throw new \RuntimeException(
+                    'Unknown syntax format: ' . $definition['syntax']
+                );
+            }
         } else {
             $sup = $schema[$definition['sup']];
-            $syntax = $schema[$sup]->syntax;
+            $syntax = $sup->syntax;
+            $len = $sup->_len;
         }
         $definition['syntax'] = $syntax;
+        $definition['_len'] = $len;
 
         foreach (self::$keys as $key) {
             $this->properties[$key] = $definition[$key];
