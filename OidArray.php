@@ -148,7 +148,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
 
     public function append(array $value)
     {
-        $offset = class::offsetMake($value);
+        $offset = self::offsetMake($value);
         $this->offsetSet($offset, $value);
     }
 

@@ -324,7 +324,7 @@ class Schema extends OidArray
             }
         }
 
-        $offset = class::offsetMake($value);
+        $offset = self::offsetMake($value);
         $self->offsetSet($offset, $value);
 
         return $value;
