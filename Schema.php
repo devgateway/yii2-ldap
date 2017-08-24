@@ -273,8 +273,9 @@ class Schema extends OidArray
             $this[[$oid]] = $syntax;
         }
 
-        // TODO: try load from cache
-        $definitions = $this->loadFromDse();
+        if (!$this->loadFromDse()) {
+            throw new \RuntimeException('Unable to load schema from root DSE');
+        }
     }
 
     protected function loadFromDse()
@@ -309,7 +310,11 @@ class Schema extends OidArray
                 $definition['_type'] = OBJECT_CLASS;
                 $self->append($definition);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     public function offsetGet($offset)
