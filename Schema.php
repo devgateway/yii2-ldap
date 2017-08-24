@@ -299,16 +299,18 @@ class Schema extends OidArray
         );
 
         foreach ($search_result as $subschema) { // just one iteration
+            unset($subschema['attributeTypes']['count']);
             foreach ($subschema['attributeTypes'] as $definition) {
                 $definition = $this->parseAttributeDefinition($definition);
                 $definition['_type'] = ATTRIBUTE;
-                $self->append($definition);
+                $this->append($definition);
             }
 
+            unset($subschema['objectClasses']['count']);
             foreach ($subschema['objectClasses'] as $definition) {
                 $definition = $this->parseObjectDefinition($definition);
                 $definition['_type'] = OBJECT_CLASS;
-                $self->append($definition);
+                $this->append($definition);
             }
 
             return true;
@@ -323,14 +325,14 @@ class Schema extends OidArray
 
         if (is_array($value)) {
             if ($value['_type'] == ATTRIBUTE) {
-                $value = new AttributeDefinition($self, $value);
+                $value = new AttributeDefinition($this, $value);
             } else {
-                $value = new ObjectDefinition($self, $value);
+                $value = new ObjectDefinition($this, $value);
             }
         }
 
         $offset = self::offsetMake($value);
-        $self->offsetSet($offset, $value);
+        $this->offsetSet($offset, $value);
 
         return $value;
     }
