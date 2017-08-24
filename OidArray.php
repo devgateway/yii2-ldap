@@ -156,6 +156,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
     {
         $offset = array_key_exists('name', $value) ?  $value['name'] : [];
         array_unshift($offset, $value['oid']);
+        return $offset;
     }
 }
 

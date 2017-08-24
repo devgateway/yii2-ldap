@@ -103,5 +103,44 @@ class TestOidArray extends TestCase
         $this->assertTrue($oa[ATTR_GN_OID] === $oa[ATTR_GN_SHORT]);
         $this->assertTrue($oa[ATTR_GN_OID] === $oa[ATTR_GN_LONG]);
     }
+
+    /**
+     * @dataProvider valueProvider
+     */
+    public function testOffsetMake($value, $expected_offset)
+    {
+        $offset = OidArray::offsetMake($value);
+
+        $this->assertEquals($expected_offset, $offset);
+    }
+
+    public function valueProvider()
+    {
+        return [
+            'OID and names' => [
+                [
+                    'obsolete' => false,
+                    'name' => [
+                        ATTR_GN_LONG,
+                        ATTR_GN_SHORT
+                    ],
+                    'single_value' => false,
+                    'oid' => ATTR_GN_OID
+                ],
+                [
+                    ATTR_GN_OID,
+                    ATTR_GN_LONG,
+                    ATTR_GN_SHORT
+                ]
+            ],
+            'Just OID' => [
+                [
+                    'oid' => ATTR_GN_OID,
+                    'answer' => 42
+                ],
+                [ATTR_GN_OID]
+            ]
+        ];
+    }
 }
 
