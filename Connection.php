@@ -19,19 +19,20 @@ use yii\base\Component;
  */
 class Connection extends Component
 {
-    const BASE = 0;
+    const BASE =     0;
     const ONELEVEL = 1;
-    const SUBTREE = 2;
+    const SUBTREE =  2;
 
-    const MOD = 0;
-    const MOD_ADD = 1;
-    const MOD_DEL = 2;
+    const MOD =         0;
+    const MOD_ADD =     1;
+    const MOD_DEL =     2;
     const MOD_REPLACE = 3;
 
+    /** @var array $mod_functions Wrapped native LDAP functions. */
     protected static $mod_functions = [
-        self::MOD =>     'ldap_modify',
-        self::MOD_ADD => 'ldap_mod_add',
-        self::MOD_DEL => 'ldap_mod_del',
+        self::MOD =>         'ldap_modify',
+        self::MOD_ADD =>     'ldap_mod_add',
+        self::MOD_DEL =>     'ldap_mod_del',
         self::MOD_REPLACE => 'ldap_mod_replace'
     ];
 
@@ -200,11 +201,11 @@ class Connection extends Component
     }
 
     /**
-     * Adds entries in directory
+     * Add an entry to the directory.
      *
-     * @param string $dn distinguished name to be added
-     * @param associative array $entry where key is attribute name and value is attribute value
-     * @throws LdapException if add failed.
+     * @param string $dn Entry distinguished name.
+     * @param mixed[] $entry Array of attributes: name => value.
+     * @throws LdapException If add operation failed.
      * @return void
      */
     public function add($dn, $entry)
@@ -212,39 +213,40 @@ class Connection extends Component
         $this->bind();
 
         $success = ldap_add($this->conn, $dn, $entry);
-        if (!$success) throw new LdapException($this->conn);
+        if (!$success) {
+            throw new LdapException($this->conn);
+        }
     }
 
     /**
-     * Deletes a particular entry from directory
+     * Deletes an entry from the directory.
      *
-     * @param string $dn distinguished name to be deleted
-     * @throws LdapException if delete failed.
-     * @return void
+     * @param string $dn Entry distinguished name.
+     * @throws LdapException If delete operation failed.
      */
     public function delete($dn)
     {
         $this->bind();
 
         $success = ldap_delete($this->conn, $dn);
-        if (!$success) throw new LdapException($this->conn);
+        if (!$success) {
+            throw new LdapException($this->conn);
+        }
     }
 
     /**
      * Modifies an object or an object attribute depending on $op
      *
-     * @param string $op one MOD, MOD_ADD, MOD_DEL, MOD_REPLACE
-     * @param string $dn distinguished name to be modified
-     * @param associative array $entry where key is attribute name and value is attribute value
-     * @throws OutOfRangeException if $op not one of predefined constants
-     * @throws LdapException if modify failed.
-     * @return void
+     * @param string $op One of: MOD, MOD_ADD, MOD_DEL, MOD_REPLACE.
+     * @param string $dn Distinguished name to be modified.
+     * @param mixed[] $entry Array of attributes: name => value.
+     * @throws OutOfRangeException If $op not one of predefined constants.
+     * @throws LdapException If modify operation failed.
      */
     public function modify($op, $dn, $entry)
     {
         $this->bind();
 
-        $modify_function;
         if (array_key_exists($op, self::$mod_functions)) {
             $modify_function = self::$mod_functions[$op];
         } else {
@@ -258,21 +260,22 @@ class Connection extends Component
     }
 
     /**
-     * Renames an LDAP entry
+     * Renames or moves an entry.
      *
-     * @param string $dn distinguished name to be modified
-     * @param string $newRDN new RDN
-     * @param string $newParent new parent/superior entry
-     * @param boolean $deleteOldRDN
-     * @throws LdapException if rename failed.
-     * @return void
+     * @param string $dn Entry distinguished name.
+     * @param string $new_rdn New relative distinguished name.
+     * @param string $new_parent New parent or superior entry.
+     * @param boolean $delete_old_rdn Move if true, copy if false.
+     * @throws LdapException If rename operation failed.
      */
-    public function rename($dn, $newRDN, $newParent, $deleteOldRDN )
+    public function rename($dn, $new_rdn, $new_parent, $delete_old_rdn )
     {
         $this->bind();
 
-        $success = ldap_rename($this->conn, $dn, $newRDN, $newParent, $deleteOldRDN);
-        if (!$success) throw new LdapException($this->conn);
+        $success = ldap_rename($this->conn, $dn, $new_rdn, $new_parent, $delete_old_rdn);
+        if (!$success) {
+            throw new LdapException($this->conn);
+        }
     }
 }
 
