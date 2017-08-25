@@ -23,7 +23,31 @@ class ModifyTest extends TestCase
         $this->dn = sprintf('cn=%s,%s', $this->entry['cn'], $base);
 
         $this->conn = new Connection($config);
-        $this->conn->add($this->dn, $this->entry);
+
+        $host = $config['host'];
+        $port = isset($config['port']) ? $config['port'] : 389;
+        $bind_dn = isset($config['bind_dn']) ? $config['bind_dn'] : null;
+        $bind_pw = isset($config['bind_pw']) ? $config['bind_pw'] : null;
+
+        $this->canonical_conn = ldap_connect($host, $port);
+        if ($this->canonical_conn === false) {
+          throw new \Exception('Can\'t connect to LDAP server');
+        }
+
+        $result = ldap_set_option($this->canonical_conn, LDAP_OPT_PROTOCOL_VERSION, 3);
+        if (!$result) {
+            throw new \Exception('Can\'t request LDAPv3');
+        }
+
+        $result = ldap_bind($this->canonical_conn, $bind_dn, $bind_pw);
+        if (!$result) {
+            throw new \Exception('Can\'t bind to LDAP');
+        }
+
+        $result = ldap_add($this->canonical_conn, $this->dn, $this->entry);
+        if (!$result) {
+            throw new \Exception('Can\'t add');
+        }
     }
 
     /**
@@ -124,7 +148,11 @@ class ModifyTest extends TestCase
 
     public function tearDown()
     {
-        $this->conn->delete($this->dn);
+        $result = ldap_delete($this->canonical_conn, $this->dn);
+        if (!$result) {
+            throw new \Exception('Can\'t delete');
+        }
+        ldap_unbind($this->canonical_conn);
         unset($this->conn);
     }
 }
