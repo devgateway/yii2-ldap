@@ -40,16 +40,20 @@ class ObjectDefinition extends Definition
                 $attributes[$id] = $attribute;
             }
 
-            // push my attributes into an array
-            $args = [$attributes];
-            foreach ($definition['sup'] as $sup_name) {
-                $sup = $schema[$sup_name];
-                // push my parent's attributes into an array
-                $args[] = $sup->properties[$may_or_must];
-            }
+            if (array_key_exists('sup', $definition)) {
+                // push my attributes into an array
+                $args = [$attributes];
+                foreach ($definition['sup'] as $sup_name) {
+                    $sup = $schema[$sup_name];
+                    // push my parent's attributes into an array
+                    $args[] = $sup->properties[$may_or_must];
+                }
 
-            // merge my own and my parents' attributes
-            $definition[$may_or_must] = call_user_func_array('array_merge', $args);
+                // merge my own and my parents' attributes
+                $definition[$may_or_must] = call_user_func_array('array_merge', $args);
+            } else {
+                $definition[$may_or_must] = $attributes;
+            }
         }
 
         // remove inherited MAYs which have been redeclared as MUSTs
