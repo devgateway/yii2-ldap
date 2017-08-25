@@ -15,13 +15,13 @@ namespace devgateway\ldap;
 class OidArray implements \ArrayAccess, \IteratorAggregate
 {
     /** @var array $oids Items by OID. */
-    protected $oids;
+    protected $oids = [];
 
     /** @var array $names Items by lowercase symbolic name. */
-    protected $names;
+    protected $names = [];
 
     /** @var array $canonical_names Items by "pretty" symbolic name. */
-    protected $canonical_names;
+    protected $canonical_names = [];
 
     /**
      * Verify OID per ITU X.660 standard.
@@ -169,6 +169,17 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         array_unshift($offset, $oid);
 
         return $offset;
+    }
+
+    public static function fromArray($array)
+    {
+        $oid_array = new self();
+
+        foreach ($array as $item) {
+            $oid_array->append($item);
+        }
+
+        return $oid_array;
     }
 }
 
