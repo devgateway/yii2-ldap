@@ -45,24 +45,37 @@ define('SYNTAX_TELETEX_TERMINAL_IDENTIFIER',    51);
 define('SYNTAX_TELEX_NUMBER',                   52);
 define('SYNTAX_UTC_TIME',                       53);
 
+/** Thrown when a value doesn't conform to syntax rules. */
 class SyntaxException extends \RuntimeException
 {
-    public function __construct(string $serialized, array $expected = [])
+    /**
+     * Build a message with an optional list of permitted values.
+     *
+     * @param string $value The value that violates the syntax rules.
+     * @param mixed[] $expected List of permitted values.
+     */
+    public function __construct(string $value, array $expected = [])
     {
         if (empty($expected)) {
-            $msg = "Value '$serialized' invalid per syntax";
+            $msg = "Value '$value' invalid per syntax";
         } else {
             $values = implode(', ', $expected);
-            $msg = "Value '$serialized' invalid. Expected one of: $values";
+            $msg = "Value '$value' invalid. Expected one of: $values";
         }
 
         parent::__construct($msg);
     }
 }
 
+/**
+ * Set of rules to serialize/unserialize values to/from LDAP string formats.
+ */
 class Syntax
 {
+    /** @var int $syntax_type Last part of standard syntax OID. */
     protected $syntax_type;
+
+    /** @var int[] $types List of all recognized syntax IDs. */
     protected static $types = [
         SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION,
         SYNTAX_BIT_STRING,
@@ -100,6 +113,11 @@ class Syntax
         SYNTAX_UTC_TIME
     ];
 
+    /**
+     * List all known syntaxes and their OIDs.
+     *
+     * @return Syntax[] Array of syntax objects with OIDs as keys.
+     */
     public static function getAll()
     {
         $all = [];
@@ -113,6 +131,12 @@ class Syntax
         return $all;
     }
 
+    /**
+     * Initialize internal syntax ID.
+     *
+     * @param int $syntax_type Internal syntax ID.
+     * @throws \OutOfRangeException When the syntax ID is not known.
+     */
     public function __construct(int $syntax_type)
     {
         if (in_array($syntax_type, self::$types)) {
@@ -122,6 +146,13 @@ class Syntax
         }
     }
 
+    /**
+     * Convert a value to LDAP format according to the syntax rules.
+     *
+     * @param mixed $value The original value.
+     * @throws SyntaxException If the value violates the syntax rules.
+     * @return string Value suitable for PHP LDAP extension functions.
+     */
     public static function serialize($value)
     {
         switch ($this->syntax_type) {
@@ -177,6 +208,13 @@ class Syntax
         }
     }
 
+    /**
+     * Convert a value from LDAP format to an appropriate PHP native type.
+     *
+     * @param string $serialized Value received from PHP LDAP extension functions.
+     * @throws SyntaxException If the value violates the syntax rules.
+     * @return mixed The native value.
+     */
     public static function unserialize(string $serialized)
     {
         switch ($this->syntax_type) {
@@ -231,6 +269,11 @@ class Syntax
         }
     }
 
+    /**
+     * Return the syntax OID.
+     *
+     * @return string Syntax OID.
+     */
     public function __toString()
     {
         return '1.3.6.1.4.1.1466.115.121.1.' . $this->syntax_type;
