@@ -2,8 +2,8 @@
 /**
  * Schema and related classes
  *
- * @link https://github.com/devgateway/yii-com-ldap
  * @link https://tools.ietf.org/html/rfc4512
+ * @link https://github.com/devgateway/yii-com-ldap
  * @copyright 2017, Development Gateway, Inc
  * @license GPL, version 3
  */
@@ -20,8 +20,16 @@ define('TYPE_ARRAY',    2);
 define('ATTRIBUTE',     0);
 define('OBJECT_CLASS',  1);
 
+/** Thrown when tokenizing schema definition fails. */
 class LexingException extends \RuntimeException
 {
+    /**
+     * Format the error message with error position and description.
+     *
+     * @param string $description Schema element definition.
+     * @param int $position Tokenizer position where the error occured.
+     * @param string $msg Additional error information.
+     */
     public function __construct(string &$description, int $position, string $msg)
     {
         $desc = substr($description, 0, 47) . "...";
@@ -29,12 +37,15 @@ class LexingException extends \RuntimeException
     }
 }
 
+/** Thrown when tokenized definition can't be parsed. */
 class ParsingException extends \RuntimeException
 {
 }
 
+/** Directory schema. */
 class Schema extends OidArray
 {
+    /** @var int[] $attribute_keywords Types of the values expected to follow. */
     protected static $attribute_keywords = [
         'NAME'                 => TYPE_ARRAY,
         'DESC'                 => TYPE_SCALAR,
@@ -49,6 +60,8 @@ class Schema extends OidArray
         'NO-USER-MODIFICATION' => TYPE_BOOL,
         'USAGE'                => TYPE_SCALAR
     ];
+
+    /** @var mixed[] $attribute_defaults Default values for attribute definitions. */
     protected static $attribute_defaults = [
         'obsolete'             => false,
         'single_value'         => false,
@@ -56,6 +69,8 @@ class Schema extends OidArray
         'no_user_modification' => false,
         'usage'                => 'userApplications'
     ];
+
+    /** @var int[] $objectclass_keywords Types of the values expected to follow. */
     protected static $objectclass_keywords = [
         'NAME'                 => TYPE_ARRAY,
         'DESC'                 => TYPE_SCALAR,
@@ -67,6 +82,8 @@ class Schema extends OidArray
         'MUST'                 => TYPE_ARRAY,
         'MAY'                  => TYPE_ARRAY
     ];
+
+    /** @var mixed[] $objectclass_defaults Default values for object definitions. */
     protected static $objectclass_defaults = [
         'structural'           => false, // defaults to true during validation
         'auxiliary'            => false,
@@ -76,7 +93,15 @@ class Schema extends OidArray
         'may'                  => []
     ];
 
-    protected function getTokens($description, &$position)
+    /**
+     * Tokenize definition into keywords and their values.
+     *
+     * @param string $description Definition from schema.
+     * @param int $position Current tokenizer position in the string.
+     * @throws LexingException If tokenizing fails.
+     * @return mixed[] Keywords and their values, possibly nested.
+     */
+    protected function getTokens(string $description, int &$position)
     {
         // find first non-blank character, move position there
         $matches = [];
@@ -161,7 +186,14 @@ class Schema extends OidArray
         return $token;
     }
 
-    protected function parseAttributeDefinition($description)
+    /**
+     * Parse and validate attribute definition from schema.
+     *
+     * @param string $description Attribute definition.
+     * @throws ParsingException If the definition violates LDAP standard.
+     * @return mixed[] Attribute properties.
+     */
+    protected function parseAttributeDefinition(string $description)
     {
         $properties = $this->parse(
             $description,
@@ -194,7 +226,14 @@ class Schema extends OidArray
         return $properties;
     }
 
-    protected function parseObjectDefinition($description)
+    /**
+     * Parse and validate object definition from schema.
+     *
+     * @param string $description Object definition.
+     * @throws ParsingException If multiple class kinds declared.
+     * @return mixed[] Object properties.
+     */
+    protected function parseObjectDefinition(string $description)
     {
         $properties = $this->parse(
             $description,
@@ -222,7 +261,16 @@ class Schema extends OidArray
         return $properties;
     }
 
-    protected function parse($description, $properties, &$keywords)
+    /**
+     * Analyze schema definition.
+     *
+     * @param string $description Definition from schema.
+     * @param mixed[] $properties Copy of default property values.
+     * @param int[] $keywords Recognized keywords and the types they expect.
+     * @throws LexingException If the definition is not parenthesized.
+     * @return mixed[] Properties of the schema item.
+     */
+    protected function parse(string $description, array $properties, array &$keywords)
     {
         // unwrap long lines
         $description = str_replace("\n ", '', $description);
@@ -269,6 +317,12 @@ class Schema extends OidArray
         return $properties;
     }
 
+    /**
+     * Load predefined syntaxes, and dynamic schema definitions.
+     *
+     * @param Connection $conn LDAP connection object.
+     * @throws \RuntimeException If loading definitions fails.
+     */
     public function __construct(Connection $conn)
     {
         $this->conn = $conn;
@@ -282,6 +336,11 @@ class Schema extends OidArray
         }
     }
 
+    /**
+     * Load subschema definitions from root DSE.
+     *
+     * @return bool True if loading succeeded.
+     */
     protected function loadFromDse()
     {
         $search_result = $this->conn->search(
@@ -323,6 +382,12 @@ class Schema extends OidArray
         return false;
     }
 
+    /**
+     * Lazily initialize and return a schema object.
+     *
+     * @param string $offset OID or case-insensitive name of the element.
+     * @return Syntax|AttributeDefinition|ObjectDefinition Initialized schema element.
+     */
     public function offsetGet($offset)
     {
         $value = parent::offsetGet($offset);

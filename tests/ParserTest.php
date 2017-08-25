@@ -8,7 +8,7 @@ define('PARSING_EXCEPTION', 'devgateway\ldap\ParsingException');
 
 class MockSchema extends Schema
 {
-    public function getTokens($description, &$position)
+    public function getTokens(string $description, int &$position)
     {
         return parent::getTokens($description, $position);
     }
@@ -17,12 +17,12 @@ class MockSchema extends Schema
     {
     }
 
-    public function parseAttributeDefinition($description)
+    public function parseAttributeDefinition(string $description)
     {
         return parent::parseAttributeDefinition($description);
     }
 
-    public function parseObjectDefinition($description)
+    public function parseObjectDefinition(string $description)
     {
         return parent::parseObjectDefinition($description);
     }
