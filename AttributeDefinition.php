@@ -13,8 +13,10 @@ namespace devgateway\ldap;
 use devgateway\ldap\Definition;
 use devgateway\ldap\Schema;
 
+/** Attribute definition in LDAP schema. */
 class AttributeDefinition extends Definition
 {
+    /** @var string[] $keys Names of recognized properties, lowercase and underscored. */
     protected static $keys = [
         'single_value',
         'no_user_modification',
@@ -22,6 +24,12 @@ class AttributeDefinition extends Definition
         '_len'
     ];
 
+    /**
+     * Set syntax and other properties from schema, possibly inherit syntax from superclass.
+     *
+     * @param Schema $schema LDAP schema.
+     * @param mixed[] $definition Schema definitions, keys lowercase and underscored.
+     */
     public function __construct(Schema $schema, array $definition)
     {
         if (isset($definition['syntax'])) {
