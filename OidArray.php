@@ -152,7 +152,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         $this->offsetSet($offset, $value);
     }
 
-    public static function offsetMake($value)
+    protected static function offsetMake($value)
     {
         if (is_array($value)) {
             $offset = array_key_exists('name', $value) ?

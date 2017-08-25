@@ -10,6 +10,14 @@ define('ATTR_SN_OID',   '2.5.4.4');
 define('ATTR_SN_LONG',  'surname');
 define('ATTR_SN_SHORT', 'sn');
 
+class MockOidArray extends OidArray
+{
+    public static function offsetMake($value)
+    {
+        return parent::offsetMake($value);
+    }
+}
+
 class TestOidArray extends TestCase
 {
     protected $given_name = 'John';
@@ -109,7 +117,7 @@ class TestOidArray extends TestCase
      */
     public function testOffsetMake($value, $expected_offset)
     {
-        $offset = OidArray::offsetMake($value);
+        $offset = MockOidArray::offsetMake($value);
 
         $this->assertEquals($expected_offset, $offset);
     }
