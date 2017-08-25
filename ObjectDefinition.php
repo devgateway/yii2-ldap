@@ -2,6 +2,7 @@
 /**
  * ObjectDefinition class
  *
+ * @link https://tools.ietf.org/html/rfc4512
  * @link https://github.com/devgateway/yii-com-ldap
  * @copyright 2017, Development Gateway, Inc
  * @license GPL, version 3
@@ -11,8 +12,10 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\Definition;
 
+/** Object definition in LDAP schema. */
 class ObjectDefinition extends Definition
 {
+    /** @var string[] $keys Names of recognized properties, lowercase and underscored. */
     protected static $keys = [
         'auxiliary',
         'structural',
@@ -21,6 +24,12 @@ class ObjectDefinition extends Definition
         'may'
     ];
 
+    /**
+     * Set recognized attributes from schema, inherit from superclasses.
+     *
+     * @param Schema $schema LDAP schema.
+     * @param mixed[] $definition Schema definitions, keys lowercase and underscored.
+     */
     public function __construct(Schema $schema, array $definition)
     {
         $attribute_set = [];
