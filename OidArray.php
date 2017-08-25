@@ -146,16 +146,28 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         }
     }
 
-    public function append(array $value)
+    public function append($value)
     {
         $offset = self::offsetMake($value);
         $this->offsetSet($offset, $value);
     }
 
-    public static function offsetMake(array $value)
+    public static function offsetMake($value)
     {
-        $offset = array_key_exists('name', $value) ?  $value['name'] : [];
-        array_unshift($offset, $value['oid']);
+        if (is_array($value)) {
+            $offset = array_key_exists('name', $value) ?
+                $value['name'] :
+                [];
+            $oid = $value['oid'];
+        } elseif (is_object($value)) {
+            $offset = $value->name;
+            $oid = $value->oid;
+        } else {
+            throw new \InvalidArgumentException('Only arrays and objects allowed');
+        }
+
+        array_unshift($offset, $oid);
+
         return $offset;
     }
 }
