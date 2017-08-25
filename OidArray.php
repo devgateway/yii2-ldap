@@ -146,12 +146,24 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         }
     }
 
+    /**
+     * Add an item to the array, detecting key automatically.
+     *
+     * @param mixed $value The item to add.
+     */
     public function append($value)
     {
         $offset = self::offsetMake($value);
         $this->offsetSet($offset, $value);
     }
 
+    /**
+     * Detect index for the item to add.
+     *
+     * @param mixed $value The item to add.
+     * @throws \InvalidArgumentException If the item is not array or object.
+     * @return array The new index.
+     */
     protected static function offsetMake($value)
     {
         if (is_array($value)) {
@@ -171,6 +183,12 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         return $offset;
     }
 
+    /**
+     * Build an instance from an array of values.
+     *
+     * @param array $array Values for the new instance.
+     * @return OidArray New instance.
+     */
     public static function fromArray($array)
     {
         $oid_array = new self();
