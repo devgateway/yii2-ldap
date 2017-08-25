@@ -103,9 +103,11 @@ class Syntax
     public static function getAll()
     {
         $all = [];
+
         foreach (self::$types as $syntax_type) {
-            $oid = "1.3.6.1.4.1.1466.115.121.1.$syntax_type";
-            $all[$oid] = new Syntax($syntax_type);
+            $syntax = new Syntax($syntax_type);
+            $oid = $syntax->__toString();
+            $all[$oid] = $syntax;
         }
 
         return $all;
@@ -116,7 +118,7 @@ class Syntax
         if (in_array($syntax_type, self::$types)) {
             $this->syntax_type = $syntax_type;
         } else {
-            throw new \OutOfRangeException("Unknown syntax 1.3.6.1.4.1.1466.115.121.1.$syntax_type");
+            throw new \OutOfRangeException("Unknown syntax ID $syntax_type");
         }
     }
 
@@ -227,6 +229,11 @@ class Syntax
             case SYNTAX_UTC_TIME:
 
         }
+    }
+
+    public function __toString()
+    {
+        return '1.3.6.1.4.1.1466.115.121.1.' . $this->syntax_type;
     }
 }
 
