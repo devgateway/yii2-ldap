@@ -14,6 +14,15 @@ class ConnectionTest extends TestCase
         $this->base = $base;
 
         $this->conn = new Connection($config);
+
+        $this->entry = [
+            'cn' => "test",
+            'memorySize' => "2",
+            'virtualCPU' => "2",
+            'objectClass' => ["virtualMachine", "device", "ansibleHost"]
+        ];
+        $this->dn = sprintf('cn=%s,%s', $this->entry['cn'], $base);
+        $this->filter = sprintf('(&(objectClass=virtualMachine)(cn=%s))', $this->entry['cn']);
     }
 
     /**
@@ -57,12 +66,10 @@ class ConnectionTest extends TestCase
 
     public function testAdd()
     {
-        require('config.php');
-
-        $this->conn->add($test_dn, $test_entry);
+        $this->conn->add($this->dn, $this->entry);
 
         $limit = 1;
-        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
         $i = 0;
 
         foreach ($search_results as $dn => $attrs) {
@@ -76,10 +83,8 @@ class ConnectionTest extends TestCase
 
     public function testDelete()
     {
-        require('config.php');
-
         $limit = 1;
-        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
         $i = 0;
 
         foreach ($search_results as $dn => $attrs) {
@@ -90,10 +95,10 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals($limit, $i);
 
-        $this->conn->delete($test_dn);
+        $this->conn->delete($this->dn);
 
         try {
-            $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+            $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
             $i = 0;
 
             foreach ($search_results as $result) {
@@ -110,12 +115,14 @@ class ConnectionTest extends TestCase
 
     public function testRename()
     {
-        require('config.php');
+        $test_dn_rename = 'cn=test_rename';
+        $test_dn_rename_full = sprintf('%s,%s', $test_dn_rename, $this->base);
+        $test_filter_rename = sprintf('(&(objectClass=virtualMachine)(%s))', $test_dn_rename);
 
-        $this->conn->add($test_dn, $test_entry);
+        $this->conn->add($this->dn, $this->entry);
 
         $limit = 1;
-        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
         $i = 0;
 
         foreach ($search_results as $dn => $attrs) {
@@ -126,7 +133,7 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals($limit, $i);
 
-        $this->conn->rename($test_dn, $test_dn_rename, null, true);
+        $this->conn->rename($this->dn, $test_dn_rename, null, true);
 
         $limit = 1;
         $search_results = $this->conn->search(Connection::BASE, $test_dn_rename_full, $test_filter_rename, [], $limit);
@@ -142,7 +149,7 @@ class ConnectionTest extends TestCase
 
         $limit = 0;
         try {
-            $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+            $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
             $i = 0;
 
             foreach ($search_results as $result) {
