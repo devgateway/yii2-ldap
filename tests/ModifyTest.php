@@ -14,11 +14,40 @@ class ModifyTest extends TestCase
     {
         $config = require('config.php');
         $this->base = $base;
-        $this->dn = $mod_dn;
-        $this->entry = $mod_entry;
+        $this->entry = [
+            'cn' => "test_mod",
+            'memorySize' => "2",
+            'virtualCPU' => "2",
+            'objectClass' => ["virtualMachine", "device", "ansibleHost"]
+        ];
+        $this->dn = sprintf('cn=%s,%s', $this->entry['cn'], $base);
 
         $this->conn = new Connection($config);
-        $this->conn->add($this->dn, $this->entry);
+
+        $host = $config['host'];
+        $port = isset($config['port']) ? $config['port'] : 389;
+        $bind_dn = isset($config['bind_dn']) ? $config['bind_dn'] : null;
+        $bind_pw = isset($config['bind_pw']) ? $config['bind_pw'] : null;
+
+        $this->canonical_conn = ldap_connect($host, $port);
+        if ($this->canonical_conn === false) {
+          throw new \Exception('Can\'t connect to LDAP server');
+        }
+
+        $result = ldap_set_option($this->canonical_conn, LDAP_OPT_PROTOCOL_VERSION, 3);
+        if (!$result) {
+            throw new \Exception('Can\'t request LDAPv3');
+        }
+
+        $result = ldap_bind($this->canonical_conn, $bind_dn, $bind_pw);
+        if (!$result) {
+            throw new \Exception('Can\'t bind to LDAP');
+        }
+
+        $result = ldap_add($this->canonical_conn, $this->dn, $this->entry);
+        if (!$result) {
+            throw new \Exception('Can\'t add');
+        }
     }
 
     /**
@@ -51,6 +80,57 @@ class ModifyTest extends TestCase
     public function modProvider()
     {
         require('config.php');
+        $mod_single['owner'] = sprintf('uid=btalayeminaei,ou=staff,ou=people,%s', $base);
+        $mod_single_filter = sprintf(
+            '(&(objectClass=virtualMachine)(cn=test_mod)(owner=%s))',
+            $mod_single['owner']
+        );
+
+        $mod_extra['cn'] = "tsm";
+        $mod_extra_filter = sprintf(
+            '(&(objectClass=virtualMachine)(cn=test_mod)(cn=%s))',
+            $mod_extra['cn']
+        );
+
+        $mod_multiple = [
+            'priority' => "3",
+            'description' => "test_add ldap object"
+        ];
+        $mod_multiple_filter = sprintf(
+            '(&(objectClass=virtualMachine)(cn=test_mod)(priority=%s)(description=%s))',
+            $mod_multiple['priority'],
+            $mod_multiple['description']
+        );
+
+        $mod_single_orig['owner'] = sprintf('uid=dummy,ou=other,ou=people,%s', $base);
+        $mod_extra_orig['cn'] = "tsmorig";
+        $mod_multiple_orig = [
+            'priority' => "5",
+            'description' => "test_add_orig ldap object"
+        ];
+        $mod_extra_repl['cn'] = ["test_mod", "tsm"];
+        $mod_extra_repl_filter = sprintf(
+            '(&(objectClass=virtualMachine)(cn=%s)(cn=%s))',
+            $mod_extra_repl['cn'][0],
+            $mod_extra_repl['cn'][1]
+        );
+
+        $mod_entry_new = [
+            'cn' => "test_mod",
+            'owner' => sprintf('uid=btalayeminaei,ou=staff,ou=people,%s', $base),
+            'description' => "test_add ldap object",
+            'memorySize' => "7",
+            'virtualCPU' => "7",
+            'objectClass' => ["virtualMachine", "device", "ansibleHost"]
+        ];
+        $mod_entry_new_filter = sprintf(
+            '(&(objectClass=virtualMachine)(cn=%s)(owner=%s)(description=%s)(memorySize=%s)(virtualCPU=%s))',
+            $mod_entry_new['cn'],
+            $mod_entry_new['owner'],
+            $mod_entry_new['description'],
+            $mod_entry_new['memorySize'],
+            $mod_entry_new['virtualCPU']
+        );
 
         return [
             'single mod_add' => [Connection::MOD_ADD, $mod_single, $mod_single_filter],
@@ -68,7 +148,11 @@ class ModifyTest extends TestCase
 
     public function tearDown()
     {
-        $this->conn->delete($this->dn);
+        $result = ldap_delete($this->canonical_conn, $this->dn);
+        if (!$result) {
+            throw new \Exception('Can\'t delete');
+        }
+        ldap_unbind($this->canonical_conn);
         unset($this->conn);
     }
 }

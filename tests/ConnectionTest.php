@@ -14,6 +14,35 @@ class ConnectionTest extends TestCase
         $this->base = $base;
 
         $this->conn = new Connection($config);
+
+        $this->entry = [
+            'cn' => "test",
+            'memorySize' => "2",
+            'virtualCPU' => "2",
+            'objectClass' => ["virtualMachine", "device", "ansibleHost"]
+        ];
+        $this->dn = sprintf('cn=%s,%s', $this->entry['cn'], $base);
+        $this->filter = sprintf('(&(objectClass=virtualMachine)(cn=%s))', $this->entry['cn']);
+
+        $host = $config['host'];
+        $port = isset($config['port']) ? $config['port'] : 389;
+        $bind_dn = isset($config['bind_dn']) ? $config['bind_dn'] : null;
+        $bind_pw = isset($config['bind_pw']) ? $config['bind_pw'] : null;
+
+        $this->canonical_conn = ldap_connect($host, $port);
+        if ($this->canonical_conn === false) {
+          throw new \Exception('Can\'t connect to LDAP server');
+        }
+
+        $result = ldap_set_option($this->canonical_conn, LDAP_OPT_PROTOCOL_VERSION, 3);
+        if (!$result) {
+            throw new \Exception('Can\'t request LDAPv3');
+        }
+
+        $result = ldap_bind($this->canonical_conn, $bind_dn, $bind_pw);
+        if (!$result) {
+            throw new \Exception('Can\'t bind to LDAP');
+        }
     }
 
     /**
@@ -57,12 +86,10 @@ class ConnectionTest extends TestCase
 
     public function testAdd()
     {
-        require('config.php');
-
-        $this->conn->add($test_dn, $test_entry);
+        $this->conn->add($this->dn, $this->entry);
 
         $limit = 1;
-        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+        $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
         $i = 0;
 
         foreach ($search_results as $dn => $attrs) {
@@ -72,35 +99,33 @@ class ConnectionTest extends TestCase
         }
 
         $this->assertEquals($limit, $i);
+
+        $result = ldap_delete($this->canonical_conn, $this->dn);
+        if (!$result) {
+            throw new \Exception('Can\'t delete');
+        }
     }
 
     public function testDelete()
     {
-        require('config.php');
-
-        $limit = 1;
-        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
-        $i = 0;
-
-        foreach ($search_results as $dn => $attrs) {
-            $this->assertNotEquals('', $dn);
-            $this->assertArrayHasKey('count', $attrs);
-            $i++;
+        $result = ldap_add($this->canonical_conn, $this->dn, $this->entry);
+        if (!$result) {
+            throw new \Exception('Can\'t add');
         }
 
-        $this->assertEquals($limit, $i);
+        $limit = 0;
 
-        $this->conn->delete($test_dn);
+        $this->conn->delete($this->dn);
 
         try {
-            $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+            $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
             $i = 0;
 
             foreach ($search_results as $result) {
                 $i++;
             }
 
-            $this->assertEquals(0, $i);
+            $this->assertEquals($limit, $i);
         } catch (\Exception $e) {
             $expected_code = 0x20;
             $error_code = $e->getCode();
@@ -110,23 +135,16 @@ class ConnectionTest extends TestCase
 
     public function testRename()
     {
-        require('config.php');
+        $test_dn_rename = 'cn=test_rename';
+        $test_dn_rename_full = sprintf('%s,%s', $test_dn_rename, $this->base);
+        $test_filter_rename = sprintf('(&(objectClass=virtualMachine)(%s))', $test_dn_rename);
 
-        $this->conn->add($test_dn, $test_entry);
-
-        $limit = 1;
-        $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
-        $i = 0;
-
-        foreach ($search_results as $dn => $attrs) {
-            $this->assertNotEquals('', $dn);
-            $this->assertArrayHasKey('count', $attrs);
-            $i++;
+        $result = ldap_add($this->canonical_conn, $this->dn, $this->entry);
+        if (!$result) {
+            throw new \Exception('Can\'t add');
         }
 
-        $this->assertEquals($limit, $i);
-
-        $this->conn->rename($test_dn, $test_dn_rename, null, true);
+        $this->conn->rename($this->dn, $test_dn_rename, null, true);
 
         $limit = 1;
         $search_results = $this->conn->search(Connection::BASE, $test_dn_rename_full, $test_filter_rename, [], $limit);
@@ -142,7 +160,7 @@ class ConnectionTest extends TestCase
 
         $limit = 0;
         try {
-            $search_results = $this->conn->search(Connection::BASE, $test_dn, $test_filter, [], $limit);
+            $search_results = $this->conn->search(Connection::BASE, $this->dn, $this->filter, [], $limit);
             $i = 0;
 
             foreach ($search_results as $result) {
@@ -156,7 +174,10 @@ class ConnectionTest extends TestCase
             $this->assertEquals($expected_code, $error_code);
         }
 
-        $this->conn->delete($test_dn_rename_full);
+        $result = ldap_delete($this->canonical_conn, $test_dn_rename_full);
+        if (!$result) {
+            throw new \Exception('Can\'t delete');
+        }
     }
 
     public function scopeProvider()
@@ -185,6 +206,7 @@ class ConnectionTest extends TestCase
     public function tearDown()
     {
         unset($this->conn);
+        ldap_unbind($this->canonical_conn);
     }
 }
 
