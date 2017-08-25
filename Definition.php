@@ -52,7 +52,13 @@ abstract class Definition
 
     public function __get(string $name)
     {
-        return property_exists($this, $name) ? $this->$name : null;
+        if (array_key_exists($name, $this->properties)) {
+            $value = $this->properties[$name];
+        } else {
+            $value = null;
+            trigger_error("Unknown property: $name");
+        }
+        return $value;
     }
 }
 
