@@ -35,6 +35,7 @@ define('SYNTAX_NAME_FORM_DESCRIPTION',          35);
 define('SYNTAX_NUMERIC_STRING',                 36);
 define('SYNTAX_OBJECT_CLASS_DESCRIPTION',       37);
 define('SYNTAX_OCTET_STRING',                   40);
+define('SYNTAX_OID',                            38);
 define('SYNTAX_OTHER_MAILBOX',                  39);
 define('SYNTAX_POSTAL_ADDRESS',                 41);
 define('SYNTAX_PRINTABLE_STRING',               44);
@@ -88,6 +89,7 @@ class Syntax
         SYNTAX_NUMERIC_STRING,
         SYNTAX_OBJECT_CLASS_DESCRIPTION,
         SYNTAX_OCTET_STRING,
+        SYNTAX_OID,
         SYNTAX_OTHER_MAILBOX,
         SYNTAX_POSTAL_ADDRESS,
         SYNTAX_PRINTABLE_STRING,
@@ -160,6 +162,7 @@ class Syntax
             case SYNTAX_NUMERIC_STRING:
             case SYNTAX_OBJECT_CLASS_DESCRIPTION:
             case SYNTAX_OCTET_STRING:
+            case SYNTAX_OID:
             case SYNTAX_OTHER_MAILBOX:
             case SYNTAX_POSTAL_ADDRESS:
             case SYNTAX_PRINTABLE_STRING:
@@ -213,6 +216,7 @@ class Syntax
             case SYNTAX_NUMERIC_STRING:
             case SYNTAX_OBJECT_CLASS_DESCRIPTION:
             case SYNTAX_OCTET_STRING:
+            case SYNTAX_OID:
             case SYNTAX_OTHER_MAILBOX:
             case SYNTAX_POSTAL_ADDRESS:
             case SYNTAX_PRINTABLE_STRING:
