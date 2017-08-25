@@ -2,6 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use devgateway\ldap\Search;
 use devgateway\ldap\Connection;
+use devgateway\ldap\Schema;
 
 class ConnectionTest extends TestCase
 {
@@ -207,6 +208,15 @@ class ConnectionTest extends TestCase
     {
         unset($this->conn);
         ldap_unbind($this->canonical_conn);
+    }
+
+    public function testStandardClass()
+    {
+        $schema = new Schema($this->conn);
+        $cn_syntax = '1.3.6.1.4.1.1466.115.121.1.15';
+        $syntax = $schema['device']->must['cn']->syntax->__toString();
+
+        $this->assertEquals($cn_syntax, $syntax);
     }
 }
 
