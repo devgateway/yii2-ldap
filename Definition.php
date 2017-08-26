@@ -74,7 +74,7 @@ abstract class Definition
      * Read-only property getter.
      *
      * @param string $name Property name, lowercase and underscored.
-     * @return mixed $value Property value.
+     * @return mixed Property value.
      */
     public function __get(string $name)
     {
