@@ -1,24 +1,24 @@
 {
-	"name": "devgateway/yii2-ldap",
-	"description": "Yii2 LDAP extension (native)",
-	"type": "yii2-extension",
-	"keywords": ["ldap", "yii2"],
-	"license": "GPL v3+",
-	"require": {
-		"php": ">=5.4.0",
-		"yiisoft/yii2": "~2.0.5",
-                "ext-ldap": "*"
-	},
-	"require-dev": {
-                "phpdocumentor/phpdocumentor": "~2.0"
+    "name": "devgateway/yii2-ldap",
+    "description": "Yii2 LDAP extension (native)",
+    "type": "yii2-extension",
+    "keywords": ["ldap", "yii2"],
+    "license": "GPL v3+",
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "~2.0.5",
+        "ext-ldap": "*"
+    },
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "devgateway\\ldap\\": ""
         },
-	"autoload": {
-		"psr-4": {
-			"devgateway\\ldap\\": ""
-		},
-                "classmap": [
-                    "vendor/yiisoft/yii2/Yii.php",
-                    "vendor/yiisoft/yii2/BaseYii.php"
-                ]
-	}
+        "classmap": [
+            "vendor/yiisoft/yii2/Yii.php",
+            "vendor/yiisoft/yii2/BaseYii.php"
+        ]
+    }
 }
