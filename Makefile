@@ -4,7 +4,7 @@ SOURCE_FILES := $(wildcard *.php)
 all: composer.lock | test docs
 
 test:
-	phpunit --bootstrap vendor/autoload.php tests
+	phpunit --bootstrap tests/bootstrap.php tests
 
 docs: ./vendor/bin/phpdoc $(SOURCE_FILES)
 	rm -rf $@
