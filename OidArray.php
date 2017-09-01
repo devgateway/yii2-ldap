@@ -102,7 +102,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
 
         foreach ($offset as $name) {
             $idx = strtolower($name);
-            $this->names[$idx] = $value;
+            $this->names[$idx] = &$value;
 
             // make the longest name the canonical name
             $name_length = strlen($name);
@@ -112,7 +112,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
             }
         }
 
-        $this->canonical_names[$canonical_name] = $value;
+        $this->canonical_names[$canonical_name] = &$value;
     }
 
     /**
