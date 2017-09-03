@@ -217,5 +217,23 @@ class Search implements \Iterator
             ldap_free_result($this->search_result);
         }
     }
+
+    /**
+     * Return a single search result.
+     *
+     * @return array Attributes of an entry.
+     */
+    public function getOne()
+    {
+        foreach ($this as $attrs) {
+            $result = $attrs;
+        }
+
+        if (isset($result)) {
+            return $result;
+        } else {
+            throw new \RuntimeException('Object not found');
+        }
+    }
 }
 
