@@ -102,6 +102,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
 
         foreach ($offset as $name) {
             $idx = strtolower($name);
+            // use an alias, so when updated, reflects in all arrays
             $this->names[$idx] = &$value;
 
             // make the longest name the canonical name
@@ -112,6 +113,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
             }
         }
 
+        // use an alias, so when updated, reflects in all arrays
         $this->canonical_names[$canonical_name] = &$value;
     }
 
@@ -198,6 +200,26 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         }
 
         return $oid_array;
+    }
+
+    public function __get(string $name)
+    {
+        if ($this->offsetExists($name)) {
+            $value = $this->offsetGet($name);
+        } else {
+            $value = null;
+            trigger_error("Unknown property: $name");
+        }
+
+        return $value;
+    }
+
+    public function __set(string $name, $value)
+    {
+        if ($this->offsetExists($name)) {
+        } else {
+            throw new \RuntimeException("Unknown property: $name");
+        }
     }
 }
 
