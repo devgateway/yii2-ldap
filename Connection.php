@@ -60,6 +60,9 @@ class Connection extends Component
      */
     public $bind_pw = null;
 
+    /** @var Schema The schema object for current server/connection. */
+    public $schema;
+
     /**
      * Initializes LDAP structures, or does nothing if already initialized.
      *
@@ -104,6 +107,9 @@ class Connection extends Component
         } else {
             throw new LdapException($this->conn);
         }
+
+        // load schema
+        $this->schema = new Schema($this);
     }
 
     /**
