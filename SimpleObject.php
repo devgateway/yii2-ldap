@@ -9,10 +9,38 @@
 
 namespace devgateway\ldap;
 
-use devgateway\ldap\AttributeDefinition;
 use devgateway\ldap\OidArray;
+use devgateway\ldap\Schema;
 
-class SimpleObject
+class SimpleObject extends OidArray
 {
+    protected $schema;
+    protected $definition;
+    protected $values;
+
+    public function __construct(
+        Schema $schema,
+        string $class_name,
+        array $entry
+    ) {
+        $this->schema = $schema;
+        $this->definition = $schema[$class_name];
+
+        $count = $entry['count'];
+        for ($i = 0; $i < $count; $i++) {
+            $attr_name = $entry[$i];
+
+            if (
+                isset($this->definition->must[$attr_name]) or
+                isset($this->definition->may[$attr_name])
+            ) {
+                $attr_def = $schema[$attr_name];
+                $offset = OidArray::offsetMake($attr_def);
+                $value = $attr_def->syntax->unserialize($entry[$attr_name]);
+
+                $this[$offset] = $value;
+            }
+        }
+    }
 }
 
