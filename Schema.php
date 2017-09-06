@@ -93,6 +93,9 @@ class Schema extends OidArray
         'may'                  => []
     ];
 
+    /** @var Connection $conn Connection object for subschema queries. */
+    protected $conn;
+
     /**
      * Tokenize definition into keywords and their values.
      *
