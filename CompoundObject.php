@@ -11,17 +11,19 @@ namespace devgateway\ldap;
 
 use devgateway\ldap\SimpleObject;
 use devgateway\ldap\Schema;
-use devgateway\ldap\SimpleObject;
 
 class CompoundObject extends OidArray
 {
     public function __construct(Schema $schema, array $entry)
     {
-        for ($i=0; $i < $entry["count"]; $i++) {
-            $key = $entry[$i];
-            if (strtolower($key) == "objectclass") {
-                for ($j = 0; $j<$entry[$key]['count']; $j++) {
-                    $simple_object = new SimpleObject($schema, $entry[$key][$j], $entry);
+        for ($i = 0; $i < $entry['count']; $i++) {
+            $attr_name = $entry[$i];
+            $num_attrs = $entry[$attr_name]['count'];
+
+            if (strtolower($attr_name) == 'objectclass') {
+                for ($j = 0; $j < $num_attrs; $j++) {
+                    $class_name = $entry[$attr_name][$j];
+                    $simple_object = new SimpleObject($schema, $class_name, $entry);
                     $offset = OidArray::offsetMake($simple_object);
                     $this[$offset] = $simple_object;
                 }
