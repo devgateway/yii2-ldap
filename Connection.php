@@ -176,15 +176,15 @@ class Connection extends Component
      * @return Search Iterator for lazy search.
      */
     public function search(
-        int $scope,
-        string $base,
-        string $filter = '(objectClass=*)',
-        array $attrs = [],
-        int $size_limit = 0,
-        int $time_limit = 0,
-        int $deref = LDAP_DEREF_NEVER,
-        int $page_size = 500,
-        bool $page_critical = false
+        $scope,
+        $base,
+        $filter = '(objectClass=*)',
+        $attrs = [],
+        $size_limit = 0,
+        $time_limit = 0,
+        $deref = LDAP_DEREF_NEVER,
+        $page_size = 500,
+        $page_critical = false
     ) {
         $this->bind();
 

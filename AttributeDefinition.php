@@ -30,7 +30,7 @@ class AttributeDefinition extends Definition
      * @param Schema $schema LDAP schema.
      * @param mixed[] $definition Schema definitions, keys lowercase and underscored.
      */
-    public function __construct(Schema $schema, array $definition)
+    public function __construct(Schema $schema, $definition)
     {
         if (isset($definition['syntax'])) {
             $matches = [];

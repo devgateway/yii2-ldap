@@ -18,7 +18,7 @@ class Attribute
 
     public function __construct(
         AttributeDefinition $definition,
-        array $ldap_value = null
+        $ldap_value = null
     ) {
         $this->definition = $definition;
 
@@ -36,7 +36,7 @@ class Attribute
         $this->value = $value;
     }
 
-    public function __set(string $name, $value)
+    public function __set($name, $value)
     {
         if ($name == 'value') {
         } else {
@@ -44,7 +44,7 @@ class Attribute
         }
     }
 
-    public function __get(string $name)
+    public function __get($name)
     {
         if ($name == 'value') {
         } else {

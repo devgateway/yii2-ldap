@@ -60,15 +60,15 @@ class Search implements \Iterator
      */
     public function __construct(
         $conn,
-        int $scope,
-        string $base,
-        string $filter,
-        array $attrs = [],
-        int $size_limit = 0,
-        int $time_limit = 0,
-        int $deref = LDAP_DEREF_NEVER,
-        int $page_size = 500,
-        bool $page_critical = false
+        $scope,
+        $base,
+        $filter,
+        $attrs = [],
+        $size_limit = 0,
+        $time_limit = 0,
+        $deref = LDAP_DEREF_NEVER,
+        $page_size = 500,
+        $page_critical = false
     ) {
         // validate search scope
         if (array_key_exists($scope, self::$functions)) {

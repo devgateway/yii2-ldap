@@ -30,7 +30,7 @@ class LexingException extends \RuntimeException
      * @param int $position Tokenizer position where the error occured.
      * @param string $msg Additional error information.
      */
-    public function __construct(string &$description, int $position, string $msg)
+    public function __construct(&$description, $position, $msg)
     {
         $desc = substr($description, 0, 47) . "...";
         parent::__construct("$msg at position $position in: $desc");
@@ -101,7 +101,7 @@ class Schema extends OidArray
      * @throws LexingException If tokenizing fails.
      * @return mixed[] Keywords and their values, possibly nested.
      */
-    protected function getTokens(string $description, int &$position)
+    protected function getTokens($description, &$position)
     {
         // find first non-blank character, move position there
         $matches = [];
@@ -193,7 +193,7 @@ class Schema extends OidArray
      * @throws ParsingException If the definition violates LDAP standard.
      * @return mixed[] Attribute properties.
      */
-    protected function parseAttributeDefinition(string $description)
+    protected function parseAttributeDefinition($description)
     {
         $properties = $this->parse(
             $description,
@@ -233,7 +233,7 @@ class Schema extends OidArray
      * @throws ParsingException If multiple class kinds declared.
      * @return mixed[] Object properties.
      */
-    protected function parseObjectDefinition(string $description)
+    protected function parseObjectDefinition($description)
     {
         $properties = $this->parse(
             $description,
@@ -270,7 +270,7 @@ class Schema extends OidArray
      * @throws LexingException If the definition is not parenthesized.
      * @return mixed[] Properties of the schema item.
      */
-    protected function parse(string $description, array $properties, array &$keywords)
+    protected function parse($description, $properties, &$keywords)
     {
         // unwrap long lines
         $description = str_replace("\n ", '', $description);

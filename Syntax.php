@@ -54,7 +54,7 @@ class SyntaxException extends \RuntimeException
      * @param string $value The value that violates the syntax rules.
      * @param mixed[] $expected List of permitted values.
      */
-    public function __construct(string $value, array $expected = [])
+    public function __construct($value, $expected = [])
     {
         if (empty($expected)) {
             $msg = "Value '$value' invalid per syntax";
@@ -137,7 +137,7 @@ class Syntax
      * @param int $syntax_type Internal syntax ID.
      * @throws \OutOfRangeException When the syntax ID is not known.
      */
-    public function __construct(int $syntax_type)
+    public function __construct($syntax_type)
     {
         if (in_array($syntax_type, self::$types)) {
             $this->syntax_type = $syntax_type;
@@ -215,7 +215,7 @@ class Syntax
      * @throws SyntaxException If the value violates the syntax rules.
      * @return mixed The native value.
      */
-    public static function unserialize(string $serialized)
+    public static function unserialize($serialized)
     {
         switch ($this->syntax_type) {
             case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:

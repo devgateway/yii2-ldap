@@ -20,8 +20,8 @@ class SimpleObject extends OidArray
 
     public function __construct(
         Schema $schema,
-        string $class_name,
-        array $entry
+        $class_name,
+        $entry
     ) {
         $this->schema = $schema;
         $this->definition = $schema[$class_name];

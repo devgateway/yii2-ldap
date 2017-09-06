@@ -32,7 +32,7 @@ abstract class Definition
      *
      * @param mixed[] $definition Schema definitions, keys lowercase and underscored.
      */
-    public function __construct(array $definition)
+    public function __construct($definition)
     {
         foreach (self::$keys as $key) {
             $this->properties[$key] = $definition[$key];
@@ -76,7 +76,7 @@ abstract class Definition
      * @param string $name Property name, lowercase and underscored.
      * @return mixed Property value.
      */
-    public function __get(string $name)
+    public function __get($name)
     {
         if (array_key_exists($name, $this->properties)) {
             $value = $this->properties[$name];

@@ -14,7 +14,7 @@ use devgateway\ldap\Schema;
 
 class CompoundObject extends OidArray
 {
-    public function __construct(Schema $schema, array $entry)
+    public function __construct(Schema $schema, $entry)
     {
         for ($i = 0; $i < $entry['count']; $i++) {
             $attr_name = $entry[$i];
