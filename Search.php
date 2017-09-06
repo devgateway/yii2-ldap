@@ -10,6 +10,7 @@
 namespace devgateway\ldap;
 
 use devgateway\ldap\Connection;
+use devgateway\ldap\CompoundObject;
 
 /** Iterable search results implementing lazy search. */
 class Search implements \Iterator
@@ -150,11 +151,13 @@ class Search implements \Iterator
     /**
      * Return current value of the iterator.
      *
-     * @return array Attributes of current entry.
+     * @return CompoundObject Current LDAP object.
      */
     public function current()
     {
-        return ldap_get_attributes($this->conn, $this->current_entry);
+        $attrs = ldap_get_attributes($this->conn, $this->current_entry);
+
+        return new CompoundObject($this->conn->schema, $attrs);
     }
 
     /**
@@ -221,19 +224,15 @@ class Search implements \Iterator
     /**
      * Return a single search result.
      *
-     * @return array Attributes of an entry.
+     * @return CompoundObject A single LDAP object.
      */
     public function getOne()
     {
-        foreach ($this as $attrs) {
-            $result = $attrs;
+        foreach ($this as $compound_object) {
+            return $compound_object;
         }
 
-        if (isset($result)) {
-            return $result;
-        } else {
-            throw new \RuntimeException('Object not found');
-        }
+        throw new \RuntimeException('Object not found');
     }
 }
 
