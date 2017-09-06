@@ -202,7 +202,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         return $oid_array;
     }
 
-    public function __get(string $name)
+    public function __get($name)
     {
         if ($this->offsetExists($name)) {
             $value = $this->offsetGet($name);
@@ -214,7 +214,7 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         return $value;
     }
 
-    public function __set(string $name, $value)
+    public function __set($name, $value)
     {
         if ($this->offsetExists($name)) {
         } else {
