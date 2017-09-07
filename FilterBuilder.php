@@ -117,19 +117,40 @@ class FilterBuilder
         }
     }
 
-    public static function _each()
+    public static function _each($keys, $value)
     {
-        throw new \RuntimeException("Not Implemented");
+        $args = array();
+        foreach ($keys as $key) {
+            $args[$key] = $value;
+        }
+        //return new FilterBuilder(self::_AND, [$args]);
+        return self::_and($args);
     }
 
-    public static function _either()
+    public static function _either($keys, $value)
     {
-        throw new \RuntimeException("Not Implemented");
+        $args = array();
+        foreach ($keys as $key) {
+            $args[$key] = $value;
+        }
+        //return new FilterBuilder(self::_OR, [$args]);
+        return self::_or($args);
     }
 
-    public static function _any()
+    public static function _any($keys, $values)
     {
-        throw new \RuntimeException("Not Implemented");
+        $values_split = preg_split("/[\s]+/", trim($values), -1, PREG_SPLIT_NO_EMPTY);
+        $values_array = array_map("self::any", $values_split);
+        $args = array();
+        foreach ($keys as $key) {
+            $args[$key] = $values_array;
+        }
+        //return new FilterBuilder(self::_OR, [$args]);
+        return self::_or($args);
+    }
+
+    private static function any($value) {
+        return("*$value*");
     }
 }
 
