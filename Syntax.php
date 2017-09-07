@@ -235,6 +235,8 @@ class Syntax
             case SYNTAX_COUNTRY_STRING:
             case SYNTAX_DELIVERY_METHOD:
             case SYNTAX_DIRECTORY_STRING:
+                return $serialized;
+
             case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
             case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
             case SYNTAX_DN:
@@ -244,6 +246,8 @@ class Syntax
             case SYNTAX_GENERALIZED_TIME:
             case SYNTAX_GUIDE:
             case SYNTAX_IA5_STRING:
+                return $serialized;
+
             case SYNTAX_INTEGER:
                 return intval($serialized);
 
@@ -254,14 +258,22 @@ class Syntax
             case SYNTAX_NAME_AND_OPTIONAL_UID:
             case SYNTAX_NAME_FORM_DESCRIPTION:
             case SYNTAX_NUMERIC_STRING:
+                return $serialized;
+
             case SYNTAX_OBJECT_CLASS_DESCRIPTION:
+                return $serialized;
+
             case SYNTAX_OCTET_STRING:
             case SYNTAX_OID:
             case SYNTAX_OTHER_MAILBOX:
             case SYNTAX_POSTAL_ADDRESS:
             case SYNTAX_PRINTABLE_STRING:
+                return $serialized;
+
             case SYNTAX_SUBSTRING_ASSERTION:
             case SYNTAX_TELEPHONE_NUMBER:
+                return $serialized;
+
             case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
             case SYNTAX_TELEX_NUMBER:
             case SYNTAX_UTC_TIME:
