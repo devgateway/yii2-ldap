@@ -24,7 +24,7 @@ class CompoundObject extends OidArray
                 for ($j = 0; $j < $num_attrs; $j++) {
                     $class_name = $entry[$attr_name][$j];
                     $simple_object = new SimpleObject($schema, $class_name, $entry);
-                    $offset = OidArray::offsetMake($simple_object);
+                    $offset = OidArray::offsetMake($simple_object->getDefinition());
                     $this[$offset] = $simple_object;
                 }
             }

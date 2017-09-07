@@ -42,5 +42,10 @@ class SimpleObject extends OidArray
             }
         }
     }
+
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
 }
 
