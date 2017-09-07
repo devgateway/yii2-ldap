@@ -40,7 +40,14 @@ class AttributeDefinition extends Definition
                 $matches
             );
             if ($matched) {
-                $syntax = $schema[$matches[1]];
+                // Some syntaxes got removed from the standard:
+                // https://tools.ietf.org/html/rfc4517#appendix-B
+                try {
+                    $syntax = $schema[$matches[1]];
+                } catch (\OutOfBoundsException $e) {
+                    // fall back to octet string syntax
+                    $syntax = $schema['1.3.6.1.4.1.1466.115.121.1.40'];
+                }
                 $len = $matches[2] ? intval($matches[3]) : 0;
             } else {
                 throw new \RuntimeException(
