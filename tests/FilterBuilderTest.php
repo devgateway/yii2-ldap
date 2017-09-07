@@ -32,5 +32,31 @@ class FilterBuilderTest extends TestCase
         $this->assertEquals($test_or_combined, "(|(&(objectClass=device)(objectClass=user))(&(objectClass=x)(objectClass=y)))");
     }
 
+    public function testGTE()
+    {
+        $GTE = FilterBuilder::_gte(['age' => 21]);
+        $OR= FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']]);
+        $COMBINED_ONE = FilterBuilder::_and($OR,$GTE);
+        $COMBINED_TWO = FilterBuilder::_and(['objectClass' => ['x', 'y']],$GTE);
+
+        $this->assertEquals($GTE, "(age>=21)");
+        $this->assertEquals($COMBINED_ONE, "(&(|(drink=whiskey)(drink=gin)(drink=rum))(age>=21))");
+        $this->assertEquals($COMBINED_TWO, "(&(objectClass=x)(objectClass=y)(age>=21))");
+
+    }
+
+    public function testLTE()
+    {
+        $GTE = FilterBuilder::_lte(['age' => 21]);
+        $OR= FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']]);
+        $COMBINED_ONE = FilterBuilder::_and($OR,$GTE);
+        $COMBINED_TWO = FilterBuilder::_and(['objectClass' => ['x', 'y']],$GTE);
+
+        $this->assertEquals($GTE, "(age<=21)");
+        $this->assertEquals($COMBINED_ONE, "(&(|(drink=whiskey)(drink=gin)(drink=rum))(age<=21))");
+        $this->assertEquals($COMBINED_TWO, "(&(objectClass=x)(objectClass=y)(age<=21))");
+
+    }
+
 }
 

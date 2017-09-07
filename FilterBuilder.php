@@ -28,8 +28,10 @@ class FilterBuilder
         switch ($operator) {
             case self::_GTE:
                 $this->comparison = '>=';
+                break;
             case self::_LTE:
                 $this->comparison = '<=';
+                break;
             default:
                 $this->comparison = '=';
         }
@@ -99,12 +101,20 @@ class FilterBuilder
 
     public static function _gte()
     {
-        throw new \RuntimeException("Not Implemented");
+        if (func_num_args() > 0) {
+            return new FilterBuilder(self::_GTE, func_get_args());
+        } else {
+            throw new \RuntimeException("No arguments provided");
+        }
     }
 
     public static function _lte()
     {
-        throw new \RuntimeException("Not Implemented");
+        if (func_num_args() > 0) {
+            return new FilterBuilder(self::_LTE, func_get_args());
+        } else {
+            throw new \RuntimeException("No arguments provided");
+        }
     }
 
     public static function _each()
