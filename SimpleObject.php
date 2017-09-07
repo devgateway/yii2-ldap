@@ -33,9 +33,19 @@ class SimpleObject extends OidArray
                 isset($this->definition->must[$attr_name]) or
                 isset($this->definition->may[$attr_name])
             ) {
-                $attr_def = $schema[$attr_name];
-                $offset = OidArray::offsetMake($attr_def);
-                $value = $attr_def->syntax->unserialize($entry[$attr_name]);
+                $definition = $schema[$attr_name];
+                $offset = OidArray::offsetMake($definition);
+
+                if ($definition->single_value) {
+                    $value = $definition->syntax->unserialize($entry[$attr_name][0]);
+                } else {
+                    $value = [];
+                    foreach ($entry[$attr_name] as $key => $each_value) {
+                        if ($key != 'count') {
+                            $value[] = $definition->syntax->unserialize($each_value);
+                        }
+                    }
+                }
 
                 $this[$offset] = $value;
             }
