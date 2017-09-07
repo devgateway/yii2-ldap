@@ -153,7 +153,7 @@ class Syntax
      * @throws SyntaxException If the value violates the syntax rules.
      * @return string Value suitable for PHP LDAP extension functions.
      */
-    public static function serialize($value)
+    public function serialize($value)
     {
         switch ($this->syntax_type) {
             case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
@@ -215,7 +215,7 @@ class Syntax
      * @throws SyntaxException If the value violates the syntax rules.
      * @return mixed The native value.
      */
-    public static function unserialize($serialized)
+    public function unserialize($serialized)
     {
         switch ($this->syntax_type) {
             case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
