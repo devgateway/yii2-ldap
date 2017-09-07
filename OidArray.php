@@ -221,5 +221,10 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
             throw new \RuntimeException("Unknown property: $name");
         }
     }
+
+    public function __toString()
+    {
+        return json_encode($this->canonical_names, JSON_PRETTY_PRINT);
+    }
 }
 

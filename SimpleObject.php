@@ -16,7 +16,6 @@ class SimpleObject extends OidArray
 {
     protected $schema;
     protected $definition;
-    protected $values;
 
     public function __construct(
         Schema $schema,
