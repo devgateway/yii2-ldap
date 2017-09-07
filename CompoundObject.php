@@ -30,5 +30,15 @@ class CompoundObject extends OidArray
             }
         }
     }
+
+    public function __toString()
+    {
+        $result = [];
+        foreach ($this as $class_name => $simple_object) {
+            $result[$class_name] = $simple_object->canonical_names;
+        }
+
+        return json_encode($result, JSON_PRETTY_PRINT);
+    }
 }
 
