@@ -41,7 +41,7 @@ class SimpleObject extends OidArray
                 } else {
                     $value = [];
                     foreach ($entry[$attr_name] as $key => $each_value) {
-                        if ($key != 'count') {
+                        if ($key !== 'count') {
                             $value[] = $definition->syntax->unserialize($each_value);
                         }
                     }
