@@ -63,6 +63,7 @@ class Schema extends OidArray
 
     /** @var mixed[] $attribute_defaults Default values for attribute definitions. */
     protected static $attribute_defaults = [
+        'desc'                 => null,
         'obsolete'             => false,
         'single_value'         => false,
         'collective'           => false,
@@ -85,6 +86,7 @@ class Schema extends OidArray
 
     /** @var mixed[] $objectclass_defaults Default values for object definitions. */
     protected static $objectclass_defaults = [
+        'desc'                 => null,
         'structural'           => false, // defaults to true during validation
         'auxiliary'            => false,
         'abstract'             => false,
