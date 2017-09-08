@@ -13,34 +13,13 @@ namespace devgateway\ldap;
 use devgateway\ldap\Syntax;
 use devgateway\ldap\OidArray;
 use devgateway\ldap\Connection;
+use devgateway\ldap\LexingException;
 
-define('TYPE_BOOL',     0);
-define('TYPE_SCALAR',   1);
-define('TYPE_ARRAY',    2);
-define('ATTRIBUTE',     0);
-define('OBJECT_CLASS',  1);
-
-/** Thrown when tokenizing schema definition fails. */
-class LexingException extends \RuntimeException
-{
-    /**
-     * Format the error message with error position and description.
-     *
-     * @param string $description Schema element definition.
-     * @param int $position Tokenizer position where the error occured.
-     * @param string $msg Additional error information.
-     */
-    public function __construct(&$description, $position, $msg)
-    {
-        $desc = substr($description, 0, 47) . "...";
-        parent::__construct("$msg at position $position in: $desc");
-    }
-}
-
-/** Thrown when tokenized definition can't be parsed. */
-class ParsingException extends \RuntimeException
-{
-}
+define('TYPE_BOOL', 0);
+define('TYPE_SCALAR', 1);
+define('TYPE_ARRAY', 2);
+define('ATTRIBUTE', 0);
+define('OBJECT_CLASS', 1);
 
 /** Directory schema. */
 class Schema extends OidArray
@@ -212,17 +191,17 @@ class Schema extends OidArray
                 $msg = 'Either SUP or SYNTAX must be set';
                 throw new ParsingException($msg);
             }
-            if (
-                $properties['collective'] &&
-                $properties['usage'] != 'userApplications'
-            ) {
+
+            $bad_collective = $properties['collective'] \
+                && $properties['usage'] != 'userApplications';
+            if ($bad_collective) {
                 $msg = 'COLLECTIVE requires USAGE userApplications';
                 throw new ParsingException($msg);
             }
-            if (
-                $properties['no_user_modification'] &&
-                $properties['usage'] == 'userApplications'
-            ) {
+
+            $not_operational = $properties['no_user_modification'] \
+                && $properties['usage'] == 'userApplications';
+            if ($not_operational) {
                 $msg = 'NO-USER-MODIFICATION requires operational attribute';
                 throw new ParsingException($msg);
             }
@@ -412,4 +391,3 @@ class Schema extends OidArray
         return $value;
     }
 }
-

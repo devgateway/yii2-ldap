@@ -29,10 +29,9 @@ class SimpleObject extends OidArray
         for ($i = 0; $i < $count; $i++) {
             $attr_name = $entry[$i];
 
-            if (
-                isset($this->definition->must[$attr_name]) or
-                isset($this->definition->may[$attr_name])
-            ) {
+            $relevant_attribute = isset($this->definition->must[$attr_name]) \
+                || isset($this->definition->may[$attr_name])
+            if ($relevant_attribute) {
                 $definition = $schema[$attr_name];
                 $offset = OidArray::offsetMake($definition);
 
@@ -57,4 +56,3 @@ class SimpleObject extends OidArray
         return $this->definition;
     }
 }
-

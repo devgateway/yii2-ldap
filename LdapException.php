@@ -24,4 +24,3 @@ class LdapException extends \RuntimeException
         parent::__construct($message, $code);
     }
 }
-

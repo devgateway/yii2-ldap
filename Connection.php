@@ -8,6 +8,7 @@
  */
 
 namespace devgateway\ldap;
+
 use devgateway\ldap\Search;
 use yii\base\Component;
 
@@ -73,12 +74,12 @@ class Connection extends Component
     protected function connect()
     {
         if ($this->conn !== false) {
-          return;
+            return;
         }
 
         $this->conn = ldap_connect($this->host, $this->port);
         if (!$this->conn) {
-            throw new \RuntimeException("LDAP settings invalid");
+            throw new \RuntimeException('LDAP settings invalid');
         }
 
         $success = ldap_set_option($this->conn, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -147,13 +148,13 @@ class Connection extends Component
         if (function_exists('ldap_escape')) {
             return ldap_escape($string, '', LDAP_ESCAPE_FILTER);
         } else {
-            $map = array(
+            $map = [
                 '\\' => '\\5c', # gotta be first, see str_replace info
                 '*' => '\\2a',
                 '(' => '\\28',
                 ')' => '\\29',
                 "\0" => '\\00'
-            );
+            ];
             return str_replace(array_keys($map), $map, $string);
         }
     }
@@ -262,7 +263,9 @@ class Connection extends Component
         }
 
         $success = $modify_function($this->conn, $dn, $entry);
-        if (!$success) throw new LdapException($this->conn);
+        if (!$success) {
+            throw new LdapException($this->conn);
+        }
     }
 
     /**
@@ -274,7 +277,7 @@ class Connection extends Component
      * @param boolean $delete_old_rdn Move if true, copy if false.
      * @throws LdapException If rename operation failed.
      */
-    public function rename($dn, $new_rdn, $new_parent, $delete_old_rdn )
+    public function rename($dn, $new_rdn, $new_parent, $delete_old_rdn)
     {
         $this->bind();
 
@@ -284,4 +287,3 @@ class Connection extends Component
         }
     }
 }
-

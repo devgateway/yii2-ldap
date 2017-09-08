@@ -89,7 +89,8 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
      * becomes the "pretty" name; if no names given, OID is the "pretty" name.
      * @param mixed $value The value of the element.
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         // OID is the first and the only mandatory item
         $oid = array_shift($offset);
         if (! $this->validateOid($oid)) {
@@ -122,7 +123,8 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
      *
      * @param string $offset OID or case-insensitive name to remove.
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         // this doesn't have to be efficient, it will be rarely used
 
         $old_value = $this->offsetGet($offset);
@@ -227,4 +229,3 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         return json_encode($this->canonical_names, JSON_PRETTY_PRINT);
     }
 }
-

@@ -41,4 +41,3 @@ class CompoundObject extends OidArray
         return json_encode($result, JSON_PRETTY_PRINT);
     }
 }
-

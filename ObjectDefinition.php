@@ -35,7 +35,6 @@ class ObjectDefinition extends Definition
         $attribute_set = [];
 
         foreach (['may', 'must'] as $may_or_must) {
-
             // ensure my own lists exist
             if (!array_key_exists($may_or_must, $definition)) {
                 $definition[$may_or_must] = [];
@@ -78,4 +77,3 @@ class ObjectDefinition extends Definition
         parent::__construct($definition);
     }
 }
-

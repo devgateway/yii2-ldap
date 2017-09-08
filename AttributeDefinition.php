@@ -69,4 +69,3 @@ class AttributeDefinition extends Definition
         parent::__construct($definition);
     }
 }
-

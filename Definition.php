@@ -88,4 +88,3 @@ abstract class Definition
         return $value;
     }
 }
-

@@ -10,62 +10,42 @@
 
 namespace devgateway\ldap;
 
-define('SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION',     3);
-define('SYNTAX_BIT_STRING',                     6);
-define('SYNTAX_BOOLEAN',                        7);
-define('SYNTAX_COUNTRY_STRING',                 11);
-define('SYNTAX_DELIVERY_METHOD',                14);
-define('SYNTAX_DIRECTORY_STRING',               15);
-define('SYNTAX_DIT_CONTENT_RULE_DESCRIPTION',   16);
+use devgateway\ldap\SyntaxException;
+
+define('SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION', 3);
+define('SYNTAX_BIT_STRING', 6);
+define('SYNTAX_BOOLEAN', 7);
+define('SYNTAX_COUNTRY_STRING', 11);
+define('SYNTAX_DELIVERY_METHOD', 14);
+define('SYNTAX_DIRECTORY_STRING', 15);
+define('SYNTAX_DIT_CONTENT_RULE_DESCRIPTION', 16);
 define('SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION', 17);
-define('SYNTAX_DN',                             12);
-define('SYNTAX_ENHANCED_GUIDE',                 21);
-define('SYNTAX_FACSIMILE_TELEPHONE_NUMBER',     22);
-define('SYNTAX_FAX',                            23);
-define('SYNTAX_GENERALIZED_TIME',               24);
-define('SYNTAX_GUIDE',                          25);
-define('SYNTAX_IA5_STRING',                     26);
-define('SYNTAX_INTEGER',                        27);
-define('SYNTAX_JPEG',                           28);
-define('SYNTAX_LDAP_SYNTAX_DESCRIPTION',        54);
-define('SYNTAX_MATCHING_RULE_DESCRIPTION',      30);
-define('SYNTAX_MATCHING_RULE_USE_DESCRIPTION',  31);
-define('SYNTAX_NAME_AND_OPTIONAL_UID',          34);
-define('SYNTAX_NAME_FORM_DESCRIPTION',          35);
-define('SYNTAX_NUMERIC_STRING',                 36);
-define('SYNTAX_OBJECT_CLASS_DESCRIPTION',       37);
-define('SYNTAX_OCTET_STRING',                   40);
-define('SYNTAX_OID',                            38);
-define('SYNTAX_OTHER_MAILBOX',                  39);
-define('SYNTAX_POSTAL_ADDRESS',                 41);
-define('SYNTAX_PRINTABLE_STRING',               44);
-define('SYNTAX_SUBSTRING_ASSERTION',            58);
-define('SYNTAX_TELEPHONE_NUMBER',               50);
-define('SYNTAX_TELETEX_TERMINAL_IDENTIFIER',    51);
-define('SYNTAX_TELEX_NUMBER',                   52);
-define('SYNTAX_UTC_TIME',                       53);
-
-/** Thrown when a value doesn't conform to syntax rules. */
-class SyntaxException extends \RuntimeException
-{
-    /**
-     * Build a message with an optional list of permitted values.
-     *
-     * @param string $value The value that violates the syntax rules.
-     * @param mixed[] $expected List of permitted values.
-     */
-    public function __construct($value, $expected = [])
-    {
-        if (empty($expected)) {
-            $msg = "Value '$value' invalid per syntax";
-        } else {
-            $values = implode(', ', $expected);
-            $msg = "Value '$value' invalid. Expected one of: $values";
-        }
-
-        parent::__construct($msg);
-    }
-}
+define('SYNTAX_DN', 12);
+define('SYNTAX_ENHANCED_GUIDE', 21);
+define('SYNTAX_FACSIMILE_TELEPHONE_NUMBER', 22);
+define('SYNTAX_FAX', 23);
+define('SYNTAX_GENERALIZED_TIME', 24);
+define('SYNTAX_GUIDE', 25);
+define('SYNTAX_IA5_STRING', 26);
+define('SYNTAX_INTEGER', 27);
+define('SYNTAX_JPEG', 28);
+define('SYNTAX_LDAP_SYNTAX_DESCRIPTION', 54);
+define('SYNTAX_MATCHING_RULE_DESCRIPTION', 30);
+define('SYNTAX_MATCHING_RULE_USE_DESCRIPTION', 31);
+define('SYNTAX_NAME_AND_OPTIONAL_UID', 34);
+define('SYNTAX_NAME_FORM_DESCRIPTION', 35);
+define('SYNTAX_NUMERIC_STRING', 36);
+define('SYNTAX_OBJECT_CLASS_DESCRIPTION', 37);
+define('SYNTAX_OCTET_STRING', 40);
+define('SYNTAX_OID', 38);
+define('SYNTAX_OTHER_MAILBOX', 39);
+define('SYNTAX_POSTAL_ADDRESS', 41);
+define('SYNTAX_PRINTABLE_STRING', 44);
+define('SYNTAX_SUBSTRING_ASSERTION', 58);
+define('SYNTAX_TELEPHONE_NUMBER', 50);
+define('SYNTAX_TELETEX_TERMINAL_IDENTIFIER', 51);
+define('SYNTAX_TELEX_NUMBER', 52);
+define('SYNTAX_UTC_TIME', 53);
 
 /**
  * Set of rules to serialize/unserialize values to/from LDAP string formats.
@@ -204,7 +184,6 @@ class Syntax
             case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
             case SYNTAX_TELEX_NUMBER:
             case SYNTAX_UTC_TIME:
-
         }
     }
 
@@ -277,7 +256,6 @@ class Syntax
             case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
             case SYNTAX_TELEX_NUMBER:
             case SYNTAX_UTC_TIME:
-
         }
     }
 
@@ -291,4 +269,3 @@ class Syntax
         return '1.3.6.1.4.1.1466.115.121.1.' . $this->syntax_type;
     }
 }
-

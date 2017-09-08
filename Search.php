@@ -232,4 +232,3 @@ class Search implements \Iterator
         throw new \RuntimeException('Object not found');
     }
 }
-
