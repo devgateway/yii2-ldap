@@ -118,7 +118,11 @@ EOF;
     {
         $schema = new MockSchema();
 
-        $this->expectException($exception_name);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception_name);
+        } else {
+            $this->setExpectedException($exception_name);
+        }
         $schema->parseAttributeDefinition($desc);
     }
 
@@ -167,7 +171,11 @@ EOF;
     {
         $schema = new MockSchema();
 
-        $this->expectException($exception_name);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception_name);
+        } else {
+            $this->setExpectedException($exception_name);
+        }
         $schema->parseObjectDefinition($desc);
     }
 

@@ -41,7 +41,13 @@ class TestOidArray extends TestCase
         $oa = new OidArray();
 
         if (!$oid_valid) {
-            $this->expectException('UnexpectedValueException');
+            $exception_name = 'UnexpectedValueException';
+
+            if (method_exists($this, 'expectException')) {
+                $this->expectException($exception_name);
+            } else {
+                $this->setExpectedException($exception_name);
+            }
         }
 
         $oa[$oid_array] = 42;
