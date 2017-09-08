@@ -192,14 +192,14 @@ class Schema extends OidArray
                 throw new ParsingException($msg);
             }
 
-            $bad_collective = $properties['collective'] \
+            $bad_collective = $properties['collective']
                 && $properties['usage'] != 'userApplications';
             if ($bad_collective) {
                 $msg = 'COLLECTIVE requires USAGE userApplications';
                 throw new ParsingException($msg);
             }
 
-            $not_operational = $properties['no_user_modification'] \
+            $not_operational = $properties['no_user_modification']
                 && $properties['usage'] == 'userApplications';
             if ($not_operational) {
                 $msg = 'NO-USER-MODIFICATION requires operational attribute';
