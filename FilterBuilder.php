@@ -86,13 +86,24 @@ class FilterBuilder
     }
 
     /**
-     * Creates a FilterBuilder object for the OR operator
+     * Creates a FilterBuilder object for the EITHER operator
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
-    public static function _or()
+    public static function either()
     {
-        if (func_num_args() > 0) {
+        if (func_num_args() === 2 and
+            is_array(func_get_arg(0)) and
+            !func_get_arg(1) instanceof FilterBuilder and
+            !is_array(func_get_arg(1))) {
+            $keys = func_get_arg(0);
+            $value = func_get_arg(1);
+            $args = [];
+            foreach ($keys as $key) {
+                $args[$key] = $value;
+            }
+            return new FilterBuilder(self::_OR, [$args]);
+        } elseif (func_num_args() > 0) {
             return new FilterBuilder(self::_OR, func_get_args());
         } else {
             throw new \InvalidArgumentException('No arguments provided');
@@ -100,13 +111,24 @@ class FilterBuilder
     }
 
     /**
-     * Creates a FilterBuilder object for the AND operator
+     * Creates a FilterBuilder object for the ALL operator
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
-    public static function _and()
+    public static function all()
     {
-        if (func_num_args() > 0) {
+        if (func_num_args() === 2 and
+            is_array(func_get_arg(0)) and
+            !func_get_arg(1) instanceof FilterBuilder and
+            !is_array(func_get_arg(1))) {
+            $keys = func_get_arg(0);
+            $value = func_get_arg(1);
+            $args = [];
+            foreach ($keys as $key) {
+                $args[$key] = $value;
+            }
+            return new FilterBuilder(self::_AND, [$args]);
+        } elseif (func_num_args() > 0) {
             return new FilterBuilder(self::_AND, func_get_args());
         } else {
             throw new \InvalidArgumentException('No arguments provided');
@@ -118,10 +140,13 @@ class FilterBuilder
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
-    public static function _not()
+    public static function neither()
     {
-        if (func_num_args() > 0) {
+        if (func_num_args() === 1) {
             return new FilterBuilder(self::_NOT, func_get_args());
+        } elseif (func_num_args() > 1) {
+            $or = new FilterBuilder(self::_OR, func_get_args());
+            return new FilterBuilder(self::_NOT, $or);
         } else {
             throw new \InvalidArgumentException('No arguments provided');
         }
@@ -153,34 +178,6 @@ class FilterBuilder
         } else {
             throw new \InvalidArgumentException('No arguments provided');
         }
-    }
-
-    /**
-     * Creates a FilterBuilder object for the EACH operator
-     * @return FilterBuilder
-     * @throws InvalidArgumentException if no arguments are provided
-     */
-    public static function _each($keys, $value)
-    {
-        $args = [];
-        foreach ($keys as $key) {
-            $args[$key] = $value;
-        }
-        return new FilterBuilder(self::_AND, [$args]);
-    }
-
-    /**
-     * Creates a FilterBuilder object for the EITHER operator
-     * @return FilterBuilder
-     * @throws InvalidArgumentException if no arguments are provided
-     */
-    public static function _either($keys, $value)
-    {
-        $args = [];
-        foreach ($keys as $key) {
-            $args[$key] = $value;
-        }
-        return new FilterBuilder(self::_OR, [$args]);
     }
 
     /**
