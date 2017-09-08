@@ -140,7 +140,7 @@ class FilterBuilder
     public static function _any($keys, $values)
     {
         $values_split = preg_split("/[\s]+/", trim($values), -1, PREG_SPLIT_NO_EMPTY);
-        $values_array = array_map("self::any", $values_split);
+        $values_array = array_map("self::anyHelper", $values_split);
         $args = array();
         foreach ($keys as $key) {
             $args[$key] = $values_array;
@@ -149,7 +149,7 @@ class FilterBuilder
         return self::_or($args);
     }
 
-    private static function any($value) {
+    private static function anyHelper($value) {
         return("*$value*");
     }
 }
