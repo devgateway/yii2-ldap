@@ -46,13 +46,12 @@ class FilterBuilder
         }
 
         // handle each memeber of $args depending on its type
-        foreach ($args as $arg) { 
+        foreach ($args as $arg) {
             if ($arg instanceof FilterBuilder) {
                 array_push($this->operands, $arg);
-            }
-            elseif (is_array($arg)) {
-                foreach ($arg as $key=>$value) {
-                    if (is_array($value)) { 
+            } elseif (is_array($arg)) {
+                foreach ($arg as $key => $value) {
+                    if (is_array($value)) {
                         foreach ($value as $v) {
                             $operand = "(${key}$this->comparison${v})";
                             array_push($this->operands, $operand);
@@ -63,7 +62,7 @@ class FilterBuilder
                     }
                 }
             } else {
-                throw new \InvalidArgumentException("Not an array or a FilterBuilder");
+                throw new \InvalidArgumentException('Not an array or a FilterBuilder');
             }
         }
     }
@@ -75,13 +74,13 @@ class FilterBuilder
     public function __toString()
     {
         if ($this->operator === self::_GTE or $this->operator === self::_LTE) {
-           return $this->operands[0];
+            return $this->operands[0];
         } else {
-            $result = "(".$this->operator;
+            $result = '(' . $this->operator;
             foreach ($this->operands as $operand) {
                 $result .= $operand;
             }
-            $result .= ")";
+            $result .= ')';
             return $result;
         }
     }
@@ -93,10 +92,10 @@ class FilterBuilder
      */
     public static function _or()
     {
-        if (func_num_args() > 0) { 
+        if (func_num_args() > 0) {
             return new FilterBuilder(self::_OR, func_get_args());
         } else {
-            throw new \InvalidArgumentException("No arguments provided");
+            throw new \InvalidArgumentException('No arguments provided');
         }
     }
 
@@ -107,10 +106,10 @@ class FilterBuilder
      */
     public static function _and()
     {
-        if (func_num_args() > 0) { 
+        if (func_num_args() > 0) {
             return new FilterBuilder(self::_AND, func_get_args());
         } else {
-            throw new \InvalidArgumentException("No arguments provided");
+            throw new \InvalidArgumentException('No arguments provided');
         }
     }
 
@@ -121,10 +120,10 @@ class FilterBuilder
      */
     public static function _not()
     {
-        if (func_num_args() > 0) { 
+        if (func_num_args() > 0) {
             return new FilterBuilder(self::_NOT, func_get_args());
         } else {
-            throw new \InvalidArgumentException("No arguments provided");
+            throw new \InvalidArgumentException('No arguments provided');
         }
     }
 
@@ -138,7 +137,7 @@ class FilterBuilder
         if (func_num_args() > 0) {
             return new FilterBuilder(self::_GTE, func_get_args());
         } else {
-            throw new \InvalidArgumentException("No arguments provided");
+            throw new \InvalidArgumentException('No arguments provided');
         }
     }
 
@@ -152,7 +151,7 @@ class FilterBuilder
         if (func_num_args() > 0) {
             return new FilterBuilder(self::_LTE, func_get_args());
         } else {
-            throw new \InvalidArgumentException("No arguments provided");
+            throw new \InvalidArgumentException('No arguments provided');
         }
     }
 
@@ -163,7 +162,7 @@ class FilterBuilder
      */
     public static function _each($keys, $value)
     {
-        $args = array();
+        $args = [];
         foreach ($keys as $key) {
             $args[$key] = $value;
         }
@@ -177,7 +176,7 @@ class FilterBuilder
      */
     public static function _either($keys, $value)
     {
-        $args = array();
+        $args = [];
         foreach ($keys as $key) {
             $args[$key] = $value;
         }
@@ -191,15 +190,14 @@ class FilterBuilder
      */
     public static function _any($keys, $values)
     {
-        $values_split = preg_split("/[\s]+/", trim($values), -1, PREG_SPLIT_NO_EMPTY);
-        $values_array = array_map(function($value) {
+        $values_split = preg_split('/[\s]+/', trim($values), -1, PREG_SPLIT_NO_EMPTY);
+        $values_array = array_map(function ($value) {
             return("*$value*");
         }, $values_split);
-        $args = array();
+        $args = [];
         foreach ($keys as $key) {
             $args[$key] = $values_array;
         }
         return new FilterBuilder(self::_OR, [$args]);
     }
 }
-
