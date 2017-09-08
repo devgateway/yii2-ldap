@@ -204,6 +204,12 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         return $oid_array;
     }
 
+    /**
+     * Property getter
+     *
+     * @param string $name Property name (case-insensitive).
+     * @return mixed Property value.
+     */
     public function __get($name)
     {
         if ($this->offsetExists($name)) {
@@ -216,6 +222,13 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         return $value;
     }
 
+    /**
+     * Property setter
+     *
+     * @param string $name Property name (case-insensitive).
+     * @param mixed $value New property value.
+     * @throws \RuntimeException If property is not defined.
+     */
     public function __set($name, $value)
     {
         if ($this->offsetExists($name)) {
@@ -224,6 +237,11 @@ class OidArray implements \ArrayAccess, \IteratorAggregate
         }
     }
 
+    /**
+     * Get JSON representation of canonical keys and values.
+     *
+     * @return string JSON representation.
+     */
     public function __toString()
     {
         return json_encode($this->canonical_names, JSON_PRETTY_PRINT);

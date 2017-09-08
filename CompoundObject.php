@@ -12,14 +12,22 @@ namespace devgateway\ldap;
 use devgateway\ldap\SimpleObject;
 use devgateway\ldap\Schema;
 
+/** Representation of an LDAP object of one or more object classes. */
 class CompoundObject extends OidArray
 {
+    /**
+     * Initialize all simple objects of individual classes.
+     *
+     * @param Schema $schema Schema object to query.
+     * @param mixed[] $entry Array of attributes from PHP LDAP extension.
+     */
     public function __construct(Schema $schema, $entry)
     {
         for ($i = 0; $i < $entry['count']; $i++) {
             $attr_name = $entry[$i];
             $num_attrs = $entry[$attr_name]['count'];
 
+            // initialize each object class as a SimpleObject
             if (strtolower($attr_name) == 'objectclass') {
                 for ($j = 0; $j < $num_attrs; $j++) {
                     $class_name = $entry[$attr_name][$j];
@@ -31,6 +39,11 @@ class CompoundObject extends OidArray
         }
     }
 
+    /**
+     * Get JSON representation of all classes and their attributes.
+     *
+     * @return string JSON representation.
+     */
     public function __toString()
     {
         $result = [];

@@ -12,11 +12,24 @@ namespace devgateway\ldap;
 use devgateway\ldap\OidArray;
 use devgateway\ldap\Schema;
 
+/**
+ * Object of a single LDAP object class.
+ */
 class SimpleObject extends OidArray
 {
+    /** @var Schema $schema Schema object for current LDAP connection. */
     protected $schema;
+
+    /** @var ObjectDefinition $definition Definition of this object class in schema. */
     protected $definition;
 
+    /**
+     * Load schema definitions, and parse LDAP array with them.
+     *
+     * @param Schema $schema Schema object to query.
+     * @param string $class_name Object class name.
+     * @param mixed[] $entry Array of attributes from PHP LDAP extension.
+     */
     public function __construct(
         Schema $schema,
         $class_name,
@@ -29,12 +42,14 @@ class SimpleObject extends OidArray
         for ($i = 0; $i < $count; $i++) {
             $attr_name = $entry[$i];
 
-            $relevant_attribute = isset($this->definition->must[$attr_name]) \
-                || isset($this->definition->may[$attr_name])
+            // only interested in my MUST and MAY attributes
+            $relevant_attribute = isset($this->definition->must[$attr_name])
+                || isset($this->definition->may[$attr_name]);
             if ($relevant_attribute) {
                 $definition = $schema[$attr_name];
                 $offset = OidArray::offsetMake($definition);
 
+                // parse arrays of strings according to syntax rules
                 if ($definition->single_value) {
                     $value = $definition->syntax->unserialize($entry[$attr_name][0]);
                 } else {
@@ -51,6 +66,11 @@ class SimpleObject extends OidArray
         }
     }
 
+    /**
+     * Return ObjectDefinition for current object class.
+     *
+     * @return ObjectDefinition Definition for current object class.
+     */
     public function getDefinition()
     {
         return $this->definition;
