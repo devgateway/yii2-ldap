@@ -9,7 +9,9 @@
 
 namespace devgateway\ldap;
 
-
+/**
+ * Encapsulates an LDAP search filter
+ */
 class FilterBuilder
 {
     const _OR =  '|';
@@ -22,6 +24,13 @@ class FilterBuilder
     protected $comparison;
     protected $operands = [];
 
+    /**
+     * Initialize class members, and validate search scope.
+     *
+     * @param string $operator filter operator
+     * @param array $args filter arguments, can include arrays or other FilterBuilders
+     * @throws RuntimeException if array does not include only arrays or FilterBuilders
+     */
     public function __construct($operator, $args)
     {
         $this->operator = $operator;
@@ -36,6 +45,7 @@ class FilterBuilder
                 $this->comparison = '=';
         }
 
+        // handle each memeber of $args depending on its type
         foreach ($args as $arg) { 
             if ($arg instanceof FilterBuilder) {
                 array_push($this->operands, $arg);
@@ -53,11 +63,15 @@ class FilterBuilder
                     }
                 }
             } else {
-                throw new \RuntimeException("not an array or a FilterBuilder");
+                throw new \RuntimeException("Not an array or a FilterBuilder");
             }
         }
     }
 
+    /**
+     * String representation of the FilterBuilder object
+     * @return string
+     */
     public function __toString()
     {
         if ($this->operator === self::_GTE or $this->operator === self::_LTE) {
@@ -72,6 +86,11 @@ class FilterBuilder
         }
     }
 
+    /**
+     * Creates a FilterBuilder object for the OR operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _or()
     {
         if (func_num_args() > 0) { 
@@ -81,6 +100,11 @@ class FilterBuilder
         }
     }
 
+    /**
+     * Creates a FilterBuilder object for the AND operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _and()
     {
         if (func_num_args() > 0) { 
@@ -90,6 +114,11 @@ class FilterBuilder
         }
     }
 
+    /**
+     * Creates a FilterBuilder object for the NOT operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _not()
     {
         if (func_num_args() > 0) { 
@@ -99,6 +128,11 @@ class FilterBuilder
         }
     }
 
+    /**
+     * Creates a FilterBuilder object for the GREATER THAN OR EQUAL TO operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _gte()
     {
         if (func_num_args() > 0) {
@@ -108,6 +142,11 @@ class FilterBuilder
         }
     }
 
+    /**
+     * Creates a FilterBuilder object for the LESS THAN OR EQUAL TO operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _lte()
     {
         if (func_num_args() > 0) {
@@ -117,6 +156,11 @@ class FilterBuilder
         }
     }
 
+    /**
+     * Creates a FilterBuilder object for the EACH operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _each($keys, $value)
     {
         $args = array();
@@ -127,6 +171,11 @@ class FilterBuilder
         return self::_and($args);
     }
 
+    /**
+     * Creates a FilterBuilder object for the EITHER operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _either($keys, $value)
     {
         $args = array();
@@ -137,6 +186,11 @@ class FilterBuilder
         return self::_or($args);
     }
 
+    /**
+     * Creates a FilterBuilder object for the ANY operator
+     * @return FilterBuilder
+     * @throws RuntimeException if no arguments are provided
+     */
     public static function _any($keys, $values)
     {
         $values_split = preg_split("/[\s]+/", trim($values), -1, PREG_SPLIT_NO_EMPTY);
@@ -149,6 +203,10 @@ class FilterBuilder
         return self::_or($args);
     }
 
+    /**
+     * Helper function for _any, surrounds value with asterisks
+     * @return string
+     */
     private static function anyHelper($value) {
         return("*$value*");
     }
