@@ -29,7 +29,7 @@ class FilterBuilder
      *
      * @param string $operator filter operator
      * @param array $args filter arguments, can include arrays or other FilterBuilders
-     * @throws RuntimeException if array does not include only arrays or FilterBuilders
+     * @throws InvalidArgumentException if array does not include only arrays or FilterBuilders
      */
     public function __construct($operator, $args)
     {
@@ -63,7 +63,7 @@ class FilterBuilder
                     }
                 }
             } else {
-                throw new \RuntimeException("Not an array or a FilterBuilder");
+                throw new \InvalidArgumentException("Not an array or a FilterBuilder");
             }
         }
     }
@@ -89,77 +89,77 @@ class FilterBuilder
     /**
      * Creates a FilterBuilder object for the OR operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _or()
     {
         if (func_num_args() > 0) { 
             return new FilterBuilder(self::_OR, func_get_args());
         } else {
-            throw new \RuntimeException("No arguments provided");
+            throw new \InvalidArgumentException("No arguments provided");
         }
     }
 
     /**
      * Creates a FilterBuilder object for the AND operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _and()
     {
         if (func_num_args() > 0) { 
             return new FilterBuilder(self::_AND, func_get_args());
         } else {
-            throw new \RuntimeException("No arguments provided");
+            throw new \InvalidArgumentException("No arguments provided");
         }
     }
 
     /**
      * Creates a FilterBuilder object for the NOT operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _not()
     {
         if (func_num_args() > 0) { 
             return new FilterBuilder(self::_NOT, func_get_args());
         } else {
-            throw new \RuntimeException("No arguments provided");
+            throw new \InvalidArgumentException("No arguments provided");
         }
     }
 
     /**
      * Creates a FilterBuilder object for the GREATER THAN OR EQUAL TO operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _gte()
     {
         if (func_num_args() > 0) {
             return new FilterBuilder(self::_GTE, func_get_args());
         } else {
-            throw new \RuntimeException("No arguments provided");
+            throw new \InvalidArgumentException("No arguments provided");
         }
     }
 
     /**
      * Creates a FilterBuilder object for the LESS THAN OR EQUAL TO operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _lte()
     {
         if (func_num_args() > 0) {
             return new FilterBuilder(self::_LTE, func_get_args());
         } else {
-            throw new \RuntimeException("No arguments provided");
+            throw new \InvalidArgumentException("No arguments provided");
         }
     }
 
     /**
      * Creates a FilterBuilder object for the EACH operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _each($keys, $value)
     {
@@ -167,14 +167,13 @@ class FilterBuilder
         foreach ($keys as $key) {
             $args[$key] = $value;
         }
-        //return new FilterBuilder(self::_AND, [$args]);
-        return self::_and($args);
+        return new FilterBuilder(self::_AND, [$args]);
     }
 
     /**
      * Creates a FilterBuilder object for the EITHER operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _either($keys, $value)
     {
@@ -182,33 +181,25 @@ class FilterBuilder
         foreach ($keys as $key) {
             $args[$key] = $value;
         }
-        //return new FilterBuilder(self::_OR, [$args]);
-        return self::_or($args);
+        return new FilterBuilder(self::_OR, [$args]);
     }
 
     /**
      * Creates a FilterBuilder object for the ANY operator
      * @return FilterBuilder
-     * @throws RuntimeException if no arguments are provided
+     * @throws InvalidArgumentException if no arguments are provided
      */
     public static function _any($keys, $values)
     {
         $values_split = preg_split("/[\s]+/", trim($values), -1, PREG_SPLIT_NO_EMPTY);
-        $values_array = array_map("self::anyHelper", $values_split);
+        $values_array = array_map(function($value) {
+            return("*$value*");
+        }, $values_split);
         $args = array();
         foreach ($keys as $key) {
             $args[$key] = $values_array;
         }
-        //return new FilterBuilder(self::_OR, [$args]);
-        return self::_or($args);
-    }
-
-    /**
-     * Helper function for _any, surrounds value with asterisks
-     * @return string
-     */
-    private static function anyHelper($value) {
-        return("*$value*");
+        return new FilterBuilder(self::_OR, [$args]);
     }
 }
 

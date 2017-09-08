@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use devgateway\ldap\FilterBuilder;
+use devgateway\ldap\FilterBuilder as FB;
 
 class FilterBuilderTest extends TestCase
 {
@@ -67,22 +67,22 @@ class FilterBuilderTest extends TestCase
             'either'  => [['givenName', 'surname', 'uid'], 'adam'],
             'any'     => [['givenName', 'surname', 'uid'], ' adam  smi'],
             'or_comb' => [
-                FilterBuilder::_and(['objectClass' => ['device', 'user']]),
-                FilterBuilder::_and(['objectClass' => ['x', 'y']])
+                FB::_and(['objectClass' => ['device', 'user']]),
+                FB::_and(['objectClass' => ['x', 'y']])
             ],
             'or_comb_two' => [
-                FilterBuilder::_and(
-                    FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']]),
-                    FilterBuilder::_gte(['age' => 21])),
-                FilterBuilder::_not(['drink' => 'liquor'])
+                FB::_and(
+                    FB::_or(['drink' => ['whiskey', 'gin', 'rum']]),
+                    FB::_gte(['age' => 21])),
+                FB::_not(['drink' => 'liquor'])
             ],
             'and_comb' => [
-                FilterBuilder::_lte(['age' => 21]),
-                FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']])
+                FB::_lte(['age' => 21]),
+                FB::_or(['drink' => ['whiskey', 'gin', 'rum']])
             ],
             'and_comb_two' => [
                 ['objectClass' => ['x', 'y']],
-                FilterBuilder::_lte(['age' => 21])
+                FB::_lte(['age' => 21])
             ]
         ];
 
