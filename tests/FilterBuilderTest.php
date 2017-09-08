@@ -4,80 +4,102 @@ use devgateway\ldap\FilterBuilder;
 
 class FilterBuilderTest extends TestCase
 {
-    public function testOr()
+    /**
+     * @dataProvider provider
+     */
+    public function testFilterBuilder($type, $input, $output)
     {
-        $test_or = FilterBuilder::_or(['objectClass' => ['device', 'user']]);
-        $this->assertEquals($test_or, "(|(objectClass=device)(objectClass=user))");
+        switch($type) {
+            case "or":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_or', $input);
+                break;
+            case "and":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_and', $input);
+                break;
+            case "not":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_not', $input);
+                break;
+            case "gte":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_gte', $input);
+                break;
+            case "lte":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_lte', $input);
+                break;
+            case "each":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_each', $input);
+                break;
+            case "either":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_either', $input);
+                break;
+            case "any":
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_any', $input);
+                break;
+            default:
+                throw new \RuntimeException("Invalid Type");
+        }
+        $this->assertEquals($filter, $output);
     }
 
-    public function testAnd()
+    public function provider()
     {
-        $test_and_one = FilterBuilder::_and(['objectClass' => ['device', 'user']]);
-        $test_and_two = FilterBuilder::_and(['objectClass' => ['x', 'y']]);
+        $output = [
+            'any' => "(|(givenName=*adam*)(givenName=*smi*)(surname=*adam*)(surname=*smi*)(uid=*adam*)(uid=*smi*))",
+            'either' => "(|(givenName=adam)(surname=adam)(uid=adam))",
+            'each' => "(&(givenName=adam)(surname=adam)(uid=adam))",
+            'or' => "(|(objectClass=device)(objectClass=user))",
+            'and' => "(&(objectClass=device)(objectClass=user))",
+            'gte' => "(age>=21)",
+            'lte' => "(age<=21)",
+            'not' => "(!(drink=liquor))",
+            'or_comb' => "(|(&(objectClass=device)(objectClass=user))(&(objectClass=x)(objectClass=y)))",
+            'or_comb_two' => "(|(&(|(drink=whiskey)(drink=gin)(drink=rum))(age>=21))(!(drink=liquor)))",
+            'and_comb' => "(&(age<=21)(|(drink=whiskey)(drink=gin)(drink=rum)))",
+            'and_comb_two' => "(&(objectClass=x)(objectClass=y)(age<=21))"
+        ];
 
-        $this->assertEquals($test_and_one, "(&(objectClass=device)(objectClass=user))");
-        $this->assertEquals($test_and_two, "(&(objectClass=x)(objectClass=y))");
+        $input = [
+            'gte'     => [['age' => 21]],
+            'lte'     => [['age' => 21]],
+            'not'     => [['drink' => 'liquor']],
+            'or'      => [['objectClass' => ['device', 'user']]],
+            'and'     => [['objectClass' => ['device', 'user']]],
+            'each'    => [['givenName', 'surname', 'uid'], 'adam'],
+            'either'  => [['givenName', 'surname', 'uid'], 'adam'],
+            'any'     => [['givenName', 'surname', 'uid'], ' adam  smi'],
+            'or_comb' => [
+                FilterBuilder::_and(['objectClass' => ['device', 'user']]),
+                FilterBuilder::_and(['objectClass' => ['x', 'y']])
+            ],
+            'or_comb_two' => [
+                FilterBuilder::_and(
+                    FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']]),
+                    FilterBuilder::_gte(['age' => 21])),
+                FilterBuilder::_not(['drink' => 'liquor'])
+            ],
+            'and_comb' => [
+                FilterBuilder::_lte(['age' => 21]),
+                FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']])
+            ],
+            'and_comb_two' => [
+                ['objectClass' => ['x', 'y']],
+                FilterBuilder::_lte(['age' => 21])
+            ]
+        ];
+
+        return [
+            'gte'          => ["gte",    $input['gte'],          $output['gte']],
+            'lte'          => ["lte",    $input['gte'],          $output['lte']],
+            'not'          => ["not",    $input['not'],          $output['not']],
+            'or'           => ["or",     $input['or'],           $output['or']],
+            'and'          => ["and",    $input['and'],          $output['and']],
+            'each'         => ["each",   $input['each'],         $output['each']],
+            'either'       => ["either", $input['either'],       $output['either']],
+            'any'          => ["any",    $input['any'],          $output['any']],
+            'or_comb'      => ["or",     $input['or_comb'],      $output['or_comb']],
+            'and_comb'     => ["and",    $input['and_comb'],     $output['and_comb']],
+            'or_comb_two'  => ["or",     $input['or_comb_two'],  $output['or_comb_two']],
+            'and_comb_two' => ["and",    $input['and_comb_two'], $output['and_comb_two']]
+        ];
     }
-
-    public function testNot()
-    {
-        $test_not = FilterBuilder::_not(['drink' => 'liquor']);
-        $this->assertEquals($test_not, "(!(drink=liquor))");
-    }
-
-    public function testCombined()
-    {
-        $test_and_one = FilterBuilder::_and(['objectClass' => ['device', 'user']]);
-        $test_and_two = FilterBuilder::_and(['objectClass' => ['x', 'y']]);
-        $test_or = FilterBuilder::_or(['objectClass' => ['device', 'user']]);
-        $test_or_combined = FilterBuilder::_or($test_and_one, $test_and_two);
-
-        $this->assertEquals($test_or_combined, "(|(&(objectClass=device)(objectClass=user))(&(objectClass=x)(objectClass=y)))");
-    }
-
-    public function testGTE()
-    {
-        $GTE = FilterBuilder::_gte(['age' => 21]);
-        $OR= FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']]);
-        $COMBINED_ONE = FilterBuilder::_and($OR,$GTE);
-        $COMBINED_TWO = FilterBuilder::_and(['objectClass' => ['x', 'y']],$GTE);
-
-        $this->assertEquals($GTE, "(age>=21)");
-        $this->assertEquals($COMBINED_ONE, "(&(|(drink=whiskey)(drink=gin)(drink=rum))(age>=21))");
-        $this->assertEquals($COMBINED_TWO, "(&(objectClass=x)(objectClass=y)(age>=21))");
-
-    }
-
-    public function testLTE()
-    {
-        $GTE = FilterBuilder::_lte(['age' => 21]);
-        $OR= FilterBuilder::_or(['drink' => ['whiskey', 'gin', 'rum']]);
-        $COMBINED_ONE = FilterBuilder::_and($OR,$GTE);
-        $COMBINED_TWO = FilterBuilder::_and(['objectClass' => ['x', 'y']],$GTE);
-
-        $this->assertEquals($GTE, "(age<=21)");
-        $this->assertEquals($COMBINED_ONE, "(&(|(drink=whiskey)(drink=gin)(drink=rum))(age<=21))");
-        $this->assertEquals($COMBINED_TWO, "(&(objectClass=x)(objectClass=y)(age<=21))");
-
-    }
-
-    public function testEach()
-    {
-        $each = FilterBuilder::_each(['givenName', 'surname', 'uid'], 'adam');
-        $this->assertEquals($each, "(&(givenName=adam)(surname=adam)(uid=adam))");
-    }
-
-    public function testEither()
-    {
-        $either = FilterBuilder::_either(['givenName', 'surname', 'uid'], 'adam');
-        $this->assertEquals($either, "(|(givenName=adam)(surname=adam)(uid=adam))");
-    }
-
-    public function testAny()
-    {
-        $any = FilterBuilder::_any(['givenName', 'surname', 'uid'], " adam  smi");
-        $this->assertEquals($any, "(|(givenName=*adam*)(givenName=*smi*)(surname=*adam*)(surname=*smi*)(uid=*adam*)(uid=*smi*))");
-    }
-
 }
 
