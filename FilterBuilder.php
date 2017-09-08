@@ -136,7 +136,7 @@ class FilterBuilder
     }
 
     /**
-     * Creates a FilterBuilder object for the NOT operator
+     * Creates a FilterBuilder object for the NEITHER operator
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
@@ -146,7 +146,7 @@ class FilterBuilder
             return new FilterBuilder(self::_NOT, func_get_args());
         } elseif (func_num_args() > 1) {
             $or = new FilterBuilder(self::_OR, func_get_args());
-            return new FilterBuilder(self::_NOT, $or);
+            return new FilterBuilder(self::_NOT, [$or]);
         } else {
             throw new \InvalidArgumentException('No arguments provided');
         }
