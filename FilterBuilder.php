@@ -157,7 +157,7 @@ class FilterBuilder
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
-    public static function _gte()
+    public static function gte()
     {
         if (func_num_args() > 0) {
             return new FilterBuilder(self::_GTE, func_get_args());
@@ -171,7 +171,7 @@ class FilterBuilder
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
-    public static function _lte()
+    public static function lte()
     {
         if (func_num_args() > 0) {
             return new FilterBuilder(self::_LTE, func_get_args());
@@ -185,7 +185,7 @@ class FilterBuilder
      * @return FilterBuilder
      * @throws InvalidArgumentException if no arguments are provided
      */
-    public static function _any($keys, $values)
+    public static function any($keys, $values)
     {
         $values_split = preg_split('/[\s]+/', trim($values), -1, PREG_SPLIT_NO_EMPTY);
         $values_array = array_map(function ($value) {
