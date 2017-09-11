@@ -1,8 +1,8 @@
 {
     "name": "devgateway/yii2-ldap",
-    "description": "Yii2 LDAP extension (native)",
+    "description": "LDAP Extension for Yii2",
     "type": "yii2-extension",
-    "keywords": ["ldap", "yii2"],
+    "keywords": ["ldap", "yii2", "directory", "component"],
     "license": "GPL v3+",
     "require": {
         "php": ">=5.4.0",
