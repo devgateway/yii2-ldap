@@ -80,10 +80,10 @@ class ModifyTest extends TestCase
     public function modProvider()
     {
         require('config.php');
-        $mod_single['owner'] = sprintf('uid=btalayeminaei,ou=staff,ou=people,%s', $base);
+        $mod_single['description'] = "added description";
         $mod_single_filter = sprintf(
-            '(&(objectClass=virtualMachine)(cn=test_mod)(owner=%s))',
-            $mod_single['owner']
+            '(&(objectClass=virtualMachine)(cn=test_mod)(description=%s))',
+            $mod_single['description']
         );
 
         $mod_extra['cn'] = "tsm";
@@ -102,7 +102,7 @@ class ModifyTest extends TestCase
             $mod_multiple['description']
         );
 
-        $mod_single_orig['owner'] = sprintf('uid=dummy,ou=other,ou=people,%s', $base);
+        $mod_single_orig['description'] = "changed description";
         $mod_extra_orig['cn'] = "tsmorig";
         $mod_multiple_orig = [
             'priority' => "5",
@@ -117,16 +117,14 @@ class ModifyTest extends TestCase
 
         $mod_entry_new = [
             'cn' => "test_mod",
-            'owner' => sprintf('uid=btalayeminaei,ou=staff,ou=people,%s', $base),
             'description' => "test_add ldap object",
             'memorySize' => "7",
             'virtualCPU' => "7",
             'objectClass' => ["virtualMachine", "device", "ansibleHost"]
         ];
         $mod_entry_new_filter = sprintf(
-            '(&(objectClass=virtualMachine)(cn=%s)(owner=%s)(description=%s)(memorySize=%s)(virtualCPU=%s))',
+            '(&(objectClass=virtualMachine)(cn=%s)(description=%s)(memorySize=%s)(virtualCPU=%s))',
             $mod_entry_new['cn'],
-            $mod_entry_new['owner'],
             $mod_entry_new['description'],
             $mod_entry_new['memorySize'],
             $mod_entry_new['virtualCPU']
