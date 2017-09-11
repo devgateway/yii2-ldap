@@ -14,10 +14,10 @@ class FilterBuilderTest extends TestCase
                 $filter = call_user_func_array('devgateway\ldap\FilterBuilder::neither', $input);
                 break;
             case "gte":
-                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_gte', $input);
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::gte', $input);
                 break;
             case "lte":
-                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_lte', $input);
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::lte', $input);
                 break;
             case "all":
                 $filter = call_user_func_array('devgateway\ldap\FilterBuilder::all', $input);
@@ -26,7 +26,7 @@ class FilterBuilderTest extends TestCase
                 $filter = call_user_func_array('devgateway\ldap\FilterBuilder::either', $input);
                 break;
             case "any":
-                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::_any', $input);
+                $filter = call_user_func_array('devgateway\ldap\FilterBuilder::any', $input);
                 break;
             default:
                 throw new \RuntimeException("Invalid Type");
@@ -69,16 +69,16 @@ class FilterBuilderTest extends TestCase
             'or_comb_two' => [
                 FB::all(
                     FB::either(['drink' => ['whiskey', 'gin', 'rum']]),
-                    FB::_gte(['age' => 21])),
+                    FB::gte(['age' => 21])),
                 FB::neither(['drink' => 'liquor'])
             ],
             'and_comb' => [
-                FB::_lte(['age' => 21]),
+                FB::lte(['age' => 21]),
                 FB::either(['drink' => ['whiskey', 'gin', 'rum']])
             ],
             'and_comb_two' => [
                 ['objectClass' => ['x', 'y']],
-                FB::_lte(['age' => 21])
+                FB::lte(['age' => 21])
             ]
         ];
 
