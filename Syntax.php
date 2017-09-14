@@ -142,8 +142,20 @@ class Syntax
                 return $value ? 'TRUE' : 'FALSE';
 
             case SYNTAX_COUNTRY_STRING:
+                if (is_string($value) && strlen($value) === 2) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_DELIVERY_METHOD:
             case SYNTAX_DIRECTORY_STRING:
+                if (is_string($value) && strlen($value) > 1) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
             case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
             case SYNTAX_DN:
@@ -223,6 +235,23 @@ class Syntax
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
             case SYNTAX_FAX:
             case SYNTAX_GENERALIZED_TIME:
+		if (preg_match('/^[0-9]{12}Z$/', $serialized)) {
+			return new Datetime($serialized);
+		} elseif (preg_match('/^[0-9]{12}[-+][0-9]{4}/', $input)) {
+		    $arr = preg_split('/([-\+])/', $serialized, -1, PREG_SPLIT_DELIM_CAPTURE);
+		    if ($arr && count($arr) === 3) {
+			$tz = new DateTimeZone($a[1].$a[2]);
+			$time = new Datetime($a[0], $tz);
+			$time->setTimezone(new DateTimeZone('Z'));
+			return $time;
+		    } else {
+                        throw new SyntaxException($serialized);
+		    }
+
+		} else {
+                        throw new SyntaxException($serialized);
+		}
+
             case SYNTAX_GUIDE:
             case SYNTAX_IA5_STRING:
                 return $serialized;
@@ -243,7 +272,11 @@ class Syntax
                 return $serialized;
 
             case SYNTAX_OCTET_STRING:
+		return $serialized;
+
             case SYNTAX_OID:
+		return $serialized;
+
             case SYNTAX_OTHER_MAILBOX:
             case SYNTAX_POSTAL_ADDRESS:
             case SYNTAX_PRINTABLE_STRING:
