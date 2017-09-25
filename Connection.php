@@ -102,7 +102,7 @@ class Connection extends Component
 
         $this->connect();
 
-        $success = ldap_bind($this->conn, $this->bind_dn, $this->bind_pw);
+        $success = @ldap_bind($this->conn, $this->bind_dn, $this->bind_pw);
         if ($success) {
             $this->bound = true;
         } else {
