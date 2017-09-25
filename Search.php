@@ -231,4 +231,18 @@ class Search implements \Iterator
 
         throw new \RuntimeException('Object not found');
     }
+
+    /**
+     * Return the DN of a single search result.
+     *
+     * @return string Distinguished name of the item.
+     */
+    public function getOneDn()
+    {
+        foreach ($this as $key => $ignore_value) {
+            return $key;
+        }
+
+        throw new \RuntimeException('Object not found');
+    }
 }
