@@ -265,120 +265,128 @@ class Syntax
      */
     public function serialize($value)
     {
+        if (!$this->validate($value)) {
+            throw new SyntaxException($value);
+        }
+
         switch ($this->syntax_type) {
             case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
+                $result = $value;
+                break;
+
             case SYNTAX_BIT_STRING:
+                break;
+
             case SYNTAX_BOOLEAN:
-                return $value ? 'TRUE' : 'FALSE';
+                $result = $value ? 'TRUE' : 'FALSE';
+                break;
 
             case SYNTAX_COUNTRY_STRING:
-                if (is_string($value) && strlen($value) === 2) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_DELIVERY_METHOD:
+                break;
+
             case SYNTAX_DIRECTORY_STRING:
-                if (is_string($value) && strlen($value) > 1) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
+                break;
+
             case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
+                break;
+
             case SYNTAX_DN:
-                if (is_string($value) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_ENHANCED_GUIDE:
+                break;
+
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
+                break;
+
             case SYNTAX_FAX:
+                break;
+
             case SYNTAX_GENERALIZED_TIME:
-		if ($value instanceof DateTime) {
-		    return $value->format("YmdHi\Z");
-		} else {
-                    throw new SyntaxException($value);
-		}
+                $result = $value->format("YmdHi\Z");
+                break;
 
             case SYNTAX_GUIDE:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_IA5_STRING:
+                break;
+
             case SYNTAX_INTEGER:
-                if (is_integer($value)) {
-                    return strval($value);
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = strval($value);
+                break;
 
             case SYNTAX_JPEG:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException('<non-string data>');
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
+                break;
+
             case SYNTAX_MATCHING_RULE_DESCRIPTION:
+                break;
+
             case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
+                break;
+
             case SYNTAX_NAME_AND_OPTIONAL_UID:
+                break;
+
             case SYNTAX_NAME_FORM_DESCRIPTION:
+                break;
+
             case SYNTAX_NUMERIC_STRING:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
+
             case SYNTAX_OBJECT_CLASS_DESCRIPTION:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_OCTET_STRING:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_OID:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_OTHER_MAILBOX:
+                break;
+
             case SYNTAX_POSTAL_ADDRESS:
+                break;
+
             case SYNTAX_PRINTABLE_STRING:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_SUBSTRING_ASSERTION:
+                break;
+
             case SYNTAX_TELEPHONE_NUMBER:
-                if (is_string($value)) {
-                    return $value;
-                } else {
-                    throw new SyntaxException($value);
-                }
+                $result = $value;
+                break;
 
             case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
+                break;
+
             case SYNTAX_TELEX_NUMBER:
+                break;
+
             case SYNTAX_UTC_TIME:
+                break;
+
         }
     }
 
