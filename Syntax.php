@@ -501,7 +501,7 @@ END;
      * Convert Generalized Time to DateTime.
      *
      * @param string $gt_string Generalized Time per RFC 4517
-     * @throws \RuntimeException If regex can't be compiled.
+     * @throws \RuntimeException If regex can't be run.
      * @return DateTime Parsed date as object.
      */
     public static function parseGeneralizedTime($gt_string)
@@ -544,7 +544,7 @@ END;
             $result = false;
         } else {
             throw new \RuntimeException(
-                'Generalized Time regex compilation error'
+                'Error running a regex match'
             );
         }
 
