@@ -454,7 +454,12 @@ END;
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
             case SYNTAX_FAX:
             case SYNTAX_GENERALIZED_TIME:
-                return static::parseGeneralizedTime($serialized);
+                $date_time = static::parseGeneralizedTime($serialized);
+                if ($date_time !== false) {
+                    return $date_time;
+                } else {
+                    throw new SyntaxException($serialized);
+                }
 
             case SYNTAX_GUIDE:
             case SYNTAX_IA5_STRING:
