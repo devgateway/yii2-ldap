@@ -127,6 +127,136 @@ class Syntax
     }
 
     /**
+     * Check if the value conforms with the syntax rules.
+     *
+     * @param mixed $value The original value.
+     * @return bool Whether the value conforms with the rules.
+     */
+    public function validate($value)
+    {
+        switch ($this->syntax_type) {
+            case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_BIT_STRING:
+                break;
+
+            case SYNTAX_BOOLEAN:
+                return $value ? 'TRUE' : 'FALSE';
+
+            case SYNTAX_COUNTRY_STRING:
+                $valid = is_string($value) && strlen($value) === 2;
+                break;
+
+            case SYNTAX_DELIVERY_METHOD:
+                break;
+
+            case SYNTAX_DIRECTORY_STRING:
+                $valid = is_string($value) && strlen($value) > 1;
+                break;
+
+            case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
+                break;
+
+            case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
+                break;
+
+            case SYNTAX_DN:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_ENHANCED_GUIDE:
+                break;
+
+            case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
+                break;
+
+            case SYNTAX_FAX:
+                break;
+
+            case SYNTAX_GENERALIZED_TIME:
+                $valid = $value instanceof DateTime;
+                break;
+
+            case SYNTAX_GUIDE:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_IA5_STRING:
+                break;
+
+            case SYNTAX_INTEGER:
+                $valid = is_integer($value);
+                break;
+
+            case SYNTAX_JPEG:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
+                break;
+
+            case SYNTAX_MATCHING_RULE_DESCRIPTION:
+                break;
+
+            case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
+                break;
+
+            case SYNTAX_NAME_AND_OPTIONAL_UID:
+                break;
+
+            case SYNTAX_NAME_FORM_DESCRIPTION:
+                break;
+
+            case SYNTAX_NUMERIC_STRING:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_OBJECT_CLASS_DESCRIPTION:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_OCTET_STRING:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_OID:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_OTHER_MAILBOX:
+                break;
+
+            case SYNTAX_POSTAL_ADDRESS:
+                break;
+
+            case SYNTAX_PRINTABLE_STRING:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_SUBSTRING_ASSERTION:
+                break;
+
+            case SYNTAX_TELEPHONE_NUMBER:
+                $valid = is_string($value);
+                break;
+
+            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
+                break;
+
+            case SYNTAX_TELEX_NUMBER:
+                break;
+
+            case SYNTAX_UTC_TIME:
+                break;
+
+        }
+
+        return $valid;
+    }
+
+    /**
      * Convert a value to LDAP format according to the syntax rules.
      *
      * @param mixed $value The original value.
