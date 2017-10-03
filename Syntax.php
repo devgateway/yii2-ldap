@@ -454,22 +454,7 @@ END;
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
             case SYNTAX_FAX:
             case SYNTAX_GENERALIZED_TIME:
-		if (preg_match('/^[0-9]{12}Z$/', $serialized)) {
-			return new DateTime($serialized);
-		} elseif (preg_match('/^[0-9]{12}[-+][0-9]{4}/', $input)) {
-		    $arr = preg_split('/([-\+])/', $serialized, -1, PREG_SPLIT_DELIM_CAPTURE);
-		    if ($arr && count($arr) === 3) {
-			$tz = new DateTimeZone($a[1].$a[2]);
-			$time = new DateTime($a[0], $tz);
-			$time->setTimezone(new DateTimeZone('Z'));
-			return $time;
-		    } else {
-                        throw new SyntaxException($serialized);
-		    }
-
-		} else {
-                        throw new SyntaxException($serialized);
-		}
+                return static::parseGeneralizedTime($serialized);
 
             case SYNTAX_GUIDE:
             case SYNTAX_IA5_STRING:
@@ -510,6 +495,60 @@ END;
             case SYNTAX_TELEX_NUMBER:
             case SYNTAX_UTC_TIME:
         }
+    }
+
+    /**
+     * Convert Generalized Time to DateTime.
+     *
+     * @param string $gt_string Generalized Time per RFC 4517
+     * @throws \RuntimeException If regex can't be compiled.
+     * @return DateTime Parsed date as object.
+     */
+    public static function parseGeneralizedTime($gt_string)
+    {
+        $gt = [];
+        $matched = preg_match(static::$gt_pattern, $gt_string, $gt);
+
+        if ($matched) {
+            // build a DateTime from date and time zone, for now
+            $date = "${gt['year']}/${gt['month']}/${gt['day']}";
+            $time_zone = new \DateTimeZone(
+                isset($gt['diff']) ? $gt['diff'] : 'UTC'
+            );
+            $result = new \DateTime($date, $time_zone);
+
+            // specify the exact time
+            $hour = intval($gt['hour']);
+
+            $frac = $gt['frac'] ? intval($gt['frac']) : 0;
+            if ($gt['minute']) {
+                $minute = intval($gt['minute']);
+
+                if ($gt['second']) {
+                    // PHP < 7.1 doesn't support milliseconds in DateTime,
+                    // so we apply frac to seconds here
+                    $second = round(floatval("${gt['second']}.$frac"));
+                } else {
+                    // if second is omitted, frac is a fraction of a minute
+                    $second = $frac ? 60 * $frac / 10 : 0;
+                }
+            } else {
+                // if minute is omitted, frac is a fraction of an hour
+                $minute = 0;
+                // overflow handled properly by DateTime
+                $second = $frac ? round(60 * 60 * $frac / 10) : 0;
+            }
+
+            $result->setTime($hour, $minute, $second);
+        } elseif ($matched === 0) {
+            $result = false;
+        } else {
+            throw new \RuntimeException(
+                'Generalized Time regex compilation error'
+            );
+        }
+
+        return $result;
     }
 
     /**
