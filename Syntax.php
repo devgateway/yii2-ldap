@@ -142,16 +142,46 @@ class Syntax
                 return $value ? 'TRUE' : 'FALSE';
 
             case SYNTAX_COUNTRY_STRING:
+                if (is_string($value) && strlen($value) === 2) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_DELIVERY_METHOD:
             case SYNTAX_DIRECTORY_STRING:
+                if (is_string($value) && strlen($value) > 1) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
             case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
             case SYNTAX_DN:
+                if (is_string($value) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_ENHANCED_GUIDE:
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
             case SYNTAX_FAX:
             case SYNTAX_GENERALIZED_TIME:
+		if ($value instanceof DateTime) {
+		    return $value->format("YmdHi\Z");
+		} else {
+                    throw new SyntaxException($value);
+		}
+
             case SYNTAX_GUIDE:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_IA5_STRING:
             case SYNTAX_INTEGER:
                 if (is_integer($value)) {
@@ -173,14 +203,49 @@ class Syntax
             case SYNTAX_NAME_AND_OPTIONAL_UID:
             case SYNTAX_NAME_FORM_DESCRIPTION:
             case SYNTAX_NUMERIC_STRING:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
             case SYNTAX_OBJECT_CLASS_DESCRIPTION:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_OCTET_STRING:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_OID:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_OTHER_MAILBOX:
             case SYNTAX_POSTAL_ADDRESS:
             case SYNTAX_PRINTABLE_STRING:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_SUBSTRING_ASSERTION:
             case SYNTAX_TELEPHONE_NUMBER:
+                if (is_string($value)) {
+                    return $value;
+                } else {
+                    throw new SyntaxException($value);
+                }
+
             case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
             case SYNTAX_TELEX_NUMBER:
             case SYNTAX_UTC_TIME:
@@ -212,6 +277,8 @@ class Syntax
                 }
 
             case SYNTAX_COUNTRY_STRING:
+                return $serialized;
+
             case SYNTAX_DELIVERY_METHOD:
             case SYNTAX_DIRECTORY_STRING:
                 return $serialized;
@@ -219,10 +286,28 @@ class Syntax
             case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
             case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
             case SYNTAX_DN:
+                return $serialized;
             case SYNTAX_ENHANCED_GUIDE:
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
             case SYNTAX_FAX:
             case SYNTAX_GENERALIZED_TIME:
+		if (preg_match('/^[0-9]{12}Z$/', $serialized)) {
+			return new DateTime($serialized);
+		} elseif (preg_match('/^[0-9]{12}[-+][0-9]{4}/', $input)) {
+		    $arr = preg_split('/([-\+])/', $serialized, -1, PREG_SPLIT_DELIM_CAPTURE);
+		    if ($arr && count($arr) === 3) {
+			$tz = new DateTimeZone($a[1].$a[2]);
+			$time = new DateTime($a[0], $tz);
+			$time->setTimezone(new DateTimeZone('Z'));
+			return $time;
+		    } else {
+                        throw new SyntaxException($serialized);
+		    }
+
+		} else {
+                        throw new SyntaxException($serialized);
+		}
+
             case SYNTAX_GUIDE:
             case SYNTAX_IA5_STRING:
                 return $serialized;
@@ -231,6 +316,7 @@ class Syntax
                 return intval($serialized);
 
             case SYNTAX_JPEG:
+		return $serialized;
             case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
             case SYNTAX_MATCHING_RULE_DESCRIPTION:
             case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
@@ -243,7 +329,11 @@ class Syntax
                 return $serialized;
 
             case SYNTAX_OCTET_STRING:
+		return $serialized;
+
             case SYNTAX_OID:
+		return $serialized;
+
             case SYNTAX_OTHER_MAILBOX:
             case SYNTAX_POSTAL_ADDRESS:
             case SYNTAX_PRINTABLE_STRING:
