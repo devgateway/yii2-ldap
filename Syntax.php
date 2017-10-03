@@ -52,6 +52,31 @@ define('SYNTAX_UTC_TIME', 53);
  */
 class Syntax
 {
+    /**
+     * @var string $gt_pattern Regex pattern for Generalized Time.
+     * @see https://tools.ietf.org/html/rfc4517#section-3.3.13
+     */
+    protected static $gt_pattern = <<<'END'
+        /^
+            (?P<year>\d{4})
+            (?P<month>\d{2})
+            (?P<day>\d{2})
+            (?P<hour>\d{2})
+            (
+                (?P<minute>\d{2})
+                (?P<second>(\d{2})?)
+            )?
+            (
+                [.,]
+                (?P<frac>\d)
+            )?
+            (
+                Z |
+                (?P<diff>[+-]\d{2}(\d{2})?)
+            )
+        $/x
+END;
+
     /** @var int $syntax_type Last part of standard syntax OID. */
     protected $syntax_type;
 
