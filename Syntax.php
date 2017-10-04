@@ -143,11 +143,15 @@ END;
                 break;
 
             case SYNTAX_UTC_TIME:
+                $result = static::parseUtcTime($serialized);
+                if ($result === false) {
+                    throw new \UnexpectedValueException($serialized);
+                }
+                break;
+
             case SYNTAX_GENERALIZED_TIME:
-                $date_time = static::parseGeneralizedTime($serialized);
-                if ($date_time !== false) {
-                    $result = $date_time;
-                } else {
+                $result = static::parseGeneralizedTime($serialized);
+                if ($result === false) {
                     throw new \UnexpectedValueException($serialized);
                 }
                 break;
