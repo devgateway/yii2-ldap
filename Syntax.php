@@ -10,7 +10,6 @@
 
 namespace devgateway\ldap;
 
-use devgateway\ldap\SyntaxException;
 
 define('SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION', 3);
 define('SYNTAX_BIT_STRING', 6);
@@ -46,7 +45,6 @@ define('SYNTAX_TELEPHONE_NUMBER', 50);
 define('SYNTAX_TELETEX_TERMINAL_IDENTIFIER', 51);
 define('SYNTAX_TELEX_NUMBER', 52);
 define('SYNTAX_UTC_TIME', 53);
-
 /**
  * Set of rules to serialize/unserialize values to/from LDAP string formats.
  */
@@ -325,7 +323,7 @@ END;
      * Convert a value to LDAP format according to the syntax rules.
      *
      * @param mixed $value The original value.
-     * @throws SyntaxException If the value violates the syntax rules.
+     * @throws \UnexpectedValueException If the value violates the syntax rules.
      * @return string Value suitable for PHP LDAP extension functions.
      */
     public function serialize($value)
@@ -459,7 +457,7 @@ END;
      * Convert a value from LDAP format to an appropriate PHP native type.
      *
      * @param string $serialized Value received from PHP LDAP extension functions.
-     * @throws SyntaxException If the value violates the syntax rules.
+     * @throws \UnexpectedValueException If the value violates the syntax rules.
      * @return mixed The native value.
      */
     public function unserialize($serialized)
@@ -476,7 +474,7 @@ END;
                         return false;
                         break;
                     default:
-                        throw new SyntaxException($serialized, ['TRUE', 'FALSE']);
+                        throw new \UnexpectedValueException($serialized);
                 }
 
             case SYNTAX_COUNTRY_STRING:
@@ -498,7 +496,7 @@ END;
                 if ($date_time !== false) {
                     return $date_time;
                 } else {
-                    throw new SyntaxException($serialized);
+                    throw new \UnexpectedValueException($serialized);
                 }
 
             case SYNTAX_GUIDE:
