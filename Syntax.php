@@ -77,6 +77,9 @@ class Syntax
         $/x
 END;
 
+    protected static $printable_str = '[a-zA-Z\d\'()+,\-.=/:? ]+';
+    protected static $ia5_str = '[\x00-\x7f]*';
+
     /** @var int $syntax_type Last part of standard syntax OID. */
     protected $syntax_type;
 
@@ -161,43 +164,72 @@ END;
     {
         switch ($this->syntax_type) {
             case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_BIT_STRING:
+                $regex = '/^ \' [01]* \' B $/x';
+                $valid = preg_match($regex, $value) === 1;
                 break;
 
             case SYNTAX_BOOLEAN:
-                return $value ? 'TRUE' : 'FALSE';
+                $valid_values = ['TRUE', 'FALSE'];
+                $valid = in_array($value, $valid_values, true);
+                break;
 
             case SYNTAX_COUNTRY_STRING:
-                $valid = is_string($value) && strlen($value) === 2;
                 break;
 
             case SYNTAX_DELIVERY_METHOD:
+                $regex = <<<'END'
+                /^
+                    (any|mhs|physical|telex|teletex|g3fax|g4fax|ia5|videotex|telephone)
+                    (
+                        \s* \$ \s*
+                        (any|mhs|physical|telex|teletex|g3fax|g4fax|ia5|videotex|telephone)
+                    )*
+                $/x
+END;
+                $valid = preg_match($regex, $value) === 1;
                 break;
 
             case SYNTAX_DIRECTORY_STRING:
-                $valid = is_string($value) && strlen($value) > 1;
+                $valid = true;
                 break;
 
             case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
+                $valid = true;
                 break;
 
             case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
+                $valid = true;
                 break;
 
             case SYNTAX_DN:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_ENHANCED_GUIDE:
+                $valid = true;
                 break;
 
             case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
+                $fax_number = <<<END
+                /^
+                    ${static::$printable_str}
+                    (
+                        \\\$
+                        (
+                            twoDimensional|fineResolution|unlimitedLength|
+                            b4Length|a3Width|b4Width|uncompressed
+                        )
+                    )*
+                \$/x
+END;
                 break;
 
             case SYNTAX_FAX:
+                $valid = true;
                 break;
 
             case SYNTAX_GENERALIZED_TIME:
@@ -205,77 +237,85 @@ END;
                 break;
 
             case SYNTAX_GUIDE:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_IA5_STRING:
+                $regex = '/^' . static::$ia5_str . '$/';
+                $valid = preg_match($regex, $value) === 1;
                 break;
 
             case SYNTAX_INTEGER:
-                $valid = is_integer($value);
+                $valid = true;
                 break;
 
             case SYNTAX_JPEG:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
+                $valid = true;
                 break;
 
             case SYNTAX_MATCHING_RULE_DESCRIPTION:
+                $valid = true;
                 break;
 
             case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
+                $valid = true;
                 break;
 
             case SYNTAX_NAME_AND_OPTIONAL_UID:
+                $valid = true;
                 break;
 
             case SYNTAX_NAME_FORM_DESCRIPTION:
+                $valid = true;
                 break;
 
             case SYNTAX_NUMERIC_STRING:
-                $valid = is_string($value);
+                $regex = '/^[\d ]+$/';
+                $valid = preg_match($regex, $value) === 1;
                 break;
 
             case SYNTAX_OBJECT_CLASS_DESCRIPTION:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_OCTET_STRING:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_OID:
-                $valid = is_string($value);
+                $valid = true;
                 break;
 
             case SYNTAX_OTHER_MAILBOX:
+                $valid = true;
                 break;
 
             case SYNTAX_POSTAL_ADDRESS:
-                break;
-
-            case SYNTAX_PRINTABLE_STRING:
-                $valid = is_string($value);
-                break;
-
-            case SYNTAX_SUBSTRING_ASSERTION:
-                break;
-
-            case SYNTAX_TELEPHONE_NUMBER:
-                $valid = is_string($value);
-                break;
-
-            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
+                $valid = true;
                 break;
 
             case SYNTAX_TELEX_NUMBER:
+            case SYNTAX_TELEPHONE_NUMBER:
+            case SYNTAX_PRINTABLE_STRING:
+                $regex = '/^' . static::$printable_str . '$/';
+                $valid = preg_match($regex, $value) === 1;
+                break;
+
+            case SYNTAX_SUBSTRING_ASSERTION:
+                $valid = true;
+                break;
+
+            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
+                $valid = true;
                 break;
 
             case SYNTAX_UTC_TIME:
+                $valid = true;
                 break;
-
         }
 
         return $valid;
