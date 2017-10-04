@@ -106,128 +106,16 @@ END;
      */
     public function serialize($value)
     {
-        if (!$this->validate($value)) {
-            throw new SyntaxException($value);
-        }
-
-        switch ($this->syntax_type) {
-            case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
-                $result = $value;
-                break;
-
-            case SYNTAX_BIT_STRING:
-                break;
-
+        switch ($this->type) {
             case SYNTAX_BOOLEAN:
                 $result = $value ? 'TRUE' : 'FALSE';
-                break;
-
-            case SYNTAX_COUNTRY_STRING:
-                $result = $value;
-                break;
-
-            case SYNTAX_DELIVERY_METHOD:
-                break;
-
-            case SYNTAX_DIRECTORY_STRING:
-                $result = $value;
-                break;
-
-            case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
-                break;
-
-            case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
-                break;
-
-            case SYNTAX_DN:
-                $result = $value;
-                break;
-
-            case SYNTAX_ENHANCED_GUIDE:
-                break;
-
-            case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
-                break;
-
-            case SYNTAX_FAX:
-                break;
 
             case SYNTAX_GENERALIZED_TIME:
-                $result = $value->format("YmdHi\Z");
-                break;
-
-            case SYNTAX_GUIDE:
-                $result = $value;
-                break;
-
-            case SYNTAX_IA5_STRING:
-                break;
-
-            case SYNTAX_INTEGER:
-                $result = strval($value);
-                break;
-
-            case SYNTAX_JPEG:
-                $result = $value;
-                break;
-
-            case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
-                break;
-
-            case SYNTAX_MATCHING_RULE_DESCRIPTION:
-                break;
-
-            case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
-                break;
-
-            case SYNTAX_NAME_AND_OPTIONAL_UID:
-                break;
-
-            case SYNTAX_NAME_FORM_DESCRIPTION:
-                break;
-
-            case SYNTAX_NUMERIC_STRING:
-                $result = $value;
-                break;
-
-            case SYNTAX_OBJECT_CLASS_DESCRIPTION:
-                $result = $value;
-                break;
-
-            case SYNTAX_OCTET_STRING:
-                $result = $value;
-                break;
-
-            case SYNTAX_OID:
-                $result = $value;
-                break;
-
-            case SYNTAX_OTHER_MAILBOX:
-                break;
-
-            case SYNTAX_POSTAL_ADDRESS:
-                break;
-
-            case SYNTAX_PRINTABLE_STRING:
-                $result = $value;
-                break;
-
-            case SYNTAX_SUBSTRING_ASSERTION:
-                break;
-
-            case SYNTAX_TELEPHONE_NUMBER:
-                $result = $value;
-                break;
-
-            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
-                break;
-
-            case SYNTAX_TELEX_NUMBER:
-                break;
-
             case SYNTAX_UTC_TIME:
-                break;
+                $result = $value->format('YmdHi\Z');
 
+            default:
+                $result = $value;
         }
     }
 
@@ -240,82 +128,39 @@ END;
      */
     public function unserialize($serialized)
     {
-        switch ($this->syntax_type) {
-            case SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION:
-            case SYNTAX_BIT_STRING:
+        switch ($this->type) {
             case SYNTAX_BOOLEAN:
                 switch ($serialized) {
                     case 'TRUE':
-                        return true;
+                        $result = true;
                         break;
                     case 'FALSE':
-                        return false;
+                        $result = false;
                         break;
                     default:
                         throw new \UnexpectedValueException($serialized);
                 }
+                break;
 
-            case SYNTAX_COUNTRY_STRING:
-                return $serialized;
-
-            case SYNTAX_DELIVERY_METHOD:
-            case SYNTAX_DIRECTORY_STRING:
-                return $serialized;
-
-            case SYNTAX_DIT_CONTENT_RULE_DESCRIPTION:
-            case SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION:
-            case SYNTAX_DN:
-                return $serialized;
-            case SYNTAX_ENHANCED_GUIDE:
-            case SYNTAX_FACSIMILE_TELEPHONE_NUMBER:
-            case SYNTAX_FAX:
+            case SYNTAX_UTC_TIME:
             case SYNTAX_GENERALIZED_TIME:
                 $date_time = static::parseGeneralizedTime($serialized);
                 if ($date_time !== false) {
-                    return $date_time;
+                    $result = $date_time;
                 } else {
                     throw new \UnexpectedValueException($serialized);
                 }
-
-            case SYNTAX_GUIDE:
-            case SYNTAX_IA5_STRING:
-                return $serialized;
+                break;
 
             case SYNTAX_INTEGER:
-                return intval($serialized);
+                $result = intval($serialized);
+                break;
 
-            case SYNTAX_JPEG:
-		return $serialized;
-            case SYNTAX_LDAP_SYNTAX_DESCRIPTION:
-            case SYNTAX_MATCHING_RULE_DESCRIPTION:
-            case SYNTAX_MATCHING_RULE_USE_DESCRIPTION:
-            case SYNTAX_NAME_AND_OPTIONAL_UID:
-            case SYNTAX_NAME_FORM_DESCRIPTION:
-            case SYNTAX_NUMERIC_STRING:
-                return $serialized;
-
-            case SYNTAX_OBJECT_CLASS_DESCRIPTION:
-                return $serialized;
-
-            case SYNTAX_OCTET_STRING:
-		return $serialized;
-
-            case SYNTAX_OID:
-		return $serialized;
-
-            case SYNTAX_OTHER_MAILBOX:
-            case SYNTAX_POSTAL_ADDRESS:
-            case SYNTAX_PRINTABLE_STRING:
-                return $serialized;
-
-            case SYNTAX_SUBSTRING_ASSERTION:
-            case SYNTAX_TELEPHONE_NUMBER:
-                return $serialized;
-
-            case SYNTAX_TELETEX_TERMINAL_IDENTIFIER:
-            case SYNTAX_TELEX_NUMBER:
-            case SYNTAX_UTC_TIME:
+            default:
+                $result = $serialized;
         }
+
+        return $result;
     }
 
     /**
@@ -331,12 +176,13 @@ END;
         $matched = preg_match(static::$gt_pattern, $gt_string, $gt);
 
         if ($matched) {
-            // build a DateTime from date and time zone, for now
-            $date = "${gt['year']}/${gt['month']}/${gt['day']}";
             $time_zone = new \DateTimeZone(
                 isset($gt['diff']) ? $gt['diff'] : 'UTC'
             );
-            $result = new \DateTime($date, $time_zone);
+
+            // build a DateTime from date and time zone, for now
+            $date = $gt['year'] . $gt['month'] . $gt['day'];
+            $result = \DateTime::createFromFormat('Ymd', $date, $time_zone);
 
             // specify the exact time
             $hour = intval($gt['hour']);
@@ -373,12 +219,50 @@ END;
     }
 
     /**
-     * Return the syntax OID.
+     * Convert UTC Time to DateTime.
      *
-     * @return string Syntax OID.
+     * @param string $ut_string UTC Time per ASN.1
+     * @throws \RuntimeException If regex can't be run.
+     * @return DateTime Parsed date as object.
      */
-    public function __toString()
+    public static function parseUtcTime($ut_string)
     {
-        return '1.3.6.1.4.1.1466.115.121.1.' . $this->syntax_type;
+        $ut_pattern = <<<'END'
+            /^
+                (?P<year>\d{2})
+                (?P<month>\d{2})
+                (?P<day>\d{2})
+                (?P<hour>\d{2})
+                (?P<minute>\d{2})
+                (?P<second>(\d{2})?)
+                (
+                    Z |
+                    (?P<diff>[+-]\d{2}(\d{2})?)
+                )
+            $/x
+END;
+        $ut = [];
+        $matched = preg_match(static::$ut_pattern, $ut_string, $ut);
+
+        if ($matched) {
+            $time_zone = new \DateTimeZone(
+                isset($ut['diff']) ? $ut['diff'] : 'UTC'
+            );
+
+            // build a DateTime from date and time zone, for now
+            $date = $ut['year'] . $ut['month'] . $ut['day'];
+            $result = \DateTime::createFromFormat('ymd', $date, $time_zone);
+
+            // specify the exact time
+            $result->setTime($ut['hour'], $ut['minute'], $ut['second']);
+        } elseif ($matched === 0) {
+            $result = false;
+        } else {
+            throw new \RuntimeException(
+                'Error running a regex match'
+            );
+        }
+
+        return $result;
     }
 }
