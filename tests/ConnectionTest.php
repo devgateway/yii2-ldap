@@ -213,8 +213,9 @@ class ConnectionTest extends TestCase
     public function testStandardClass()
     {
         $schema = new Schema($this->conn);
-        $cn_syntax = '1.3.6.1.4.1.1466.115.121.1.15';
-        $syntax = $schema['device']->must['cn']->syntax->__toString();
+        // 1.3.6.1.4.1.1466.115.121.1.15
+        $cn_syntax = 15;
+        $syntax = $schema['device']->must['cn']->syntax->type;
 
         $this->assertEquals($cn_syntax, $syntax);
     }
