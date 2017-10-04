@@ -3,7 +3,7 @@
  * ParsingException
  *
  * @link https://tools.ietf.org/html/rfc4512
- * @link https://github.com/devgateway/yii-com-ldap
+ * @link https://github.com/devgateway/yii2-ldap
  * @copyright 2017, Development Gateway, Inc
  * @license GPL, version 3
  */
