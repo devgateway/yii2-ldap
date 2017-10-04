@@ -10,46 +10,46 @@
 
 namespace devgateway\ldap;
 
-
-define('SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION', 3);
-define('SYNTAX_BIT_STRING', 6);
-define('SYNTAX_BOOLEAN', 7);
-define('SYNTAX_COUNTRY_STRING', 11);
-define('SYNTAX_DELIVERY_METHOD', 14);
-define('SYNTAX_DIRECTORY_STRING', 15);
-define('SYNTAX_DIT_CONTENT_RULE_DESCRIPTION', 16);
-define('SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION', 17);
-define('SYNTAX_DN', 12);
-define('SYNTAX_ENHANCED_GUIDE', 21);
-define('SYNTAX_FACSIMILE_TELEPHONE_NUMBER', 22);
-define('SYNTAX_FAX', 23);
-define('SYNTAX_GENERALIZED_TIME', 24);
-define('SYNTAX_GUIDE', 25);
-define('SYNTAX_IA5_STRING', 26);
-define('SYNTAX_INTEGER', 27);
-define('SYNTAX_JPEG', 28);
-define('SYNTAX_LDAP_SYNTAX_DESCRIPTION', 54);
-define('SYNTAX_MATCHING_RULE_DESCRIPTION', 30);
-define('SYNTAX_MATCHING_RULE_USE_DESCRIPTION', 31);
-define('SYNTAX_NAME_AND_OPTIONAL_UID', 34);
-define('SYNTAX_NAME_FORM_DESCRIPTION', 35);
-define('SYNTAX_NUMERIC_STRING', 36);
-define('SYNTAX_OBJECT_CLASS_DESCRIPTION', 37);
-define('SYNTAX_OCTET_STRING', 40);
-define('SYNTAX_OID', 38);
-define('SYNTAX_OTHER_MAILBOX', 39);
-define('SYNTAX_POSTAL_ADDRESS', 41);
-define('SYNTAX_PRINTABLE_STRING', 44);
-define('SYNTAX_SUBSTRING_ASSERTION', 58);
-define('SYNTAX_TELEPHONE_NUMBER', 50);
-define('SYNTAX_TELETEX_TERMINAL_IDENTIFIER', 51);
-define('SYNTAX_TELEX_NUMBER', 52);
-define('SYNTAX_UTC_TIME', 53);
 /**
  * Set of rules to serialize/unserialize values to/from LDAP string formats.
  */
 class Syntax
 {
+    const SYNT_ATTRIBUTE_TYPE_DESCRIPTION = 3;
+    const SYNT_BIT_STRING = 6;
+    const SYNT_BOOLEAN = 7;
+    const SYNT_COUNTRY_STRING = 11;
+    const SYNT_DELIVERY_METHOD = 14;
+    const SYNT_DIRECTORY_STRING = 15;
+    const SYNT_DIT_CONTENT_RULE_DESCRIPTION = 16;
+    const SYNT_DIT_STRUCTURE_RULE_DESCRIPTION = 17;
+    const SYNT_DN = 12;
+    const SYNT_ENHANCED_GUIDE = 21;
+    const SYNT_FACSIMILE_TELEPHONE_NUMBER = 22;
+    const SYNT_FAX = 23;
+    const SYNT_GENERALIZED_TIME = 24;
+    const SYNT_GUIDE = 25;
+    const SYNT_IA5_STRING = 26;
+    const SYNT_INTEGER = 27;
+    const SYNT_JPEG = 28;
+    const SYNT_LDAP_SYNTAX_DESCRIPTION = 54;
+    const SYNT_MATCHING_RULE_DESCRIPTION = 30;
+    const SYNT_MATCHING_RULE_USE_DESCRIPTION = 31;
+    const SYNT_NAME_AND_OPTIONAL_UID = 34;
+    const SYNT_NAME_FORM_DESCRIPTION = 35;
+    const SYNT_NUMERIC_STRING = 36;
+    const SYNT_OBJECT_CLASS_DESCRIPTION = 37;
+    const SYNT_OCTET_STRING = 40;
+    const SYNT_OID = 38;
+    const SYNT_OTHER_MAILBOX = 39;
+    const SYNT_POSTAL_ADDRESS = 41;
+    const SYNT_PRINTABLE_STRING = 44;
+    const SYNT_SUBSTRING_ASSERTION = 58;
+    const SYNT_TELEPHONE_NUMBER = 50;
+    const SYNT_TELETEX_TERMINAL_IDENTIFIER = 51;
+    const SYNT_TELEX_NUMBER = 52;
+    const SYNT_UTC_TIME = 53;
+
     /**
      * @var string $gt_pattern Regex pattern for Generalized Time.
      * @see https://tools.ietf.org/html/rfc4517#section-3.3.13
@@ -78,46 +78,8 @@ END;
     protected static $printable_str = '[a-zA-Z\d\'()+,\-.=/:? ]+';
     protected static $ia5_str = '[\x00-\x7f]*';
 
-    /** @var int $syntax_type Last part of standard syntax OID. */
-    protected $syntax_type;
-
-    /** @var int[] $types List of all recognized syntax IDs. */
-    protected static $types = [
-        SYNTAX_ATTRIBUTE_TYPE_DESCRIPTION,
-        SYNTAX_BIT_STRING,
-        SYNTAX_BOOLEAN,
-        SYNTAX_COUNTRY_STRING,
-        SYNTAX_DELIVERY_METHOD,
-        SYNTAX_DIRECTORY_STRING,
-        SYNTAX_DIT_CONTENT_RULE_DESCRIPTION,
-        SYNTAX_DIT_STRUCTURE_RULE_DESCRIPTION,
-        SYNTAX_DN,
-        SYNTAX_ENHANCED_GUIDE,
-        SYNTAX_FACSIMILE_TELEPHONE_NUMBER,
-        SYNTAX_FAX,
-        SYNTAX_GENERALIZED_TIME,
-        SYNTAX_GUIDE,
-        SYNTAX_IA5_STRING,
-        SYNTAX_INTEGER,
-        SYNTAX_JPEG,
-        SYNTAX_LDAP_SYNTAX_DESCRIPTION,
-        SYNTAX_MATCHING_RULE_DESCRIPTION,
-        SYNTAX_MATCHING_RULE_USE_DESCRIPTION,
-        SYNTAX_NAME_AND_OPTIONAL_UID,
-        SYNTAX_NAME_FORM_DESCRIPTION,
-        SYNTAX_NUMERIC_STRING,
-        SYNTAX_OBJECT_CLASS_DESCRIPTION,
-        SYNTAX_OCTET_STRING,
-        SYNTAX_OID,
-        SYNTAX_OTHER_MAILBOX,
-        SYNTAX_POSTAL_ADDRESS,
-        SYNTAX_PRINTABLE_STRING,
-        SYNTAX_SUBSTRING_ASSERTION,
-        SYNTAX_TELEPHONE_NUMBER,
-        SYNTAX_TELETEX_TERMINAL_IDENTIFIER,
-        SYNTAX_TELEX_NUMBER,
-        SYNTAX_UTC_TIME
-    ];
+    /** @var int $type Last part of standard syntax OID. */
+    public $type;
 
     /**
      * List all known syntaxes and their OIDs.
@@ -127,29 +89,15 @@ END;
     public static function getAll()
     {
         $all = [];
+        $me = new \ReflectionClass(__CLASS__);
 
-        foreach (self::$types as $syntax_type) {
-            $syntax = new Syntax($syntax_type);
-            $oid = $syntax->__toString();
-            $all[$oid] = $syntax;
+        foreach ($me->getConstants() as $type) {
+            $syntax = new Syntax();
+            $syntax->type = $type;
+            $all["1.3.6.1.4.1.1466.115.121.1.$type"] = $syntax;
         }
 
         return $all;
-    }
-
-    /**
-     * Initialize internal syntax ID.
-     *
-     * @param int $syntax_type Internal syntax ID.
-     * @throws \OutOfRangeException When the syntax ID is not known.
-     */
-    public function __construct($syntax_type)
-    {
-        if (in_array($syntax_type, self::$types)) {
-            $this->syntax_type = $syntax_type;
-        } else {
-            throw new \OutOfRangeException("Unknown syntax ID $syntax_type");
-        }
     }
 
     /**
