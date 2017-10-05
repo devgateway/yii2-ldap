@@ -180,9 +180,13 @@ END;
         $matched = preg_match(static::$gt_pattern, $gt_string, $gt);
 
         if ($matched) {
-            $time_zone = new \DateTimeZone(
-                isset($gt['diff']) ? $gt['diff'] : 'UTC'
-            );
+            $newer_php = version_compare(PHP_VERSION, '5.5.10', '>=');
+            if ($newer_php) {
+                $tz_info = isset($gt['diff']) ? $gt['diff'] : 'UTC';
+            } else {
+                $tz_info = 'UTC';
+            }
+            $time_zone = new \DateTimeZone($tz_info);
 
             // build a DateTime from date and time zone, for now
             $date = $gt['year'] . $gt['month'] . $gt['day'];
@@ -211,6 +215,17 @@ END;
             }
 
             $result->setTime($hour, $minute, $second);
+            if (!$newer_php && isset($gt['diff'])) {
+                $diff = [];
+                $pattern = '/^ ([+-]) (\d{2}) ((\d{2})?) $/x';
+                preg_match($pattern, $gt['diff'], $diff);
+
+                $offset = new \DateInterval('PT' . $diff[1]); // hours
+                $offset->i = intval($diff[2]); // minutes
+                $offset->invert = (int) $diff[0] == '-';
+
+                $result->add($offset);
+            }
         } elseif ($matched === 0) {
             $result = false;
         } else {
@@ -241,7 +256,7 @@ END;
                 (?P<second>(\d{2})?)
                 (
                     Z |
-                    (?P<diff>[+-]\d{2}(\d{2})?)
+                    (?P<diff>[+-]\d{4})
                 )
             $/x
 END;
@@ -249,9 +264,12 @@ END;
         $matched = preg_match(static::$ut_pattern, $ut_string, $ut);
 
         if ($matched) {
-            $time_zone = new \DateTimeZone(
-                isset($ut['diff']) ? $ut['diff'] : 'UTC'
-            );
+            $newer_php = version_compare(PHP_VERSION, '5.5.10', '>=');
+            if ($newer_php) {
+                $tz_info = isset($gt['diff']) ? $gt['diff'] : 'UTC';
+            } else {
+                $tz_info = 'UTC';
+            }
 
             // build a DateTime from date and time zone, for now
             $date = $ut['year'] . $ut['month'] . $ut['day'];
@@ -259,6 +277,16 @@ END;
 
             // specify the exact time
             $result->setTime($ut['hour'], $ut['minute'], $ut['second']);
+            if (!$newer_php && isset($gt['diff'])) {
+                $diff = [];
+                $pattern = '/^ ([+-]) (\d{2}) (\d{2}) $/x';
+                preg_match($pattern, $gt['diff'], $diff);
+
+                $offset = new \DateInterval("PT${diff[1]}H${diff[2]}M");
+                $offset->invert = (int) $diff[0] == '-';
+
+                $result->add($offset);
+            }
         } elseif ($matched === 0) {
             $result = false;
         } else {
