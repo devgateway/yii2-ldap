@@ -220,9 +220,9 @@ END;
                 $pattern = '/^ ([+-]) (\d{2}) ((\d{2})?) $/x';
                 preg_match($pattern, $gt['diff'], $diff);
 
-                $offset = new \DateInterval('PT' . $diff[1]); // hours
-                $offset->i = intval($diff[2]); // minutes
-                $offset->invert = (int) $diff[0] == '-';
+                $offset = new \DateInterval('PT' . $diff[2]); // hours
+                $offset->i = intval($diff[3]); // minutes
+                $offset->invert = (int) $diff[1] == '-';
 
                 $result->add($offset);
             }
@@ -282,8 +282,8 @@ END;
                 $pattern = '/^ ([+-]) (\d{2}) (\d{2}) $/x';
                 preg_match($pattern, $gt['diff'], $diff);
 
-                $offset = new \DateInterval("PT${diff[1]}H${diff[2]}M");
-                $offset->invert = (int) $diff[0] == '-';
+                $offset = new \DateInterval("PT${diff[2]}H${diff[3]}M");
+                $offset->invert = (int) $diff[1] == '-';
 
                 $result->add($offset);
             }
