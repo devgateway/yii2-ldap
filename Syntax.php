@@ -220,7 +220,7 @@ END;
                 $pattern = '/^ ([+-]) (\d{2}) ((\d{2})?) $/x';
                 preg_match($pattern, $gt['diff'], $diff);
 
-                $offset = new \DateInterval('PT' . $diff[2]); // hours
+                $offset = new \DateInterval("PT${diff[2]}H"); // hours
                 $offset->i = intval($diff[3]); // minutes
                 $offset->invert = (int) $diff[1] == '-';
 
