@@ -222,9 +222,9 @@ END;
 
                 $offset = new \DateInterval("PT${diff[2]}H"); // hours
                 $offset->i = intval($diff[3]); // minutes
-                $offset->invert = (int) $diff[1] == '-';
+                $offset->invert = (int) $diff[1] !== '-';
 
-                $result->add($offset);
+                $result->sub($offset);
             }
         } elseif ($matched === 0) {
             $result = false;
@@ -283,9 +283,9 @@ END;
                 preg_match($pattern, $gt['diff'], $diff);
 
                 $offset = new \DateInterval("PT${diff[2]}H${diff[3]}M");
-                $offset->invert = (int) $diff[1] == '-';
+                $offset->invert = (int) $diff[1] !== '-';
 
-                $result->add($offset);
+                $result->sub($offset);
             }
         } elseif ($matched === 0) {
             $result = false;
