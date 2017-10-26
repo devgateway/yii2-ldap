@@ -107,11 +107,11 @@ END;
     public function serialize($value)
     {
         switch ($this->type) {
-            case SYNTAX_BOOLEAN:
+            case self::SYNT_BOOLEAN:
                 $result = $value ? 'TRUE' : 'FALSE';
 
-            case SYNTAX_GENERALIZED_TIME:
-            case SYNTAX_UTC_TIME:
+            case self::SYNT_GENERALIZED_TIME:
+            case self::SYNT_UTC_TIME:
                 $result = $value->format('YmdHi\Z');
 
             default:
@@ -129,7 +129,7 @@ END;
     public function unserialize($serialized)
     {
         switch ($this->type) {
-            case SYNTAX_BOOLEAN:
+            case self::SYNT_BOOLEAN:
                 switch ($serialized) {
                     case 'TRUE':
                         $result = true;
@@ -142,21 +142,21 @@ END;
                 }
                 break;
 
-            case SYNTAX_UTC_TIME:
+            case self::SYNT_UTC_TIME:
                 $result = static::parseUtcTime($serialized);
                 if ($result === false) {
                     throw new \UnexpectedValueException($serialized);
                 }
                 break;
 
-            case SYNTAX_GENERALIZED_TIME:
+            case self::SYNT_GENERALIZED_TIME:
                 $result = static::parseGeneralizedTime($serialized);
                 if ($result === false) {
                     throw new \UnexpectedValueException($serialized);
                 }
                 break;
 
-            case SYNTAX_INTEGER:
+            case self::SYNT_INTEGER:
                 $result = intval($serialized);
                 break;
 
