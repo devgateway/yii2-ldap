@@ -59,10 +59,17 @@ class CompoundObject extends OidArray
         $seen_attrs = [];
         $result = [];
 
-        foreach ($this as $class_name => $simple_object) {
+        foreach ($this as $class_name => $ignored) {
+            $result[$class_name] = null;
+        }
+
+        // sort simple objects by class name
+        ksort($result);
+
+        foreach (array_keys($result) as $class_name) {
             // from current object class, remove attrs already present in other classes
             $result[$class_name] = array_diff_key(
-                $simple_object->canonical_names,
+                $this[$class_name]->canonical_names,
                 $seen_attrs
             );
             // sort attributes
@@ -70,9 +77,6 @@ class CompoundObject extends OidArray
             // append new attrs to the list of seen ones
             $seen_attrs = array_replace($seen_attrs, $result[$class_name]);
         }
-
-        // sort simple objects by class name
-        ksort($result);
 
         return $result;
     }

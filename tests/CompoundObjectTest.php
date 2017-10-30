@@ -39,21 +39,44 @@ class CompoundObjectTest extends TestCase
 
     public function mockProvider()
     {
-        return [ // array of test cases
-            [ // array of arguments
-                ['inetOrgPerson' => [
-                    'surname' => 'Doe',
-                    'givenName' => 'John',
-                    'userId' => 42,
-                    'mail' => 'john@example.net'
-                ]],
-                ['inetOrgPerson' => [
-                    'givenName' => 'John',
-                    'mail' => 'john@example.net',
-                    'surname' => 'Doe',
-                    'userId' => 42
-                ]]
+        // PHP interpreter will sort the array during initialization,
+        // so we set each member separately in order to randomize it
+        $unsorted = [];
+        $unsorted['posixAccount'] = [
+            'cn' => 'jdoe',
+            'userPassword' => 'hunter2',
+            'homeDirectory' => '/home/jdoe',
+            'uid' => 'jdoe'
+        ];
+        $unsorted['shadowAccount'] = [
+            'uid' => 'jdoe', // duplicate uid
+            'userPassword' => 'hunter2', // duplicate userPassword
+        ];
+        $unsorted['inetOrgPerson'] = [
+            'surname' => 'Doe',
+            'givenName' => 'John',
+            'employeeNumber' => 42,
+            'mail' => 'john@example.net'
+        ];
+
+        $sorted = [
+            'inetOrgPerson' => [
+                'employeeNumber' => 42,
+                'givenName' => 'John',
+                'mail' => 'john@example.net',
+                'surname' => 'Doe'
             ],
+            'posixAccount' => [
+                'cn' => 'jdoe',
+                'homeDirectory' => '/home/jdoe',
+                'uid' => 'jdoe',
+                'userPassword' => 'hunter2'
+            ],
+            'shadowAccount' => []
+        ];
+
+        return [
+            [$unsorted, $sorted]
         ];
     }
 }
