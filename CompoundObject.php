@@ -53,4 +53,35 @@ class CompoundObject extends OidArray
 
         return json_encode($result, JSON_PRETTY_PRINT);
     }
+
+    public function toArray()
+    {
+        $classes = [];
+        $attrs = [];
+        $seen_attrs = [];
+
+        foreach ($this as $class_name => $simple_object) {
+            // remember object class names for future sorting
+            $classes[] = $class_name;
+            // from current object class, remove attrs already present in other classes
+            $attrs[$class_name] = array_diff_key(
+                $simple_object->canonical_names,
+                $seen_attrs
+            );
+            // append new attrs to the list of seen ones
+            $seen_attrs = array_replace($seen_attrs, $attrs);
+            sort($attrs[$class_name]);
+        }
+
+        sort($classes);
+
+        $result = [];
+        foreach ($classes as $class_name) {
+            foreach ($attrs[$class_name] as $key => $value) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
 }
