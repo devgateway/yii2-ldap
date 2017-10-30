@@ -54,6 +54,12 @@ class CompoundObject extends OidArray
         return json_encode($result, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * Export the object to a sorted two-dimensional array. Keys are sorted object class names,
+     * and values are arrays of attributes, also sorted by name.
+     *
+     * @return array[] Attributes grouped by simple object.
+     */
     public function toArray()
     {
         $seen_attrs = [];
