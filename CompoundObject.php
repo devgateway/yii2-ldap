@@ -56,31 +56,23 @@ class CompoundObject extends OidArray
 
     public function toArray()
     {
-        $classes = [];
-        $attrs = [];
         $seen_attrs = [];
+        $result = [];
 
         foreach ($this as $class_name => $simple_object) {
-            // remember object class names for future sorting
-            $classes[] = $class_name;
             // from current object class, remove attrs already present in other classes
-            $attrs[$class_name] = array_diff_key(
+            $result[$class_name] = array_diff_key(
                 $simple_object->canonical_names,
                 $seen_attrs
             );
+            // sort attributes
+            ksort($result[$class_name]);
             // append new attrs to the list of seen ones
-            $seen_attrs = array_replace($seen_attrs, $attrs);
-            sort($attrs[$class_name]);
+            $seen_attrs = array_replace($seen_attrs, $result[$class_name]);
         }
 
-        sort($classes);
-
-        $result = [];
-        foreach ($classes as $class_name) {
-            foreach ($attrs[$class_name] as $key => $value) {
-                $result[$key] = $value;
-            }
-        }
+        // sort simple objects by class name
+        ksort($result);
 
         return $result;
     }
