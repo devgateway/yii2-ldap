@@ -32,10 +32,8 @@ class CompoundObjectTest extends TestCase
      */
     public function testSort($unsorted, $expected)
     {
-        var_dump($expected);
         $comp_object = new MockableCompoundObject($unsorted);
         $sorted = $comp_object->toArray();
-        var_dump($sorted);
         $this->assertTrue($sorted === $expected);
     }
 
